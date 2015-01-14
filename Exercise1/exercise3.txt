@@ -1,0 +1,17 @@
+Why threading: Splits multiple paralell problems. On a multicore enviroment this can speed up execution. Blocking calls will not stop the whole program. 
+Problems: Threading can create data races. It is more difficult to view the flow of execution. 
+
+
+Green thread: A thread which runs on a virtual machine, thus emulating threads. It does not rely on the operating system thread features,
+Thread: Often a component of a process. The smallest sequence of programmed instructions that can be managed independently by the scheduler.
+Process: Can consist of different threads. Shares memory between the threads.
+Coroutines: 
+
+
+pthread_create(): Starts a separate thread.
+
+go: A kind of green thread, but it is not handled by a virtual machine. Dynamic stack size. 
+
+GOMAXPROCS: Changes the maximum of processor cores the code can execute on.
+
+GIL, global interpreter lock(python): Prevents data races, and controls access on variables. 
