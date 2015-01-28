@@ -21,7 +21,7 @@ void main () {
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 
-	if ((status = getaddrinfo("129.241.187.144", "20007", &hints, &res)) != 0) {
+	if ((status = getaddrinfo("129.241.187.136", "20007", &hints, &res)) != 0) {
     		fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
 	}
 
