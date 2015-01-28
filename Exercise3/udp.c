@@ -83,11 +83,11 @@ int main(int argc, char *argv[])
   }
 
   char buf[1024] = {};
-  if (recvUdpBroadcast(1024, buf, receiveport))
+  if (recvUdpBroadcast(receiveport, buf, 1024))
     printf("Received: %s\n", buf);;
   
   sprintf(buf, "Hello world");
-  if (sendUdpBroadcast(1024, buf, sendport))
+  if (sendUdpBroadcast(sendport, buf, 1024))
     printf("Sent message\n");
 
   return 0;
