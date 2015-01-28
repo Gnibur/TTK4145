@@ -9,13 +9,14 @@
 
 /* Gets error status variable */
 #include <errno.h>
-
-
 #include <string.h>
 #include <stdio.h>
 
 #include <unistd.h>
 
+
+int sendport = 20007;
+int receiveport = 30000;
 
 int sendUdpBroadcast(int targetPort, char buf[], int buflen)
 {
@@ -74,16 +75,20 @@ int recvUdpBroadcast(int targetPort, char buf[], int buflen)
 }
 
  
-int main(void)
+int main(int argc, char *argv[])
 {
+  if (argc == 3){
+    sendport = atoi(argv[1]);
+    receiveport = atoi(argv[2]);
+  }
+
   char buf[1024] = {};
-  if (recvUdpBroadcast(1024, buf, 1024))
+  if (recvUdpBroadcast(1024, buf, receiveport))
     printf("Received: %s\n", buf);;
   
   sprintf(buf, "Hello world");
-  if (sendUdpBroadcast(1024, buf, 1024))
+  if (sendUdpBroadcast(1024, buf, sendport))
     printf("Sent message\n");
-  
 
   return 0;
 }
