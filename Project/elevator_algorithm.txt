@@ -1,0 +1,32 @@
+UPDATE_PLANS
+	#Variables
+	My_floor
+	My_direction (up, down)
+
+	if there exists floors in my direction
+		check list for orders for people wanting to go in my direction
+			if exists, choose closest
+			else, do nothing
+		check list for orders for my personal elevator
+			if exists, choose closest
+			else, do nothing
+		check list for orders for people wanting to go the opposite direction
+			if exists, choose closest
+			else, do nothing
+	
+	# REDUNTANT
+	else, and list is not empty
+		check list for orders for people wanting to go in my new direction
+			if exists, choose closest
+			else, do nothing
+		check list for orders for my personal elevator
+			if exists, choose closest
+			else, do nothing
+		check list for orders for people wanting to go the opposite direction
+			if exists, choose closest
+			else, die.
+	#END REDUNTANT
+
+Eventually, cost calculator
+	
+

@@ -1,0 +1,11 @@
+Update = floor_order_reached, new_order, timeout
+
+when recvupdate
+1:	Call cost-algorithm
+	Send out your lowest cost floor
+		if someone else sends the same
+			explain why you should have it
+			if you loose:
+				goto 1
+			else
+				drive in your desired direction
