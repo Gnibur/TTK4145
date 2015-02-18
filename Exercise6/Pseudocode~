@@ -1,0 +1,24 @@
+main {
+	
+	state = backup
+
+	start sendMessagesThread
+
+	while (true){	
+
+
+		if (state == primary)
+			print to terminal
+			tell I'm alive
+		else if (state == backup)
+			If (PrimaryisDead)
+				state = primary
+				spawn backup
+	}
+}
+
+primaryisDead {
+	check memory/udp/IPC...
+	if (timeout)
+		return true
+}
