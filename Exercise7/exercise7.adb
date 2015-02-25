@@ -18,6 +18,21 @@ procedure Exercise7 is
    protected body Transaction_Manager is
       entry Finished when Finished_Gate_Open or Finished'Count = N is
       begin
+
+      	Finished_Gate_Open := true;
+      	
+      	if Finished'Count = 0 Then
+      		Finished_Gate_Open := False;
+      		if Aborted = true Then
+      			Should_Commit := false;
+      		else
+      			Should_Commit := True;
+      		end if;
+      		Aborted := false;
+      	end if;
+      
+
+
 	 ------------------------------------------
 	 -- PART 3: Complete the exit protocol here
 	 ------------------------------------------
@@ -33,7 +48,7 @@ procedure Exercise7 is
 	 return Should_Commit;
       end Commit;
       
-   end Transaction_Manager;
+   end TrAnsAction_Manager;
    
    
    
@@ -42,12 +57,12 @@ procedure Exercise7 is
       Error_Rate : constant := 0.15;  -- (between 0 and 1)
    begin
       if Random(Gen) < Error_Rate then -- error occured
-	 delay 0.5*Random(Gen);
+	 delay Duration(Random(Gen)*0.5);
 	 raise Count_Failed;
       else
-	 delay 4*Random(Gen);
+	 delay 4.0;
 	 return X + 10;
-      end if
+      end if;
    end Unreliable_Slow_Add;
    
    
@@ -64,7 +79,14 @@ procedure Exercise7 is
       loop
 	 Put_Line ("Worker" & Integer'Image(Initial) & " started round" & Integer'Image(Round_Num));
 	 Round_Num := Round_Num + 1;
-	 
+	 begin
+	 	Num := Unreliable_Slow_Add(Num);
+	 exception
+   		when Count_Failed =>
+   			Manager.Signal_Abort;
+   			Put_Line("Count failed, worker " & Integer'Image(Initial));
+   	 end;
+	 Manager.Finished;
 	 ---------------------------------------
 	 -- PART 2: Do the transaction work here             
 	 ---------------------------------------
@@ -75,15 +97,18 @@ procedure Exercise7 is
 	    Put_Line ("  Worker" & Integer'Image(Initial) &
 			" reverting from" & Integer'Image(Num) &
 			" to" & Integer'Image(Prev));
+	    Num := Prev;
 	    -------------------------------------------
 	    -- PART 2: Roll back to previous value here
 	    -------------------------------------------
+	
 	 end if;
 	 
 	 Prev := Num;
 	 delay 0.5;
 	 
       end loop;
+   		
    end Transaction_Worker;
    
    Manager : aliased Transaction_Manager (3);
