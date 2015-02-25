@@ -41,9 +41,13 @@ procedure Exercise7 is
    function Unreliable_Slow_Add (X : Integer) return Integer is
       Error_Rate : constant := 0.15;  -- (between 0 and 1)
    begin
-      -------------------------------------------
-      -- PART 1: Create the transaction work here
-      -------------------------------------------
+      if Random(Gen) < Error_Rate then -- error occured
+	 delay 0.5*Random(Gen);
+	 raise Count_Failed;
+      else
+	 delay 4*Random(Gen);
+	 return X + 10;
+      end if
    end Unreliable_Slow_Add;
    
    
