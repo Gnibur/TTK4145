@@ -4,25 +4,25 @@ UPDATE_PLANS
 	My_direction (up, down)
 
 	if there exists floors in my direction
-		check list for orders for people wanting to go in my direction
+		check list for orders for people wanting to go in my direction		+ 0 * N_FLOORS
 			if exists, choose closest
 			else, do nothing
-		check list for orders for my personal elevator
+		check list for orders for my personal elevator				+ 0 * N_FLOORS
 			if exists, choose closest
 			else, do nothing
-		check list for orders for people wanting to go the opposite direction
+		check list for orders for people wanting to go the opposite direction 	+ 1 * N_FLOORS
 			if exists, choose closest
 			else, do nothing
 	
 	# REDUNTANT
 	else, and list is not empty
-		check list for orders for people wanting to go in my new direction
+		check list for orders for people wanting to go in my new direction 	+ 2 * N_FLOORS
 			if exists, choose closest
 			else, do nothing
-		check list for orders for my personal elevator
+		check list for orders for my personal elevator 				+ 2 * N_FLOORS
 			if exists, choose closest
 			else, do nothing
-		check list for orders for people wanting to go the opposite direction
+		check list for orders for people wanting to go the opposite direction 	+ 3 * N_FLOORS
 			if exists, choose closest
 			else, die.
 	#END REDUNTANT

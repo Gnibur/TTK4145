@@ -1,6 +1,7 @@
 Update = floor_order_reached, new_order, timeout
 
 when recvupdate
+Remove temporary cannot-go-to-list
 1:	Call cost-algorithm
 	Send out your lowest cost floor
 		if someone else sends the same
