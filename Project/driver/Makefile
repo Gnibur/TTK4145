@@ -1,14 +1,14 @@
 # Which compiler to use
-CC = gcc
+CC = g++
 
 # Compiler flags go here.
 CFLAGS = -g -Wall
 
 # Linker flags go here.
-LDFLAGS = -lcomedi -lm
+LDFLAGS =  -lm -lcomedi
 
 # list of sources
-ELEVSRC = elev.c io.c main.c
+SRC = *.cpp
 
 # program executable file name.
 TARGET = lift
@@ -17,15 +17,17 @@ TARGET = lift
 all: $(TARGET)
 
 # Define all object files.
-ELEVOBJ = $(ELEVSRC:.c=.o)
+OBJ = $(SRC:.cpp=.o)
 
 # rule to link the program
-$(TARGET): $(ELEVOBJ)
-	$(CC) $^ -o $@ $(LDFLAGS)
+$(TARGET): $(OBJ)
+	$(CC) $(OBJ) $(LDFLAGS) $^ -o $@
 
 # Compile: create object files from C source files.
-%.o : %.c
+%.o : %.cpp
 	$(CC) $(CFLAGS) -c $< -o $@ 
+
+
 
 # rule for cleaning re-compilable files.
 clean:
@@ -36,4 +38,4 @@ rebuild:	clean all
 .PHONY: all rebuild clean
 
 
-#Martin Korsgaard, 2006
+
