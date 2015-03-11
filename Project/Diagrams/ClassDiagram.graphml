@@ -16,7 +16,6 @@
     <data key="d0"/>
     <node id="n0">
       <data key="d4"/>
-      <data key="d5"/>
       <data key="d6">
         <y:UMLClassNode>
           <y:Geometry height="93.92000000000002" width="270.01000000000005" x="-173.01999999999975" y="449.58333333333337"/>
@@ -39,7 +38,6 @@
     </node>
     <node id="n1">
       <data key="d4"/>
-      <data key="d5"/>
       <data key="d6">
         <y:UMLClassNode>
           <y:Geometry height="62.290000000000006" width="277.29000000000013" x="-176.6599999999998" y="357.29333333333335"/>
@@ -61,7 +59,6 @@
     </node>
     <node id="n2">
       <data key="d4"/>
-      <data key="d5"/>
       <data key="d6">
         <y:UMLClassNode>
           <y:Geometry height="122.53999999999999" width="217.25" x="442.35" y="148.5324999999997"/>
@@ -88,7 +85,6 @@
     </node>
     <node id="n3">
       <data key="d4"/>
-      <data key="d5"/>
       <data key="d6">
         <y:UMLClassNode>
           <y:Geometry height="79.79000000000002" width="445.7499999999999" x="-161.75000000000003" y="148.5324999999997"/>
@@ -111,7 +107,6 @@
     </node>
     <node id="n4">
       <data key="d4"/>
-      <data key="d5"/>
       <data key="d6">
         <y:UMLClassNode>
           <y:Geometry height="253.47250000000014" width="234.4999999999999" x="706.0999999999997" y="8.657499999999857"/>
@@ -127,13 +122,19 @@
           <y:UML clipContent="true" constraint="" omitDetails="false" stereotype="" use3DEffect="true">
             <y:AttributeLabel/>
             <y:MethodLabel>State machine:
-+ setMotorDirection()
-+ setMotorSpeed()
-+ setFloorLight(floor)
-+ setOrderbuttonLight(order)
++ initialize()
++ setMotorDirection(direction)
+
++ setDoorOpenLight(floor)
++ clearDoorOpenLight(floor)
++ setFloorLight(light_type, floor)
++ clearFloorLight(floor)
+
++ setOrderButtonLight(order)
++ clearOrderButtonLight(order)
 
 EventManager:
-+ getOrderButton()
++ getOrderButton(buttontype, floor)
 + getFloorSensorSignal()</y:MethodLabel>
           </y:UML>
         </y:UMLClassNode>
@@ -141,13 +142,12 @@ EventManager:
     </node>
     <node id="n5">
       <data key="d4"/>
-      <data key="d5"/>
       <data key="d6">
         <y:UMLClassNode>
           <y:Geometry height="93.92000000000002" width="217.25" x="442.35" y="8.657499999999857"/>
           <y:Fill color="#FFCC00" transparent="false"/>
           <y:BorderStyle color="#000000" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="13" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="19.1328125" modelName="custom" textColor="#000000" visible="true" width="109.91064453125" x="53.669677734375" y="3.0">EventManager<y:LabelModel>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="13" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="19.1328125" modelName="custom" textColor="#000000" visible="true" width="62.4873046875" x="77.38134765625" y="3.0">IOPoller<y:LabelModel>
               <y:SmartNodeLabelModel distance="4.0"/>
             </y:LabelModel>
             <y:ModelParameter>
@@ -163,13 +163,12 @@ EventManager:
     </node>
     <node id="n6">
       <data key="d4"/>
-      <data key="d5"/>
       <data key="d6">
         <y:UMLNoteNode>
           <y:Geometry height="93.92000000000002" width="277.2900000000002" x="286.08000000000004" y="-172.5075"/>
           <y:Fill color="#CCFFFF" transparent="false"/>
           <y:BorderStyle color="#000000" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="45.90625" modelName="custom" textColor="#000000" visible="true" width="186.244140625" x="45.522929687500095" y="24.006875000000036">Checks the system for events.
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="45.90625" modelName="custom" textColor="#000000" visible="true" width="186.244140625" x="45.522929687500095" y="24.006875000000008">Checks the system for events.
 These are from IODriver. 
 And from network...<y:LabelModel>
               <y:SmartNodeLabelModel distance="4.0"/>
@@ -183,7 +182,6 @@ And from network...<y:LabelModel>
     </node>
     <node id="n7">
       <data key="d4"/>
-      <data key="d5"/>
       <data key="d6">
         <y:UMLNoteNode>
           <y:Geometry height="49.0" width="182.0" x="540.7999999999992" y="346.84749999999974"/>
@@ -201,7 +199,6 @@ And from network...<y:LabelModel>
     </node>
     <node id="n8">
       <data key="d4"/>
-      <data key="d5"/>
       <data key="d6">
         <y:UMLClassNode>
           <y:Geometry height="121.10583333333375" width="365.99999999999983" x="-161.75000000000003" y="-18.528333333333876"/>
@@ -226,7 +223,6 @@ And from network...<y:LabelModel>
       </data>
     </node>
     <edge id="e0" source="n2" target="n4">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="4.028854625550402" ty="-34.04590210557827"/>
@@ -237,7 +233,6 @@ And from network...<y:LabelModel>
       </data>
     </edge>
     <edge id="e1" source="n5" target="n4">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="-1.3558645374448162" ty="64.825699375062"/>
@@ -248,7 +243,6 @@ And from network...<y:LabelModel>
       </data>
     </edge>
     <edge id="e2" source="n6" target="n5">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -259,7 +253,6 @@ And from network...<y:LabelModel>
       </data>
     </edge>
     <edge id="e3" source="n7" target="n2">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -270,7 +263,6 @@ And from network...<y:LabelModel>
       </data>
     </edge>
     <edge id="e4" source="n2" target="n3">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -281,7 +273,6 @@ And from network...<y:LabelModel>
       </data>
     </edge>
     <edge id="e5" source="n2" target="n8">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -292,7 +283,6 @@ And from network...<y:LabelModel>
       </data>
     </edge>
     <edge id="e6" source="n5" target="n2">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
