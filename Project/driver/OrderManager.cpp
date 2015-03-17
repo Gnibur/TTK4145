@@ -9,22 +9,6 @@
 OrderManager::OrderManager()
 {
 	myID = 1;
-	Order order[10];
-	order[0] = {0, DIRECTION_UP, 0};
-	order[1] = {1, DIRECTION_DOWN, 0};
-	order[2] = {1, DIRECTION_UP, 0};
-	order[3] = {2, DIRECTION_UNDEFINED, 1};
-	order[4] = {2, DIRECTION_UNDEFINED, 2};
-	order[5] = {3, DIRECTION_DOWN, 0};
-	order[6] = {3, DIRECTION_UNDEFINED, 3};
-	order[7] = {0, DIRECTION_UNDEFINED, 1};
-	order[8] = {1, DIRECTION_UNDEFINED, 2};
-	order[9] = {2, DIRECTION_UP, 0};
-
-	for (int i = 0; i < 10; i++)
-	{
-		orderList.push_back(order[i]);
-	}
 }
 
 int OrderManager::getFloorWithLowestCost(int currentFloor, order_direction_t currentDirection)
@@ -64,6 +48,15 @@ int OrderManager::getFloorWithLowestCost(int currentFloor, order_direction_t cur
 		}
 	}
 	return bestFloor;
+}
+
+// TEST FUNCTIONS
+void OrderManager::printOrders () {
+	std::cout << "Floor \t Dir \t Elev \n";
+	for (auto it = orderList.begin(); it != orderList.end(); ++it)
+	{
+		std::cout << it->floor << "\t" << it->direction << "\t" << it->elevator << "\n";
+	}
 }
 
 

@@ -27,6 +27,14 @@ public:
     OrderManager();
     int getFloorWithLowestCost(int currentFloor, order_direction_t currentDirection);
     void mergeList();
+    orderList getList() {return orderList; }
+
+
+    // TEST FUNCTIONS START
+    void addOrder(Order order) {orderList.push_back(order); }
+    void clear() {orderList.clear(); }
+    void printOrders ();
+	// TEST FUNCTIONS END
 };
 
 #endif
