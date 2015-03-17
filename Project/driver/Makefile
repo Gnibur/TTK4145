@@ -8,30 +8,40 @@ CFLAGS = -g -Wall
 LDFLAGS =  -lm -lcomedi
 
 # list of sources
-SRC = *.cpp
+SOURCES = $(wildcard *.cpp)
+INCLUDES = $(wildcard *.h)
+
+TEMP_FOLDER = ./.temp
+
+OBJECTS := $(SOURCES:%.cpp=$(TEMP_FOLDER)/%.o)
 
 # program executable file name.
 TARGET = lift
 
+
+
 # top-level rule, to compile everything.
-all: $(TARGET)
+all: createTempDirectory $(TARGET)
 
-# Define all object files.
-OBJ = $(SRC:.cpp=.o)
+createTempDirectory :
+	@mkdir -p $(TEMP_FOLDER)
 
-# rule to link the program
-$(TARGET): $(OBJ)
-	$(CC) $(OBJ) $(LDFLAGS) $^ -o $@
 
-# Compile: create object files from C source files.
-%.o : %.cpp
-	$(CC) $(CFLAGS) -c $< -o $@ 
+
+
+$(OBJECTS): *.cpp
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+$(TARGET): $(OBJECTS)
+	$(CC) $(LDFLAGS) $^ -o $@
+
 
 
 
 # rule for cleaning re-compilable files.
+
 clean:
-	rm -f $(TARGET) $(ELEVOBJ)
+	rm -rf $(TEMP_FOLDER)/* $(TARGET)
 
 rebuild:	clean all
 
