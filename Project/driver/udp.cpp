@@ -81,14 +81,14 @@ bool Udp::receive(int port, char *data, size_t dataLength){
 }
 
 
-bool Udp::sendto(char *destinationIP, int port, char *data, size_t dataLength){
-  struct addrinfo hints, *servinfo;
+bool Udp::sendtoIP(char *destinationIP, int port, char *data, size_t dataLength){
+  /*  struct addrinfo hints, *servinfo;
 	
   memset(&hints, 0, sizeof hints);
   hints.ai_family = AF_UNSPEC;
   hints.ai_socktype = SOCK_DGRAM;
 
-  if (getaddrinfo(addr, targetPort, &hints, &servinfo) != 0)
+  if (getaddrinfo(destinationIP, targetPort, &hints, &servinfo) != 0)
     {
       perror("talker: gettaddr");
       return 0;
@@ -98,11 +98,11 @@ bool Udp::sendto(char *destinationIP, int port, char *data, size_t dataLength){
       perror("talker: socket");
       return 0;
     }
-  if (sendto(sockfd, buf, buflen, 0, servinfo->ai_addr, servinfo->ai_addrlen) == -1)
+  if (sendto(sockfd, data, dataLength, 0, servinfo->ai_addr, servinfo->ai_addrlen) == -1)
     {
       perror("talker: send");
       return 0;
     }
   freeaddrinfo(servinfo);
-
+  */
 }

@@ -37,8 +37,8 @@ createTempDirectory :
 
 
 
-$(OBJECTS): *.cpp 
-	$(CC) $(CFLAGS) -c -o $@ $<
+$(OBJECTS): $(TEMP_FOLDER)/%.o : %.cpp 
+	$(CC) $(CFLAGS) -c $^ -o $@ 
 
 $(TARGET): $(OBJECTS) $(TEMP_FOLDER)/simulation_elevator.a
 	$(CC) $(LD_FLAGS) $(TEMP_FOLDER)/simulation_elevator.a -l:libphobos2.a $^ -o $@
