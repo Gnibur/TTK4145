@@ -2,6 +2,7 @@
 #define ORDERMANAGER_H
 
 #include <vector>
+#include <algorithm>
 //#include "IoDriver.h"
 
 typedef enum {
@@ -14,6 +15,21 @@ struct Order {
     int floor;
     order_direction_t direction;
     int elevator;
+
+	// Overload Operators
+    bool operator==(const Order& rhs) const
+	{
+	    return (floor == rhs.floor && direction == rhs.direction && elevator == rhs.elevator);
+	}
+	bool operator < (const Order& rhs) const
+	{
+		if (floor < rhs.floor) 			return true;
+		if (floor > rhs.floor) 			return false;
+		if (elevator < rhs.floor) 		return true;
+		if (elevator > rhs.floor) 		return false;
+		if (direction < rhs.direction) 	return true;
+		return false;
+	}
 };
 
 typedef std::vector<Order> OrderList;
@@ -26,14 +42,16 @@ private:
 public:
     OrderManager();
     int getFloorWithLowestCost(int currentFloor, order_direction_t currentDirection);
-    void mergeList();
-    orderList getList() {return orderList; }
+    int mergeList(OrderList list);
+    int updateList(int status, OrderList list, Order order);
+    OrderList getList() {return orderList; }
 
 
     // TEST FUNCTIONS START
     void addOrder(Order order) {orderList.push_back(order); }
     void clear() {orderList.clear(); }
     void printOrders ();
+    void sortOrders() {std::sort(orderList.begin(), orderList.end()); }
 	// TEST FUNCTIONS END
 };
 

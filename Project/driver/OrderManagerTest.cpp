@@ -13,6 +13,7 @@ int main () {
 		cout << "2: Run algorithm\n";
 		cout << "3: Clear orders \n";
 		cout << "4: Print orders\n";
+		cout << "5: Sort orders\n";
 		cout << "-1: Exit\n";
 		cin >> cmd;
 		if (cmd == 1) {
@@ -41,6 +42,9 @@ int main () {
 		}
 		else if (cmd == 4) {
 			my_manager.printOrders();
+		}
+		else if (cmd == 5) {
+			my_manager.sortOrders();
 		}
 		else {
 			break;

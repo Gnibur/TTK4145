@@ -50,6 +50,17 @@ int OrderManager::getFloorWithLowestCost(int currentFloor, order_direction_t cur
 	return bestFloor;
 }
 
+int OrderManager::updateList(int status, OrderList list, Order order = {}) {
+
+}
+
+/*
+int OrderManager::mergeList() {
+	OrderList oldList = orderList;
+	orderList
+}*/
+
+
 // TEST FUNCTIONS
 void OrderManager::printOrders () {
 	std::cout << "Floor \t Dir \t Elev \n";
@@ -58,59 +69,3 @@ void OrderManager::printOrders () {
 		std::cout << it->floor << "\t" << it->direction << "\t" << it->elevator << "\n";
 	}
 }
-
-
-/*
-		int cost;
-		int distance = abs(it->floor - currentFloor);
-		// Case 1: The order has a specified direction, which is the direction we're going
-		if (order_direction_t::it->direction == currentDirection)
-		{
-			// Case 1.1: The floor is in our direction
-			if (relativeCurrentFloor < relativeFloor)
-			{
-				cost = distance;
-			}
-			// Case 1.2: The floor is NOT in our direction
-			else
-			{
-				cost = (3 * N_FLOORS) + distance;
-			}
-		}
-		// Case 2: The floor direction is undefined
-		else if (order_direction_t::it->direction == DIRECTION_UNDEFINED)
-		{
-			// Case 2.1: The floor is in our direction
-			if (relativeCurrentFloor < relativeFloor)
-			{
-				cost = distance;
-			}
-			// Case 2.1: The floor is NOT in our direction
-			else
-			{
-				cost = (2 * N_FLOORS) + distance;
-			}
-		}
-		// Case 3: The order has a specified direction, which is the OPPOSITE direction we're going
-		else
-		{
-			//Case 3.1: The floor is in our direction
-			if (relativeCurrentFloor < relativeFloor)
-			{
-				cost = distance + N_FLOORS + distance;
-			}
-			// Case 3.1: The floor is NOT in our direction
-			else
-			{
-				cost = distance + (2 * N_FLOORS) + distance;
-			}
-		}
-		// Check if this cost is the lowest
-		if (cost < lowestCost)
-		{
-			lowestCost = cost;
-			bestFloor = it->floor;
-		}
-	}
-	return bestFloor;
-}*/
