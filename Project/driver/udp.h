@@ -2,19 +2,21 @@
 
 #include <cstddef>
 
-class UdpBroadcast {
+class Udp {
   
  public:
-  UdpBroadcast();
-  ~UdpBroadcast();
+  Udp();
+  ~Udp();
 
   bool send(int targetPort, char *data, size_t dataLength);
 
   bool receive(int port, char *data, size_t dataLength);
-  
+ 
+  bool sendto(char *ip, int port, char *data, size_t dataLength); 
+ 
+  bool receiveFrom(char *ip, int port, char *buffer, size_t bufferLength);
  private:
 
   int socketfd;
-
 
 };
