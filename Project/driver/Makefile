@@ -2,7 +2,7 @@
 CC = g++
 
 # Compiler flags go here.
-CFLAGS = -g -Wall
+CFLAGS = -g -Wall -std=c++11
 
 # Linker flags go here.
 LDFLAGS =  -lm -lcomedi
