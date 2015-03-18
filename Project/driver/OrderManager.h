@@ -42,7 +42,7 @@ private:
 public:
     OrderManager();
     int getFloorWithLowestCost(int currentFloor, order_direction_t currentDirection);
-    int mergeList(OrderList list);
+    //int mergeList(OrderList list);
     int updateList(int status, OrderList list, Order order);
     OrderList getList() {return orderList; }
 

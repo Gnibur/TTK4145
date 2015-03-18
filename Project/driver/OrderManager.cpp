@@ -51,7 +51,19 @@ int OrderManager::getFloorWithLowestCost(int currentFloor, order_direction_t cur
 }
 
 int OrderManager::updateList(int status, OrderList list, Order order = {}) {
-
+	if (status == 0) // New
+	{
+		orderList.push_back(order);
+	}
+	if (status == 1) // Delete
+	{
+		std::sort(orderList.begin(), orderList.end());
+		auto it = std::find(orderList.begin(), orderList.end(), order);
+		if (it != orderList.end())
+		{
+			orderList.erase(it);
+		}
+	}
 }
 
 /*
