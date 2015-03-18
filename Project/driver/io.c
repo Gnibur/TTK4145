@@ -7,12 +7,12 @@
 static comedi_t     *it_g           = NULL;
 static ElevatorType elevatorType    = ET_comedi;
 
-void simulation_elevator_start();
+/*void simulation_elevator_start();
 void simulation_dio_write(int channel, int value);
 int simulation_dio_read(int channel);
 void simulation_data_write(int channel, int value);
 int simulation_data_read(int channel);
-
+*/
 
 int io_init(ElevatorType type){
 
@@ -38,7 +38,7 @@ int io_init(ElevatorType type){
     }
     
     case ET_simulation:
-        simulation_elevator_start();
+        //simulation_elevator_start();
         return 1;
         
     default:
@@ -55,7 +55,7 @@ void io_set_bit(int channel){
         break;
         
     case ET_simulation:
-        simulation_dio_write(channel, 1);
+        //simulation_dio_write(channel, 1);
         break;
         
     default:
@@ -72,7 +72,7 @@ void io_clear_bit(int channel){
         break;
         
     case ET_simulation:
-        simulation_dio_write(channel, 0);
+        //simulation_dio_write(channel, 0);
         break;
         
     default:
@@ -89,7 +89,7 @@ void io_write_analog(int channel, int value){
         break;
         
     case ET_simulation:
-        simulation_data_write(channel, value);
+        //simulation_data_write(channel, value);
         break;
         
     default:
@@ -108,7 +108,8 @@ int io_read_bit(int channel){
         return (int)data;
     }
     case ET_simulation:
-        return simulation_dio_read(channel);
+	return 1;
+        //return simulation_dio_read(channel);
         
     default:
         return 0;
@@ -129,7 +130,8 @@ int io_read_analog(int channel){
     }
         
     case ET_simulation:
-        return simulation_data_read(channel);
+	return 1;        
+	//return simulation_data_read(channel);
         
     default:
         return 0;
