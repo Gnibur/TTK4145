@@ -1,52 +1,31 @@
 #include "OrderManager.h"
 #include <stdlib.h>
+#include <algorithm>
 
 OrderManager::OrderManager()
 {
 }
 
-/*
-	switch(currentDirection) {
-	
-	case UP:
-	find up order above current floor
-	
-	
-	
-	
-	case DOWN:
-	
-	
-	
-	
-	
-	
-	case STOP:	
-	
-		
-	
-	
-	}
-
-
-
-
-
-
-
-*/
-
-
-
-
-int OrderManager::getFloorWithLowestCost(int currentFloor, motor_direction_t currentDirection)
+int OrderManager::getFloorWithLowestCost(int currentFloor, motor_direction_t currentDirection, OrderList stashedList)
 {
-	int directionMultiplier = (currentDirection == DIRECTION_UP)? 1 : -1; // Multiply with the floors when checking if it's in our wanted direction, so we can treat both directions the same
+	OrderList searchList;
+	std::sort(orderList.begin(), orderList.end()); 		// TODO: Remove if redundant
+	std::sort(stashedList.begin(), stashedList.end()); 	// TODO: Remove if redundant
+	
+	// Set ut searchlist so it does not containt the elements of stashedlist.
+	std::set_difference(
+			orderList.begin(), orderList.end(),
+			stashedList.begin(), stashedList.end(),
+			std::back_inserter( searchList )
+	);
+	
+	// Multiply with the floors when checking if it's in our wanted direction, so we can treat both directions the same
+	int directionMultiplier = (currentDirection == DIRECTION_UP)? 1 : -1;
 	int multipliedCurrentFloor = currentFloor * multiplier;
 	int lowestCost = N_FLOOR * 4;
 	int bestFloor = -1;
 	
-	for (auto it = orderList.begin(); it != orderList.end(); ++it)
+	for (auto it = searchList.begin(); it != orderList.end(); ++it)
 	{
 		int multipliedFloor = it->floor * directionMultiplier;
 		int cost = abs(it->floor - currentFloor);
@@ -75,6 +54,9 @@ int OrderManager::getFloorWithLowestCost(int currentFloor, motor_direction_t cur
 	return bestFloor;
 }
 
+int OrderManager::updateList() {
+	
+}
 
 /*
 		int cost;

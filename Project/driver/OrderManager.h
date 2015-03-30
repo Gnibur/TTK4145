@@ -14,6 +14,11 @@ struct Order {
     int floor;
     order_direction_t direction;
     int elevator;
+    
+    bool operator == (const Order& rhs) const
+    {
+        return ((floor == rhs.floor) && (direction == rhs.direction) && (elevator == rhs.elevator));
+    }
 }
 
 typedef vector<Order> OrderList;
@@ -24,7 +29,7 @@ private:
 	//OrderList stashedList;
 public:
     OrderManager();
-    getFoorWithLowestCost(int currentFloor, order_direction_t currentDirection);
+    getFoorWithLowestCost(int currentFloor, order_direction_t currentDirection, OrderList stashedList = {});
     mergeList();
 };
 
