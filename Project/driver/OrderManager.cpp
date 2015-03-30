@@ -1,23 +1,20 @@
 #include "OrderManager.h"
 #include <stdlib.h>
-<<<<<<< HEAD
 #include <algorithm>
-=======
 #include <ctime>
 #include <iostream>
 
 // REMOVE THIS!!!!!!!
 #define N_FLOORS 4
->>>>>>> 8976588fdf22b93052b5f4a131bf6edeff400342
 
 OrderManager::OrderManager()
 {
 	myID = 1;
 }
 
-<<<<<<< HEAD
-int OrderManager::getFloorWithLowestCost(int currentFloor, motor_direction_t currentDirection, OrderList stashedList)
+int OrderManager::getFloorWithLowestCost(int currentFloor, order_direction_t currentDirection, OrderList stashedList)
 {
+
 	OrderList searchList;
 	std::sort(orderList.begin(), orderList.end()); 		// TODO: Remove if redundant
 	std::sort(stashedList.begin(), stashedList.end()); 	// TODO: Remove if redundant
@@ -29,23 +26,12 @@ int OrderManager::getFloorWithLowestCost(int currentFloor, motor_direction_t cur
 			std::back_inserter( searchList )
 	);
 	
-	// Multiply with the floors when checking if it's in our wanted direction, so we can treat both directions the same
-	int directionMultiplier = (currentDirection == DIRECTION_UP)? 1 : -1;
-	int multipliedCurrentFloor = currentFloor * multiplier;
-	int lowestCost = N_FLOOR * 4;
-	int bestFloor = -1;
-	
-	for (auto it = searchList.begin(); it != orderList.end(); ++it)
-=======
-int OrderManager::getFloorWithLowestCost(int currentFloor, order_direction_t currentDirection)
-{
 	int directionMultiplier = (currentDirection == DIRECTION_UP)? 1 : -1; // Multiply with the floors when checking if it's in our wanted direction, so we can treat both directions the same
 	int multipliedCurrentFloor = currentFloor * directionMultiplier;
 	int lowestCost = (N_FLOORS * 4);
 	int bestFloor = -1;
 
 	for (auto it = orderList.begin(); it != orderList.end(); ++it)
->>>>>>> 8976588fdf22b93052b5f4a131bf6edeff400342
 	{
 		if ((it->elevator != 0) && (it->elevator != myID))
 			continue;
@@ -77,7 +63,6 @@ int OrderManager::getFloorWithLowestCost(int currentFloor, order_direction_t cur
 	return bestFloor;
 }
 
-<<<<<<< HEAD
 int OrderManager::updateList() {
 	
 }
@@ -115,7 +100,6 @@ int OrderManager::updateList() {
 		}
 		// Case 3: The order has a specified direction, which is the OPPOSITE direction we're going
 		else
-=======
 int OrderManager::updateList(int status, OrderList list, Order order = {}) {
 	if (status == 0) // New
 	{
@@ -126,7 +110,6 @@ int OrderManager::updateList(int status, OrderList list, Order order = {}) {
 		std::sort(orderList.begin(), orderList.end());
 		auto it = std::find(orderList.begin(), orderList.end(), order);
 		if (it != orderList.end())
->>>>>>> 8976588fdf22b93052b5f4a131bf6edeff400342
 		{
 			orderList.erase(it);
 		}

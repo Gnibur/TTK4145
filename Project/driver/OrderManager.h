@@ -15,16 +15,6 @@ struct Order {
     int floor;
     order_direction_t direction;
     int elevator;
-<<<<<<< HEAD
-    
-    bool operator == (const Order& rhs) const
-    {
-        return ((floor == rhs.floor) && (direction == rhs.direction) && (elevator == rhs.elevator));
-    }
-}
-=======
->>>>>>> 8976588fdf22b93052b5f4a131bf6edeff400342
-
 	// Overload Operators
     bool operator==(const Order& rhs) const
 	{
@@ -50,11 +40,7 @@ private:
 	//OrderList stashedList;
 public:
     OrderManager();
-<<<<<<< HEAD
-    getFoorWithLowestCost(int currentFloor, order_direction_t currentDirection, OrderList stashedList = {});
-    mergeList();
-=======
-    int getFloorWithLowestCost(int currentFloor, order_direction_t currentDirection);
+    int getFloorWithLowestCost(int currentFloor, order_direction_t currentDirection, OrderList stashedList = {});
     //int mergeList(OrderList list);
     int updateList(int status, OrderList list, Order order);
     OrderList getList() {return orderList; }
@@ -66,7 +52,6 @@ public:
     void printOrders ();
     void sortOrders() {std::sort(orderList.begin(), orderList.end()); }
 	// TEST FUNCTIONS END
->>>>>>> 8976588fdf22b93052b5f4a131bf6edeff400342
 };
 
 #endif
