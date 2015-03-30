@@ -1,37 +1,58 @@
 #include "orderlist.h"
 
-// --- ORDER_EQUALS --- //
-int order_equals(order rhs, order lhs)
-{
-	if ((rhs.floor == lhs.floor) && (rhs.direction == lhs.direction) && (rhs.elevator == lhs.elevator)) return 1;
-	else return 0;
+int order_equals(order rhs, order lhs) {
+    return ((rhs.floor = lhs.floor) && (rhs.direction == lhs.direction) && (rhs.elevator == lhs.elevator))? 1 : 0;
 }
 
-// --- ORDERLIST_INSERT --- //
-int orderlist_insert(order *order, orderlist &list)
-{
-	if ((list.first != NULL) && (list.last != NULL))
-	{
-		list.last->next = order;
-	}
-	else
-	{
-		order->next = NULL;
-		list.first = order;
-	}
-	list.last = order;
+orderlist orderlist_insert(order my_order, orderlist my_list) {
+    my_list.list[my_list.elements] = my_order;
+    my_list.elements += 1;
+    return my_list;
 }
 
-// --- ORDERLIST_REMOVE --- //
-int orderlist_remove(order order, orderlist &list)
+orderlist orderlist_remove(order my_order, orderlist my_list) {
+    int i;
+    for (i = 0; i < my_list.elements; i++)
+    {
+        if (order_equals(my_order, my_list.list[i]))
+        {
+            my_list.list[i] = my_list.list[((my_list.elements)-1)];
+            my_list.elements -= 1;
+            break;
+        }
+    }
+    return my_list;
+} 
+
+
+orderlist substract(orderlist lhs, orderlist rhs) {
+    int i;
+    int max = rhs.elements;
+    for (i = 0; i < max; i++) {
+        lhs = orderlist_remove(rhs.list[i], lhs);
+    }
+    return lhs;
+}
+
+void main ()
 {
-	order* current = list.start;
-	order* prev = NULL;
-	while (current != NULL)
-	{
-		if (order_equals((*current), order))
-		{
-			
-		}
-	}
+    orderlist my_list;
+    my_list.elements = 0;
+    order order1;
+    order order2;
+    
+    order1.floor = 1;
+    order1.direction = DIRECTION_UP;
+    order1.elevator = 1;
+    
+    order2.floor = 2;
+    order2.direction = DIRECTION_UP;
+    order2.elevator = 3;
+    
+    my_list = orderlist_insert(order1, my_list);
+    my_list = orderlist_insert(order2, my_list);
+    //my_list = orderlist_remove(order1, my_list);
+    
+    printf("%d\n", my_list.elements);
+    
 }
