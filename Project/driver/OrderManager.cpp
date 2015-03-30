@@ -63,65 +63,9 @@ int OrderManager::getFloorWithLowestCost(int currentFloor, order_direction_t cur
 	return bestFloor;
 }
 
-int OrderManager::updateList() {
-	
+int OrderManager::updateList(int status, OrderList list, Order order) {
+	return 0;
 }
-
-/*
-		int cost;
-		int distance = abs(it->floor - currentFloor);
-		// Case 1: The order has a specified direction, which is the direction we're going
-		if (order_direction_t::it->direction == currentDirection)
-		{
-			// Case 1.1: The floor is in our direction
-			if (relativeCurrentFloor < relativeFloor)
-			{
-				cost = distance;
-			}
-			// Case 1.2: The floor is NOT in our direction
-			else
-			{
-				cost = (3 * N_FLOORS) + distance;
-			}
-		}
-		// Case 2: The floor direction is undefined
-		else if (order_direction_t::it->direction == DIRECTION_UNDEFINED)
-		{
-			// Case 2.1: The floor is in our direction
-			if (relativeCurrentFloor < relativeFloor)
-			{
-				cost = distance;
-			}
-			// Case 2.1: The floor is NOT in our direction
-			else 
-			{
-				cost = (2 * N_FLOORS) + distance;
-			}
-		}
-		// Case 3: The order has a specified direction, which is the OPPOSITE direction we're going
-		else
-int OrderManager::updateList(int status, OrderList list, Order order = {}) {
-	if (status == 0) // New
-	{
-		orderList.push_back(order);
-	}
-	if (status == 1) // Delete
-	{
-		std::sort(orderList.begin(), orderList.end());
-		auto it = std::find(orderList.begin(), orderList.end(), order);
-		if (it != orderList.end())
-		{
-			orderList.erase(it);
-		}
-	}
-}
-
-/*
-int OrderManager::mergeList() {
-	OrderList oldList = orderList;
-	orderList
-}*/
-
 
 // TEST FUNCTIONS
 void OrderManager::printOrders () {
