@@ -1,8 +1,4 @@
-#include "UdpBroadcast.h"
-
-
-
-
+#include "udp.h"
 
 
 /* socket header files */
@@ -24,7 +20,7 @@
 /* TODO:
    - check last parameter in socket(...)
  */
-UdpBroadcast::UdpBroadcast() 
+Udp::Udp() 
 {
     socketfd = socket(AF_INET, SOCK_DGRAM, 0);
 
@@ -35,12 +31,12 @@ UdpBroadcast::UdpBroadcast()
    - Check if socket is initialized before calling close
 
  */
-UdpBroadcast::~UdpBroadcast()
+Udp::~Udp()
 {
   close(socketfd);
 }
 
-bool UdpBroadcast::send(int targetPort, char *data, size_t dataLength){
+bool Udp::send(int targetPort, char *data, size_t dataLength){
   
   struct sockaddr_in target;
   ssize_t bytes_sent;
@@ -58,7 +54,7 @@ bool UdpBroadcast::send(int targetPort, char *data, size_t dataLength){
     return false;
 }
 
-bool UdpBroadcast::receive(int port, char *data, size_t dataLength){
+bool Udp::receive(int port, char *data, size_t dataLength){
   struct sockaddr_in target;
   ssize_t bytes_received;
 
@@ -82,4 +78,31 @@ bool UdpBroadcast::receive(int port, char *data, size_t dataLength){
     return true;
   else 
     return false;
+}
+
+
+bool Udp::sendtoIP(char *destinationIP, int port, char *data, size_t dataLength){
+  /*  struct addrinfo hints, *servinfo;
+	
+  memset(&hints, 0, sizeof hints);
+  hints.ai_family = AF_UNSPEC;
+  hints.ai_socktype = SOCK_DGRAM;
+
+  if (getaddrinfo(destinationIP, targetPort, &hints, &servinfo) != 0)
+    {
+      perror("talker: gettaddr");
+      return 0;
+    }
+  if ((sockfd = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol)) == -1)
+    {
+      perror("talker: socket");
+      return 0;
+    }
+  if (sendto(sockfd, data, dataLength, 0, servinfo->ai_addr, servinfo->ai_addrlen) == -1)
+    {
+      perror("talker: send");
+      return 0;
+    }
+  freeaddrinfo(servinfo);
+  */
 }

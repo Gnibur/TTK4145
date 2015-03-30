@@ -2,9 +2,10 @@
 #define ORDERMANAGER_H
 
 #include <vector>
-#include "IoDriver.h"
+#include <algorithm>
+//#include "IoDriver.h"
 
-typedef enum { 
+typedef enum {
     DIRECTION_DOWN,
     DIRECTION_UNDEFINED,
     DIRECTION_UP
@@ -14,23 +15,58 @@ struct Order {
     int floor;
     order_direction_t direction;
     int elevator;
+<<<<<<< HEAD
     
     bool operator == (const Order& rhs) const
     {
         return ((floor == rhs.floor) && (direction == rhs.direction) && (elevator == rhs.elevator));
     }
 }
+=======
+>>>>>>> 8976588fdf22b93052b5f4a131bf6edeff400342
 
-typedef vector<Order> OrderList;
+	// Overload Operators
+    bool operator==(const Order& rhs) const
+	{
+	    return (floor == rhs.floor && direction == rhs.direction && elevator == rhs.elevator);
+	}
+	bool operator < (const Order& rhs) const
+	{
+		if (floor < rhs.floor) 			return true;
+		if (floor > rhs.floor) 			return false;
+		if (elevator < rhs.floor) 		return true;
+		if (elevator > rhs.floor) 		return false;
+		if (direction < rhs.direction) 	return true;
+		return false;
+	}
+};
+
+typedef std::vector<Order> OrderList;
 
 class OrderManager {
 private:
 	OrderList orderList;
+	int myID;
 	//OrderList stashedList;
 public:
     OrderManager();
+<<<<<<< HEAD
     getFoorWithLowestCost(int currentFloor, order_direction_t currentDirection, OrderList stashedList = {});
     mergeList();
+=======
+    int getFloorWithLowestCost(int currentFloor, order_direction_t currentDirection);
+    //int mergeList(OrderList list);
+    int updateList(int status, OrderList list, Order order);
+    OrderList getList() {return orderList; }
+
+
+    // TEST FUNCTIONS START
+    void addOrder(Order order) {orderList.push_back(order); }
+    void clear() {orderList.clear(); }
+    void printOrders ();
+    void sortOrders() {std::sort(orderList.begin(), orderList.end()); }
+	// TEST FUNCTIONS END
+>>>>>>> 8976588fdf22b93052b5f4a131bf6edeff400342
 };
 
 #endif

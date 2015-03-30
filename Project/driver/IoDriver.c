@@ -27,17 +27,17 @@ bool IoDriver_initialize(void) {
     int i;
 
     // Init hardware
-    if (!io_init())
+    if (!io_init(ET_comedi))
         return false;
 
     for (i = 0; i < N_FLOORS; ++i) {
         if (i != 0)
-	  clearButtonLamp(BUTTON_CALL_DOWN, i);
+	  clearOrderButtonLamp(BUTTON_CALL_DOWN, i);
 
         if (i != N_FLOORS - 1)
-	  clearButtonLamp(BUTTON_CALL_UP, i);
+	  clearOrderButtonLamp(BUTTON_CALL_UP, i);
 
-        clearButtonLamp(BUTTON_COMMAND, i);
+        clearOrderButtonLamp(BUTTON_COMMAND, i);
     }
 
     // Clear stop lamp, door open lamp, and set floor indicator to ground floor.
@@ -52,14 +52,14 @@ bool IoDriver_initialize(void) {
 void setMotorDirection(motor_direction_t direction) {
   switch (direction) {
   case DIRECTION_DOWN:
-    io_clear_bit(MOTORDIR);
+    io_set_bit(MOTORDIR);
     io_write_analog(MOTOR, 2800);
     break;
   case DIRECTION_STOP:
     io_write_analog(MOTOR, 0);
     break;
   case DIRECTION_UP:
-    io_set_bit(MOTORDIR);
+    io_clear_bit(MOTORDIR);
     io_write_analog(MOTOR, 2800);
     break;
   }
