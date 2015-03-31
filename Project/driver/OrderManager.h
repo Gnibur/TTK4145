@@ -5,7 +5,7 @@
 #include <algorithm>
 //#include "IoDriver.h"
 
-typedef enum {
+typedef enum {				// TODO: This enum seems quite redundant...
     DIRECTION_DOWN,
     DIRECTION_UNDEFINED,
     DIRECTION_UP
