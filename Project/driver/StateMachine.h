@@ -2,7 +2,7 @@
 #define STATEMACHINE_H
 
 #include "OrderManager.h"
-#include "IoDriver.h"
+//#include "IoDriver.h"
 
 typedef enum {
 	INIT = 0,
@@ -27,11 +27,13 @@ typedef struct {
 /*------------------ STATE MACHINE ---------------------*/
 /*------------------------------------------------------*/
 class StateMachine {
+	OrderManager myManager;
+	elevator_t myElevator;
 public:
-	StateMachine();			// Init function
-	newOrder(int floor);	// Send update to others and find new order
-	floorReached();			// Send update to others and find new order
-	orderButtonPressed();	// Send msg about changing the light
+	StateMachine();				// Init function
+	void newOrder(int floor);	// Send update to others and find new order
+	void floorReached();		// Send update to others and find new order
+	void orderButtonPressed();	// Send msg about changing the light
 };
 
 #endif
