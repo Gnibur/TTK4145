@@ -12,7 +12,7 @@ OrderManager::OrderManager()
 	myID = 1;
 }
 
-int OrderManager::getFloorWithLowestCost(int currentFloor, order_direction_t currentDirection, OrderList stashedList)
+Order OrderManager::getOrderWithLowestCost(int currentFloor, order_direction_t currentDirection, OrderList stashedList)
 {
 
 	OrderList searchList;
@@ -28,7 +28,7 @@ int OrderManager::getFloorWithLowestCost(int currentFloor, order_direction_t cur
 	int directionMultiplier = (currentDirection == DIRECTION_UP)? 1 : -1; // Multiply with the floors when checking if it's in our wanted direction, so we can treat both directions the same
 	int multipliedCurrentFloor = currentFloor * directionMultiplier;
 	int lowestCost = (N_FLOORS * 4);
-	int bestFloor = -1;
+	Order bestOrder;
 
 	for (auto it = orderList.begin(); it != orderList.end(); ++it)
 	{
@@ -56,10 +56,10 @@ int OrderManager::getFloorWithLowestCost(int currentFloor, order_direction_t cur
 		if (cost < lowestCost)
 		{
 			lowestCost = cost;
-			bestFloor = it->floor;
+			bestOrder = (*it);
 		}
 	}
-	return bestFloor;
+	return bestOrder;
 }
 
 int OrderManager::updateList(order_status status, OrderList list, Order order) {
@@ -96,8 +96,4 @@ void OrderManager::printOrders () {
 	{
 		std::cout << it->floor << "\t" << it->direction << "\t" << it->elevator << "\n";
 	}
-}
-
-int main () {
-	return 0;
 }

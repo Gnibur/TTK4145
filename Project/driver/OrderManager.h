@@ -46,7 +46,7 @@ private:
 	//OrderList stashedList;
 public:
     OrderManager();
-    int getFloorWithLowestCost(int currentFloor, order_direction_t currentDirection, OrderList stashedList = {});
+    Order getOrderWithLowestCost(int currentFloor, order_direction_t currentDirection, OrderList stashedList = {});
     int updateList(order_status status, OrderList list, Order order);
     OrderList getList() {return orderList; }
 

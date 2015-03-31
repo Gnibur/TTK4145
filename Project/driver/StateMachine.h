@@ -17,8 +17,8 @@ typedef enum {
 typedef struct {
 	int elevID;				// From 1 to n, unique for this elevator
 	int currentFloor;
-	int goalFloor; 			// The elevators desired goal
-	motor_direction_t dir;	// The elevators current or last used dir
+	Order goalOrder; 		// The elevators desired goal
+	order_direction_t dir;	// The elevators current or last used dir
 	elevator_state_t elevState;
 } elevator_t;
 
@@ -30,10 +30,11 @@ class StateMachine {
 	OrderManager myManager;
 	elevator_t myElevator;
 public:
-	StateMachine();				// Init function
-	void newOrder(int floor);	// Send update to others and find new order
-	void floorReached();		// Send update to others and find new order
-	void orderButtonPressed();	// Send msg about changing the light
+	StateMachine();											// Init function
+	void newOrder(int floor, order_direction_t direction);	// Send update to others and find new order
+	void floorReached();									// Send update to others and find new order
+	void orderButtonPressed();								// Send msg about changing the light
+	void run();												// Runs the entire process
 };
 
 #endif
