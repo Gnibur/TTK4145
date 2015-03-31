@@ -43,7 +43,7 @@ bool StateMachine::timeOut()
 void StateMachine::handleTimeout()
 {
     Order order = myManager.getOrderWithLowestCost(myElevator.currentFloor, myElevator.dir);
-    if (order) // TODO: Make sure you have sufficient operators for this.
+    if (order.floor != -1) // TODO: Make sure you have sufficient operators for this.
     {
         myElevator.goalOrder = order;
         myElevator.driveHere(order.floor);

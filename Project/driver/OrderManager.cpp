@@ -28,7 +28,7 @@ Order OrderManager::getOrderWithLowestCost(int currentFloor, order_direction_t c
 	int directionMultiplier = (currentDirection == DIRECTION_UP)? 1 : -1; // Multiply with the floors when checking if it's in our wanted direction, so we can treat both directions the same
 	int multipliedCurrentFloor = currentFloor * directionMultiplier;
 	int lowestCost = (N_FLOORS * 4);
-	Order bestOrder;
+	Order bestOrder = {-1, DIRECTION_UNDEFINED, 0};
 
 	for (auto it = orderList.begin(); it != orderList.end(); ++it)
 	{
