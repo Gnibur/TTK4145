@@ -16,7 +16,6 @@ int OrderManager::getFloorWithLowestCost(int currentFloor, order_direction_t cur
 {
 
 	OrderList searchList;
-	std::sort(orderList.begin(), orderList.end()); 		// TODO: Remove if redundant
 	std::sort(stashedList.begin(), stashedList.end()); 	// TODO: Remove if redundant
 	
 	// Set ut searchlist so it does not containt the elements of stashedlist.
@@ -63,7 +62,30 @@ int OrderManager::getFloorWithLowestCost(int currentFloor, order_direction_t cur
 	return bestFloor;
 }
 
-int OrderManager::updateList(int status, OrderList list, Order order) {
+int OrderManager::updateList(order_status status, OrderList list, Order order) {
+	// TODO: Find out how to handle the searching when the status is UPDATE
+	std::vector<Order>::iterator search = std::find(orderList.begin(), orderList.end(), order);
+	if (status == NEW)
+	{
+		if (search == orderList.end()) orderList.push_back(order);
+	}
+	if (status == DELETE)
+	{
+		if (search != orderList.end()) orderList.erase(search);
+	}
+	if (status == UPDATE)
+	{
+		for (auto it = list.begin(); it != list.end(); ++it)
+		{
+			if (std::find(orderList.begin(), orderList.end(), (*it)) == orderList.end()) orderList.push_back((*it));
+		}
+	}
+	std::sort(orderList.begin(), orderList.end());
+	
+	if ((status == DELETE) || (status == NEW))
+	{
+		// TODO: Check if the lists are the same, then shout out for an update
+	}
 	return 0;
 }
 
@@ -74,4 +96,8 @@ void OrderManager::printOrders () {
 	{
 		std::cout << it->floor << "\t" << it->direction << "\t" << it->elevator << "\n";
 	}
+}
+
+int main () {
+	return 0;
 }

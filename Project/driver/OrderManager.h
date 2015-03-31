@@ -31,6 +31,12 @@ struct Order {
 	}
 };
 
+typedef enum {
+	NEW,
+	DELETE,
+	UPDATE
+} order_status;
+
 typedef std::vector<Order> OrderList;
 
 class OrderManager {
@@ -41,8 +47,7 @@ private:
 public:
     OrderManager();
     int getFloorWithLowestCost(int currentFloor, order_direction_t currentDirection, OrderList stashedList = {});
-    //int mergeList(OrderList list);
-    int updateList(int status, OrderList list, Order order);
+    int updateList(order_status status, OrderList list, Order order);
     OrderList getList() {return orderList; }
 
 
