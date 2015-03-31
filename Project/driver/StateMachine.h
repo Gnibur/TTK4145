@@ -2,7 +2,7 @@
 #define STATEMACHINE_H
 
 #include "OrderManager.h"
-//#include "IoDriver.h"
+#include "IoDriver.h"
 
 typedef enum {
 	INIT = 0,
@@ -10,14 +10,6 @@ typedef enum {
 	AT_FLOOR = 2,
 	DRIVING = 3
 } elevator_state_t;
-
-typedef enum { 
-    DIRECTION_DOWN,
-    DIRECTION_STOP,
-    DIRECTION_UP
-} motor_direction_t;
-
-void setMotorDirection(motor_direction_t direction) { };
 
 /*------------------------------------------------------*/
 /*---------------- ELEVATOR STRUCT ---------------------*/
@@ -27,7 +19,7 @@ typedef struct {
 	int elevID;				// From 1 to n, unique for this elevator
 	int currentFloor;
 	Order goalOrder; 		// The elevators desired goal
-	motor_direction_t dir;	// The elevators current or last used dir TODO: Should be motor_direction_t
+	motor_direction_t dir;	// The elevators current or last used dir
 	elevator_state_t elevState;
 	
 	void driveHere(int floor)
@@ -46,13 +38,15 @@ typedef struct {
 class StateMachine {
 	OrderManager myManager;
 	elevator_t myElevator;
+	elevator_state_t myState;
 public:
 	StateMachine();											// Init function
 	void newOrder(int floor, order_direction_t direction);	// Send update to others and find new order
 	void floorReached();									// Send update to others and find new order
 	void orderButtonPressed();								// Send msg about changing the light
+	bool timeOut();											// TODO: Make this!
+	void handleTimeout();
 	void run();												// Runs the entire process
-	void driveHere(int floor);								// TODO: This needs to be placed somewhere smart
 };
 
 #endif
