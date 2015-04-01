@@ -19,19 +19,22 @@ StateMachine::StateMachine()
 void StateMachine::newOrder(int floor, motor_direction_t direction)
 {
 	// First: Update the list
-	int elevator;
-	if (direction == (motor_direction_t)DIRECTION_UNDEFINED) elevator = 0;
-	else elevator = myElevator.elevID;
-	Order order = {floor, (order_direction_t)direction, elevator};
+	int elevatorID;
+	if (direction == (motor_direction_t)DIRECTION_UNDEFINED) elevatorID = 0;
+	else elevatorID = myElevator.elevID;
+	Order order = {floor, (order_direction_t)direction, elevatorID};
 	myManager.updateList(NEW, myManager.getList(), order);
 	// TODO: Send out the update!
 	
 	// Then: Check for new goal
-	Order newOrder = myManager.getOrderWithLowestCost(myElevator.currentFloor, (order_direction_t)myElevator.dir);
-	if ((!(newOrder == myElevator.goalOrder)) && ((myState == DRIVING) || (myState == IDLE))) //Ooops! This is ugly. TODO: Make this pretty.
+	if (myState == DRIVING)
 	{
-		myElevator.goalOrder = newOrder;
-		myElevator.driveHere(newOrder.floor);
+	    Order newOrder = myManager.getOrderWithLowestCost(myElevator.currentFloor, (order_direction_t)myElevator.dir);
+	    if (!(newOrder == myElevator.goalOrder))
+	    { 
+	        myElevator.driveHere(newOrder.floor);
+	        myElevator.goalOrder = newOrder;
+	    }
 	}
 }
 
