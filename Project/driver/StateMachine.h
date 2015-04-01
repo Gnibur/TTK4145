@@ -1,14 +1,14 @@
 #ifndef STATEMACHINE_H
 #define STATEMACHINE_H
-
-#include "OrderManager.h"
 #include "IoDriver.h"
+#include "OrderManager.h"
 
 typedef enum {
 	INIT = 0,
 	IDLE = 1,
 	AT_FLOOR = 2,
-	DRIVING = 3
+	DRIVING = 3,
+	DOOR_OPEN = 4
 } elevator_state_t;
 
 /*------------------------------------------------------*/
@@ -39,6 +39,8 @@ class StateMachine {
 	OrderManager myManager;
 	elevator_t myElevator;
 	elevator_state_t myState;
+	int time_start;
+	int time_duration;
 public:
 	StateMachine();											// Init function
 	void newOrder(int floor, motor_direction_t direction);	// Send update to others and find new order
