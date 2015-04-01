@@ -46,8 +46,6 @@ public:
 	void newOrder(int floor, motor_direction_t direction);	// Send update to others and find new order
 	void floorReached();									// Send update to others and find new order
 	void orderButtonPressed();								// Send msg about changing the light
-	bool timeOut();											// TODO: Make this!
-	void handleTimeout();
 	void run();												// Runs the entire process
 };
 

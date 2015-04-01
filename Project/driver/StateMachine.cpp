@@ -1,6 +1,9 @@
 #include "StateMachine.h"
 #include <ctime>
 
+// ---------------------------------------------------------------------- ||
+//                          STATEMACHINE, CONSTRUCTOR                     ||
+// ---------------------------------------------------------------------- ||
 StateMachine::StateMachine()
 {
     //First: Create your elevator
@@ -16,6 +19,9 @@ StateMachine::StateMachine()
     
 }
 
+// ---------------------------------------------------------------------- ||
+//                          NEW ORDER                                     ||
+// ---------------------------------------------------------------------- ||
 void StateMachine::newOrder(int floor, motor_direction_t direction)
 {
 	// First: Update the list
@@ -26,7 +32,7 @@ void StateMachine::newOrder(int floor, motor_direction_t direction)
 	myManager.updateList(NEW, myManager.getList(), order);
 	// TODO: Send out the update!
 	
-	// Then: Check for new goal
+	// Second: Check for new goal
 	if (myState == DRIVING)
 	{
 	    Order newOrder = myManager.getOrderWithLowestCost(myElevator.currentFloor, (order_direction_t)myElevator.dir);
@@ -38,6 +44,9 @@ void StateMachine::newOrder(int floor, motor_direction_t direction)
 	}
 }
 
+// ---------------------------------------------------------------------- ||
+//                          FLOOR REACHED                                 ||
+// ---------------------------------------------------------------------- ||
 void StateMachine::floorReached()
 {
     // First: Update the list
@@ -45,26 +54,18 @@ void StateMachine::floorReached()
     // TODO: Set start-time, and when to timeout.
 }
 
+// ---------------------------------------------------------------------- ||
+//                          ORDERBUTTON PRESSED                           ||
+// ---------------------------------------------------------------------- ||
 void StateMachine::orderButtonPressed()
 {
     // TODO: Send message about button being pressed!
     
 }
 
-bool StateMachine::timeOut() 
-{
-    return true;
-}
-void StateMachine::handleTimeout()
-{
-    Order order = myManager.getOrderWithLowestCost(myElevator.currentFloor, (order_direction_t)myElevator.dir);
-    if (order.floor != -1) // TODO: Make sure you have sufficient operators for this.
-    {
-        myElevator.goalOrder = order;
-        myElevator.driveHere(order.floor);
-    }
-}
-
+// ---------------------------------------------------------------------- ||
+//                          RUN FUNCTION                                  ||
+// ---------------------------------------------------------------------- ||
 void StateMachine::run()
 {
     time_t timer;
