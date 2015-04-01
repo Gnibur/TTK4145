@@ -41,7 +41,7 @@ class StateMachine {
 	elevator_state_t myState;
 public:
 	StateMachine();											// Init function
-	void newOrder(int floor, order_direction_t direction);	// Send update to others and find new order
+	void newOrder(int floor, motor_direction_t direction);	// Send update to others and find new order
 	void floorReached();									// Send update to others and find new order
 	void orderButtonPressed();								// Send msg about changing the light
 	bool timeOut();											// TODO: Make this!

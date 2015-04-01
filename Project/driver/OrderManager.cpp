@@ -9,7 +9,8 @@
 
 OrderManager::OrderManager()
 {
-	myID = 1;
+	// Do nothing
+	myID = 0;
 }
 
 Order OrderManager::getOrderWithLowestCost(int currentFloor, order_direction_t currentDirection, OrderList stashedList)
@@ -25,7 +26,7 @@ Order OrderManager::getOrderWithLowestCost(int currentFloor, order_direction_t c
 			std::back_inserter( searchList )
 	);
 	
-	int directionMultiplier = (currentDirection == DIRECTION_UP)? 1 : -1; // Multiply with the floors when checking if it's in our wanted direction, so we can treat both directions the same
+	int directionMultiplier = (currentDirection == DIR_UP)? 1 : -1; // Multiply with the floors when checking if it's in our wanted direction, so we can treat both directions the same
 	int multipliedCurrentFloor = currentFloor * directionMultiplier;
 	int lowestCost = (N_FLOORS * 4);
 	Order bestOrder = {-1, DIRECTION_UNDEFINED, 0};

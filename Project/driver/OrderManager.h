@@ -6,9 +6,9 @@
 //#include "IoDriver.h"
 
 typedef enum {				// TODO: This enum seems quite redundant...
-    DIRECTION_DOWN,
+    DIR_DOWN,
     DIRECTION_UNDEFINED,
-    DIRECTION_UP
+    DIR_UP
 } order_direction_t;
 
 struct Order {
@@ -46,7 +46,8 @@ private:
 	//OrderList stashedList;
 public:
     OrderManager();
-    Order getOrderWithLowestCost(int currentFloor, order_direction_t currentDirection, OrderList stashedList = {});
+    void init(int elevatorID);
+    Order getOrderWithLowestCost(int currentFloor, order_direction_t currentDirection, OrderList stashedList = OrderList());
     int updateList(order_status status, OrderList list, Order order);
     OrderList getList() {return orderList; }
 
