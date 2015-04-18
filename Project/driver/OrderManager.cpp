@@ -32,7 +32,31 @@ bool OrderManager::hasOrderOnFloor(int floor)
 
 motor_direction_t OrderManager::getNextDirection(int floor, motor_direction_t lastDirection)
 {
+	// If the list is empty, stand still.
+	if (orderList.empty()) return DIRECTION_STOP;
 
+	// Find the directional multiplier, so we can use the same check whether you are going up or down.
+	int directionalMultiplier;
+	motor_direction_t = newDirection;
+	if (lastDirection == UP)
+		directionalMultiplier = 1;
+		newDirection = DIRECTION_DOWN;
+	else
+		directionalMultiplier = -1;
+		newDirection = DIRECTION_UP;
+
+	floor = directionalMultiplier * floor;
+
+	// Go through all the elements. If you find something in your direction, imideatly return.
+	for (auto it = orderList.begin(); it != orderList.end(); ++it)
+	{
+		int orderedFloor = it->floor * directionalMultiplier;
+		if (orderedFloor > floor)
+			return lastDirection;
+	}
+
+	// If you get this far, you need to change the direction.
+	return newDirection;
 }
 
 int OrderManager::getCost(int floor)
