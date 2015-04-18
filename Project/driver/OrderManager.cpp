@@ -9,7 +9,7 @@ void OrderManager::newOrder(int floor, order_direction_t direction)
 {
 	time_t timer;
 	Order newOrder = {floor, direction, IP, time(&timer) };
-	std::sort(stashedList.begin(), stashedList.end());
+	std::sort(orderList.begin(), orderList.end());
 	std::vector<Order>::iterator search = std::find(orderList.begin(), orderList.end(), newOrder); // See if the order is already there
 	if (search == orderList.end())
 		orderList.push_back(newOrder);
@@ -84,7 +84,12 @@ int OrderManager::getCost(int lastFloor, int newFloor, motor_direction_t lastDir
 	return cost;
 }
 
-int mergeOrdersWith(OrderList orders)
+int OrderManager::mergeOrdersWith(OrderList orders)
 {
-
+	for (auto it = orders.begin(); it != orders.end(); ++it)
+	{
+		if (std::find(orderList.begin(), orderList.end(), (*it)) == orderList.end())
+			orderList.push_back((*it));
+	}
+	std::sort(orderList.begin(), orderList.end());
 }
