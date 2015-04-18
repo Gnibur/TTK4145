@@ -1,7 +1,9 @@
-#include "OrderManager_new.h" // Change to OrderManager.h
-#include <ctime>
 #include "Globals.h"
+#include "OrderManager.h"
+#include <ctime>
 #include <algorithm>
+#include <cmath>
+
 
 void OrderManager::newOrder(int floor, order_direction_t direction)
 {
@@ -59,9 +61,27 @@ motor_direction_t OrderManager::getNextDirection(int floor, motor_direction_t la
 	return newDirection;
 }
 
-int OrderManager::getCost(int floor)
+int OrderManager::getCost(int lastFloor, int newFloor, motor_direction_t lastDirection, order_direction_t wantedDirection)
 {
-
+	int cost = abs(lastFloor - newFloor);
+	// Case: In the same direction
+	if (((newFloor > lastFloor) && (lastDirection == DIRECTION_UP)) || ((newFloor < lastFloor) && (lastDirection == DIRECTION_DOWN)))
+	{
+		// Subcase: Wanting to go the other direction
+		if (((motor_direction_t)wantedDirection != lastDirection) && (wantedDirection != ORDER_INSIDE))
+			cost += N_FLOORS * 1;
+	}
+	// Case: You need to change direction
+	else
+	{
+		// Subcase: You need to change direction _again_
+		if (((motor_direction_t)wantedDirection == lastDirection) && (wantedDirection != ORDER_INSIDE))
+			cost += N_FLOORS * 3;
+		// Subcase: You only need to change direction once.
+		else
+			cost += N_FLOORS * 2;
+	}
+	return cost;
 }
 
 int mergeOrdersWith(OrderList orders)

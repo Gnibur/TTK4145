@@ -24,7 +24,8 @@ public:
 	void clearOrder(Order order);
 	bool hasOrderOnFloor(int floor);
 	motor_direction_t getNextDirection(int floor, motor_direction_t lastDirection);
-	int getCost(int floor);
+	// NB! getCost _might_ be a bit too confusing. I should get another set of eyes on it.
+	int getCost(int lastFloor, int newFloor, motor_direction_t lastDirection, order_direction_t wantedDirection);
 	int mergeOrdersWith(OrderList orders)
 };
 
