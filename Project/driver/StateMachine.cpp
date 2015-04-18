@@ -1,12 +1,11 @@
 #include "StateMachine.h"
 #include "IoDriver.h"
 
-void StateMachine::eventButtonPressed(button_type_t button)
+void StateMachine::eventButtonPressed(button_type_t button, int floor)
 {
-  
-  orderManager.newOrder(button.floor, button.direction);
-  // set light
 
+  orderManager.newOrder(floor, (order_direction_t)direction);
+  setOrderButtonLamp(button, floor);
   budmanager.start(button);
 }
 
@@ -39,7 +38,7 @@ void StateMachine::eventDoorTimeout()
   state.lastDirection = nextDirection
 }
 
-void StateMachine::orderTimeOut(order) 
+void StateMachine::orderTimeOut(order)
 {
   eventButtonPressed();
 }

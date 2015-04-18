@@ -3,6 +3,7 @@
 
 /* Include all files with the needed datastructures */
 
+// Maybe this should be button_type_t? Then we need to include "IoDriver.h"
 enum order_direction_t {
 	ORDER_UP = 0,
 	ORDER_INSIDE,

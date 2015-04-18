@@ -6,9 +6,14 @@
 
 typedef enum {
   UP = 0,
-  DOWN,
-  INSIDE
+  INSIDE,
+  DOWN
 } button_t;
+
+struct button {
+	button_type_t button;
+	int floor;
+}
 
 
 /*------------------------------------------------------*/
@@ -25,9 +30,9 @@ class StateMachine {
 private:
   ElevatorState state;
 public:
-  void eventNewOrder(button_type_t button);
-  void eventFloorReached(int floor);
-  void eventDoorTimeout();
+	void eventButtonPressed(button_type_t button, int floor)
+  	void eventFloorReached(int floor);
+  	void eventDoorTimeout();
 };
 
 #endif
