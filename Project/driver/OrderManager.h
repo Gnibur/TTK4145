@@ -20,6 +20,7 @@ struct Order {
 class OrderManager {
 private:
 	OrderList orderList;
+	OrderList globalList;
 public:
 	void newOrder(int floor, order_direction_t direction);
 	void clearOrder(Order order);
