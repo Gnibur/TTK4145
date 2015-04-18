@@ -11,7 +11,7 @@ typedef enum {
 } button_t;
 
 struct button {
-	button_type_t button;
+	button_type_t direction;
 	int floor;
 }
 
@@ -31,7 +31,7 @@ private:
   ElevatorState state;
 public:
 	void eventButtonPressed(button_type_t button, int floor)
-  	void eventFloorReached(int floor);
+  	void eventFloorReached(int floor, motor_direction_t direction);
   	void eventDoorTimeout();
 };
 

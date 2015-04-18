@@ -23,6 +23,7 @@ private:
 public:
 	void newOrder(int floor, order_direction_t direction);
 	void clearOrder(Order order);
+	void clearOrdersOnFloor(int floor, motor_direction_t direction);
 	bool hasOrderOnFloor(int floor);
 	motor_direction_t getNextDirection(int floor, motor_direction_t lastDirection);
 	// NB! getCost _might_ be a bit too confusing. I should get another set of eyes on it.

@@ -22,6 +22,15 @@ void OrderManager::clearOrder(Order order)
 		orderList.erase(search);
 }
 
+void OrderManager::clearOrdersOnFloor(int floor, motor_direction_t direction)
+{
+	for (auto it = orderList.begin(); it != orderList.end(); ++it)
+	{
+		if ((it->floor == floor) && ((it->direction == (order_direction_t)direction) || (it->direction == ORDER_INSIDE)))
+			orderList.erase(it);
+	}
+}
+
 bool OrderManager::hasOrderOnFloor(int floor)
 {
 	for (auto it = orderList.begin(); it != orderList.end(); ++it)

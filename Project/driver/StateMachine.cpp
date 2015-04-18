@@ -1,25 +1,25 @@
 #include "StateMachine.h"
 #include "IoDriver.h"
+#include <algorithm>
 
-void StateMachine::eventButtonPressed(button_type_t button, int floor)
+void StateMachine::eventButtonPressed(button button)
 {
 
-  orderManager.newOrder(floor, (order_direction_t)direction);
-  setOrderButtonLamp(button, floor);
+  orderManager.newOrder(button.floor, (order_direction_t)button.direction);
+  setOrderButtonLamp(button.direction, button.floor);
   budmanager.start(button);
 }
 
 
-void StateMachine::eventFloorReached(int reachedFloor)
+void StateMachine::eventFloorReached(int reachedFloor, motor_direction_t direction)
 {
 
-  // set floor indicator
-
+  setFloorIndicator(reachedFloor)
   state.lastFloor = reachedFloor;
 
   // ordermanager is also responsible for the light
   if (orderManager.hasOrderOnFloor(floor)){
-      orderManager.clearOrder(floor);
+      orderManager.clearOrdersOnFloor(floor, direction);
 
       // send out order info to network. Also when internal?
 
