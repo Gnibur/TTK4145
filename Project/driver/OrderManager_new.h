@@ -9,6 +9,13 @@ enum order_direction_t {
 	ORDER_DOWN
 };
 
+struct Order {
+	order_direction_t direction;
+	int floor;
+	int assignedIP; // Should be string? Or?
+	int timeAssigned;
+}
+
 class OrderManager {
 private:
 	OrderList orderList;
