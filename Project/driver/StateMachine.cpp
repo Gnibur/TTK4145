@@ -6,8 +6,16 @@
 void StateMachine::eventButtonPressed(button button)
 {
 	orderManager.newOrder(button.floor, (order_direction_t)button.direction);
-	//setOrderButtonLamp(button.direction, button.floor);
-	//budmanager.start(button);
+	setOrderButtonLamp(button.direction, button.floor);
+	if (button.direction == BUTTON_COMMAND)
+	{
+		orderManager.newOrder(button.floor, (order_direction_t)button.direction);
+		// Send out to others that you got a local order
+	}
+	else
+	{
+		budmanager.start(button);
+	}
 }
 
 
@@ -22,7 +30,7 @@ void StateMachine::eventFloorReached(int reachedFloor, motor_direction_t directi
 		OrderList ordersToClear = orderManager.findOrdersOnFloor(reachedFloor, direction);
 		orderManager.clearOrders(ordersToClear);
 
-		//string clearOrdersMsg = makeOrderListMsg(CLEAR_ORDER, orderManager.getGlobalList(), ordersToClear);
+		string clearOrdersMsg = makeOrderListMsg(CLEAR_ORDER, orderManager.getGlobalList(), ordersToClear);
 		// send out order info to network. Also when internal?
 
 		// set door open light and start timer
@@ -32,16 +40,16 @@ void StateMachine::eventFloorReached(int reachedFloor, motor_direction_t directi
 
 void StateMachine::eventDoorTimeout()
 {
-	// clear door light;
+	clearDoorOpenLamp();
 	// state is IDLE
-	//motor_direction_t nextDirection = orderManager.getNextDirection(currentFloor, lastDirection);
-	//motor.setDirection(nextDirection);
-
-	//state.lastDirection = nextDirection;
+	motor_direction_t nextDirection = orderManager.getNextDirection(state.lastFloor, state.lastDirection);
+	setMotorDirection(nextDirection);
+	state.lastDirection = nextDirection;
 }
 
 void StateMachine::orderTimeOut(Order order)
 {
+	// How to;
 	//eventButtonPressed();
 }
 
