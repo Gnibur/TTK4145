@@ -1,4 +1,4 @@
-#include "Globals.h"
+//#include "Globals.h"
 #include "OrderManager.h"
 #include <ctime>
 #include <algorithm>
@@ -8,7 +8,8 @@
 void OrderManager::newOrder(int floor, order_direction_t direction)
 {
 	time_t timer;
-	Order newOrder = {floor, direction, IP, time(&timer) };
+	int assignedDate = time(&timer);
+	Order newOrder = {direction, floor, IP, assignedDate };
 	std::sort(orderList.begin(), orderList.end());
 	std::vector<Order>::iterator search = std::find(orderList.begin(), orderList.end(), newOrder); // See if the order is already there
 	if (search == orderList.end())
@@ -48,14 +49,18 @@ motor_direction_t OrderManager::getNextDirection(int floor, motor_direction_t la
 
 	// Find the directional multiplier, so we can use the same check whether you are going up or down.
 	int directionalMultiplier;
-	motor_direction_t = newDirection;
-	if (lastDirection == UP)
+	motor_direction_t newDirection;
+	if (lastDirection == DIRECTION_UP)
+	{
 		directionalMultiplier = 1;
 		newDirection = DIRECTION_DOWN;
+	}
 	else
+	{
 		directionalMultiplier = -1;
 		newDirection = DIRECTION_UP;
-
+	}
+	
 	floor = directionalMultiplier * floor;
 
 	// Go through all the elements. If you find something in your direction, imideatly return.
@@ -93,7 +98,7 @@ int OrderManager::getCost(int lastFloor, int newFloor, motor_direction_t lastDir
 	return cost;
 }
 
-int OrderManager::mergeOrdersWith(OrderList orders)
+void OrderManager::mergeMyOrdersWith(OrderList orders)
 {
 	for (auto it = orders.begin(); it != orders.end(); ++it)
 	{
@@ -101,4 +106,9 @@ int OrderManager::mergeOrdersWith(OrderList orders)
 			orderList.push_back((*it));
 	}
 	std::sort(orderList.begin(), orderList.end());
+}
+
+int main ()
+{
+	return 0;
 }
