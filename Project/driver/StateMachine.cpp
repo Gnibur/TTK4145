@@ -49,7 +49,10 @@ void StateMachine::eventDoorTimeout()
 
 void StateMachine::orderTimeOut(Order order)
 {
-	// How to;
+	// How to:
+	// Clear order
+	// Send out msg
+	// Call eventbuttonpressed.
 	//eventButtonPressed();
 }
 
