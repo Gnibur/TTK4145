@@ -5,38 +5,14 @@
 #define N_FLOORS 4
 
 #include <vector>
+#include "DataStructures.h"
+
+struct Order;
 
 /* Include all files with the needed datastructures */
-enum motor_direction_t {
-	DIRECTION_DOWN,
-	DIRECTION_STOP,
-	DIRECTION_UP
-};
+
 
 // Maybe this should be button_type_t? Then we need to include "IoDriver.h"
-enum order_direction_t {
-	ORDER_DOWN = 0,
-	ORDER_INSIDE,
-	ORDER_UP
-};
-
-struct Order {
-	order_direction_t direction;
-	int floor;
-	int assignedIP; // Should be string? Or?
-	int timeAssigned;
-	bool operator==(const Order& rhs) const
-	{
-	    return (floor == rhs.floor && direction == rhs.direction && assignedIP == rhs.assignedIP);
-	}
-	bool operator < (const Order& rhs) const
-	{
-		if (floor < rhs.floor) 			return true;
-		if (floor > rhs.floor) 			return false;
-		if (direction < rhs.direction) 	return true;
-		return false;
-	}
-};
 
 typedef std::vector<Order> OrderList;
 

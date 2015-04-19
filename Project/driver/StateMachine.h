@@ -10,11 +10,6 @@ typedef enum {
   DOWN
 } button_t;
 
-struct button {
-	button_type_t direction;
-	int floor;
-}
-
 
 /*------------------------------------------------------*/
 /*------------------ STATE MACHINE ---------------------*/
