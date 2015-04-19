@@ -23,13 +23,23 @@ void OrderManager::clearOrder(Order order)
 		orderList.erase(search);
 }
 
-void OrderManager::clearOrdersOnFloor(int floor, motor_direction_t direction)
+void OrderManager::clearOrders(OrderList orders)
 {
+	for (auto it = orders.begin(); it != orders.end(); ++it)
+	{
+		orderList.erase(it);
+	}
+}
+
+OrderList OrderManager::findOrdersOnFloor(int floor, motor_direction_t direction)
+{
+	OrderList ordersOnFloor;
 	for (auto it = orderList.begin(); it != orderList.end(); ++it)
 	{
 		if ((it->floor == floor) && ((it->direction == (order_direction_t)direction) || (it->direction == ORDER_INSIDE)))
-			orderList.erase(it);
+			ordersOnFloor.push_back(*it);
 	}
+	return ordersOnFloor;
 }
 
 bool OrderManager::hasOrderOnFloor(int floor)
