@@ -14,7 +14,6 @@ typedef std::vector<Order> OrderList;
 class OrderManager {
 private:
 	OrderList orderList;
-	OrderList globalList;
 public:
 	void newOrder(int floor, order_direction_t direction);
 	void clearOrder(Order order);
@@ -24,7 +23,7 @@ public:
 	bool hasOrderOnFloor(int floor);
 	motor_direction_t getNextDirection(int floor, motor_direction_t lastDirection);
 	int getCost(int lastFloor, int newFloor, motor_direction_t lastDirection, order_direction_t wantedDirection); // This _might_ be confusing
-	OrderList getGlobalOrders() { return globalList; }
+	OrderList getOrders() { return orderList; }
 };
 
 #endif

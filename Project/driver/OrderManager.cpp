@@ -10,10 +10,12 @@ void OrderManager::newOrder(int floor, order_direction_t direction)
 	time_t timer;
 	int assignedDate = time(&timer);
 	Order newOrder = {direction, floor, IP, assignedDate };
-	std::sort(orderList.begin(), orderList.end());
 	std::vector<Order>::iterator search = std::find(orderList.begin(), orderList.end(), newOrder); // See if the order is already there
 	if (search == orderList.end())
+	{
 		orderList.push_back(newOrder);
+	}
+	std::sort(orderList.begin(), orderList.end());
 }
 
 void OrderManager::clearOrder(Order order)

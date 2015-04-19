@@ -2,32 +2,27 @@
 #define STATEMACHINE_H
 
 #include "OrderManager.h"
+#include "DataStructures.h"
 //#include "IoDriver.h"
 
-typedef enum {
-  UP = 0,
-  INSIDE,
-  DOWN
-} button_t;
-
-
-/*------------------------------------------------------*/
-/*------------------ STATE MACHINE ---------------------*/
-/*------------------------------------------------------*/
 
 typedef struct {
-  lastFloor;
-  lastDirection;
+  int lastFloor;
+  motor_direction_t lastDirection;
 } ElevatorState;
 
 
 class StateMachine {
 private:
-  ElevatorState state;
+	ElevatorState state;
+	OrderManager orderManager;
 public:
-	void eventButtonPressed(button_type_t button, int floor)
+	void eventButtonPressed(button button);
   	void eventFloorReached(int floor, motor_direction_t direction);
   	void eventDoorTimeout();
+  	void orderTimeOut(Order order);
+  	
+  	bool shouldIStopHere(int floor, motor_direction_t direction); // Is this too complicated?
 };
 
 #endif
