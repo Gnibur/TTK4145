@@ -5,6 +5,9 @@
 #include <cmath>
 #include <ctime>
 
+int					lastFloor;
+motor_direction_t	lastDirection;
+
 void stateMachine_buttonPressed(int floor, button_type_t button)
 {
 	ioDriver_setOrderButtonLamp(button, floor);
@@ -23,12 +26,13 @@ void stateMachine_buttonPressed(int floor, button_type_t button)
 	}
 }
 
-void stateMachine_floorReached(int floor, motor_direction_t direction)
+void stateMachine_floorReached(int floor)
 {
+	lastFloor = floor;
 	ioDriver_setFloorIndicator(floor)
 
-	button_type_t buttonDirection			= (button_type_t)direction;
-	button_type_t buttonOppositeDirection	= (button_type_t)abs((int)direction - 2);
+	button_type_t buttonDirection			= (button_type_t)lastDirection;
+	button_type_t buttonOppositeDirection	= (button_type_t)abs((int)lastDirection - 2);
 
 	OrderList ordersInDirection			= orderManager_getOrdersOnFloorInDirection(floor, buttonDirection);
 	OrderList ordersInOppositeDirection = orderManager_getOrdersOnFloorInDirection(floor, buttonOppositeDirection);
@@ -43,7 +47,7 @@ void stateMachine_floorReached(int floor, motor_direction_t direction)
 	}
 	else
 	{
-		if ((ordersInOppositeDirection.empty()) && (orderManager_getNextDirection(floor, direction) != direction))
+		if ((ordersInOppositeDirection.empty()) && (orderManager_getNextDirection(floor, lastDirection) != lastDirection))
 		{
 			ordersToClear = ordersInOppositeDirection;
 			stop = true;
@@ -62,11 +66,11 @@ void stateMachine_floorReached(int floor, motor_direction_t direction)
 	}
 }
 
-void stateMachine_doorTimeout(motor_direction_t &lastDirection)
+void stateMachine_doorTimeout()
 {
 	clearDoorOpenLamp();
 	// state is IDLE
-	motor_direction_t nextDirection = orderManager_getNextDirection(state.lastFloor, state.lastDirection);
+	motor_direction_t nextDirection = orderManager_getNextDirection(lastFloor, lastDirection);
 	setMotorDirection(nextDirection);
 	lastDirection = nextDirection;
 }

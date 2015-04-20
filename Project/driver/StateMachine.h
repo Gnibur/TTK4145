@@ -10,7 +10,7 @@
 
 void stateMachine_buttonPressed(int floor, button_type_t button);
 void stateMachine_floorReached(int floor, motor_direction_t direction);
-void stateMachine_doorTimeout(motor_direction_t &lastDirection);
+void stateMachine_doorTimeout();
 void stateMachine_orderTimeOut(Order order);
 
 #endif
