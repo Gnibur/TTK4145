@@ -27,28 +27,40 @@ void StateMachine::eventButtonPressed(button_type_t button, int floor)
 
 void StateMachine::eventFloorReached(int reachedFloor, motor_direction_t direction)
 {
-
 	setFloorIndicator(reachedFloor)
-	state.lastFloor = reachedFloor;
-	button_type_t buttonDirection = (button_type_t)direction;
-	button_type_t buttonOppositeDirection = (button_type_t)abs((int)direction - 2);
+	state.lastFloor	= reachedFloor;
 
-	OrderList ordersInDirection = getOrdersOnFloorInDirection(reachedFloor, buttonDirection);
+	button_type_t buttonDirection			= (button_type_t)direction;
+	button_type_t buttonOppositeDirection	= (button_type_t)abs((int)direction - 2);
+
+	OrderList ordersInDirection			= getOrdersOnFloorInDirection(reachedFloor, buttonDirection);
 	OrderList ordersInOppositeDirection = getOrdersOnFloorInDirection(reachedFloor, buttonOppositeDirection);
+	OrderList ordersToClear;
+
+	bool stop = false;
 
 	if (!ordersInDirection.empty())
 	{
-		// STOP
+		ordersToClear = ordersInDirection;
+		stop = true;
 	}
 	else
 	{
 		if ((ordersInOppositeDirection.empty()) && (orderManager.getNextDirection(reachedFloor, direction) != direction))
 		{
-			// STOP
+			ordersToClear = ordersInOppositeDirection;
+			stop = true;
 		}
-		else
+	}
+	if (stop == true)
+	{
+		setMotorDirection(DIRECTION_STOP);
+		for (auto it = ordersToClear.begin(); it != ordersToClear.end(); ++it) 
 		{
-			// DON'T STOP
+			orderManager.clearOrder(*it);
+			std::string clearOrderMsg;
+			udp.send(BROADCAST_PORT, clearOrderMsg, MAXLENGTH_BUF);
+			// open door, set light, start timer
 		}
 	}
 }

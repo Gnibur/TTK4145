@@ -16,12 +16,12 @@ class OrderManager {
 private:
 	OrderList orderList;
 public:
-    // Pushing, pulling and popping from the orderlist
-	void newOrder(int floor, button_type_t direction);
+    // Pushing and popping from the orderlist
 	void newOrder(Order order);
 	void clearOrder(Order order);
-	void clearOrders(int floor, button_type_t direction, std::string IP); // IP should be string?
 	void mergeMyOrdersWith(OrderList orders);
+
+	// Pulling from orderlist
 	OrderList getOrders() { return orderList; }
 		
 	// Logic and algorithms

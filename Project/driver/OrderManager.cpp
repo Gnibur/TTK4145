@@ -5,19 +5,6 @@
 #include <cmath>
 
 
-void OrderManager::newOrder(int floor, button_type_t direction)
-{
-	time_t timer;
-	int assignedDate = time(&timer);
-	Order order = {direction, floor, IP, assignedDate };
-	std::vector<Order>::iterator search = std::find(orderList.begin(), orderList.end(), order); // See if the order is already there
-	if (search == orderList.end())
-	{
-		orderList.push_back(order);
-	}
-	std::sort(orderList.begin(), orderList.end());
-}
-
 void OrderManager::newOrder(Order order)
 {
 	std::vector<Order>::iterator search = std::find(orderList.begin(), orderList.end(), order);
@@ -33,15 +20,6 @@ void OrderManager::clearOrder(Order order)
 	std::vector<Order>::iterator search = std::find(orderList.begin(), orderList.end(), order);
 	if (search != orderList.end())
 		orderList.erase(search);
-	std::sort(orderList.begin(), orderList.end());
-}
-
-void OrderManager::clearOrders(OrderList orders)
-{
-	for (auto it = orders.begin(); it != orders.end(); ++it)
-	{
-		orderList.erase(it);
-	}
 	std::sort(orderList.begin(), orderList.end());
 }
 
