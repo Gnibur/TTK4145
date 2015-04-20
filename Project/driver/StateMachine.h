@@ -24,8 +24,6 @@ public:
   	void eventFloorReached(int floor, motor_direction_t direction);
   	void eventDoorTimeout();
   	void orderTimeOut(Order order);
-  	
-  	bool shouldIStopHere(int floor, motor_direction_t direction); // Is this too complicated?
 };
 
 #endif

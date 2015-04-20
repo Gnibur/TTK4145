@@ -104,3 +104,20 @@ int main ()
 {
 	return 0;
 }
+
+bool OrderManager::orderListEquals(OrderList rhs)
+{
+	auto rhsIterator = rhs.begin();
+	auto lhsIterator = orderList.begin();
+	while (lhsIterator != orderList.end())
+	{
+		if (rhsIterator == rhs.end())			return false;
+		if ((*lhsIterator) != (*rhsIterator))	return false;
+
+		++lhsIterator;
+		++rhsIterator;
+	}
+	if (rhsIterator != rhs.end())		return false;
+	
+	return true;
+}

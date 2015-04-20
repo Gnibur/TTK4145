@@ -28,6 +28,7 @@ public:
 	OrderList			getOrdersOnFloorInDirection(int floor, button_type_t direction);
 	motor_direction_t	getNextDirection(int floor, motor_direction_t lastDirection);
 	int					getCost(int lastFloor, int newFloor, motor_direction_t lastDirection, button_type_t wantedDirection);
+	bool				orderListEquals(OrderList rhs);
 };
 
 #endif
