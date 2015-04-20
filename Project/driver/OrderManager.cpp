@@ -33,7 +33,7 @@ void OrderManager::clearOrders(OrderList orders)
 	}
 }
 
-OrderList OrderManager::findOrdersOnFloor(int floor, motor_direction_t direction)
+OrderList OrderManager::findOrdersOnFloorInDirection(int floor, motor_direction_t direction)
 {
 	OrderList ordersOnFloor;
 	for (auto it = orderList.begin(); it != orderList.end(); ++it)
@@ -48,7 +48,7 @@ bool OrderManager::hasOrderOnFloor(int floor)
 {
 	for (auto it = orderList.begin(); it != orderList.end(); ++it)
 	{
-		if (it->floor == floor)
+		if ((it->floor == floor) && (it->assignedIP == IP))
 			return true;
 	}
 	return false;

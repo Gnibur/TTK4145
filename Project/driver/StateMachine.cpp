@@ -27,7 +27,7 @@ void StateMachine::eventFloorReached(int reachedFloor, motor_direction_t directi
 
   // Ordermanager is also responsible for the light
 	if (shouldIStopHere(reachedFloor, direction)){
-		OrderList ordersToClear = orderManager.findOrdersOnFloor(reachedFloor, direction);
+		OrderList ordersToClear = orderManager.findOrdersOnFloorInDirection(reachedFloor, direction);
 		orderManager.clearOrders(ordersToClear);
 
 		string clearOrdersMsg = makeOrderListMsg(CLEAR_ORDER, orderManager.getGlobalList(), ordersToClear);
@@ -60,30 +60,10 @@ bool StateMachine::shouldIStopHere(int floor, motor_direction_t direction)
 {
 	if (!orderManager.hasOrderOnFloor(floor)) 
 		return false;
-	OrderList ordersOnFloor = orderManager.findOrdersOnFloor(floor, direction);
-	if (!ordersOnFloor.empty())
+	OrderList ordersOnFloor = orderManager.findOrdersOnFloorInDirection(floor, direction);
+	if ((!ordersOnFloor.empty()) || (orderManager.getNextDirection(floor, direction) != direction))
 	{
 		return true;
 	}
-	else
-	{
-		int directionalAdder;
-		int limit;
-		if (direction == DIRECTION_UP)
-		{
-			directionalAdder = 1;
-			limit = N_FLOORS - 1;
-		}
-		else
-		{
-			directionalAdder = -1;
-			limit = 0;
-		}
-		for (int i = floor; i != limit; i += directionalAdder)
-		{
-			if (orderManager.hasOrderOnFloor(i)) 
-				return false;
-		}
-	}
-	return true;
+	return false;
 }
