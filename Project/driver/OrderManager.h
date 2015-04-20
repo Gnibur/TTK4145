@@ -13,17 +13,17 @@ struct Order;
 typedef std::vector<Order> OrderList;
 
 // Pushing and popping from the orderlist
-void newOrder(Order order);
-void clearOrder(Order order);
-void mergeMyOrdersWith(OrderList orders);
+void orderManager_newOrder(Order order);
+void orderManager_clearOrder(Order order);
+void orderManager_mergeMyOrdersWith(OrderList orders);
 
 // Pulling from orderlist
-OrderList getOrders() { return orderList; }
+OrderList orderManager_getOrders() { return orderList; }
 		
 // Logic and algorithms
-OrderList			getOrdersOnFloorInDirection(int floor, button_type_t direction);
-motor_direction_t	getNextDirection(int floor, motor_direction_t lastDirection);
-int					getCost(int lastFloor, int newFloor, motor_direction_t lastDirection, button_type_t wantedDirection);
-bool				orderListEquals(OrderList rhs);
+OrderList			orderManager_getOrdersOnFloorInDirection(int floor, button_type_t direction);
+motor_direction_t	orderManager_getNextDirection(int floor, motor_direction_t lastDirection);
+int					orderManager_getCost(int lastFloor, int newFloor, motor_direction_t lastDirection, button_type_t wantedDirection);
+bool				orderManager_orderListEquals(OrderList rhs);
 
 #endif

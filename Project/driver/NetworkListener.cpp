@@ -16,20 +16,20 @@ void listen()
 
 		case ADD_ORDER:
 			Order order = getOrderFromMessage(buf);
-			orderManager.newOrder(order);
+			orderManager_newOrder(order);
 			break;
 
 		case GET_FLOOR_COST:
 			Order order				= getOrderCostRequestFromMessage(buf);
-			cost					= orderManager.getCost(currentFloor, order.floor, currentDirection, order.direction);
+			cost					= orderManager_getCost(currentFloor, order.floor, currentDirection, order.direction);
 			Offer offer				= {cost, order.floor, order.direction, IP};
 			std::string offerMsg; // TODO: Fill this out
-			udp.send(BROADCAST_PORT, offerMsg, MAXLENGTH_BUF)
+			udp_send(BROADCAST_PORT, offerMsg, MAXLENGTH_BUF)
 			break;
 
 		case REMOVE_ORDER:
 			order = getOrderFromMessage(buf);
-			orderManager.clearOrder(order);
+			orderManager_clearOrder(order);
 			break;
 
 		case ORDER_COST_OFFER: 
@@ -46,9 +46,9 @@ void listen()
 		}
 
 		receivedOrderList = getOrderListFromMessage(buf);
-		if (!(orderManager.orderListEquals(receivedOrderList)))
+		if (!(orderManager_orderListEquals(receivedOrderList)))
 		{
-			orderManager.mergeMyOrdersWith(receivedOrderList);
+			orderManager_mergeMyOrdersWith(receivedOrderList);
 			sendUpdate(orderManager.getOrders());
 		}
 

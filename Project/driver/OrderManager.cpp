@@ -6,7 +6,7 @@
 
 OrderList orderList;
 
-void newOrder(Order order)
+void orderManager_newOrder(Order order)
 {
 	std::vector<Order>::iterator search = std::find(orderList.begin(), orderList.end(), order);
 	if (search == orderList.end())
@@ -16,7 +16,7 @@ void newOrder(Order order)
 	std::sort(orderList.begin(), orderList.end());
 }
 
-void clearOrder(Order order)
+void orderManager_clearOrder(Order order)
 {
 	std::vector<Order>::iterator search = std::find(orderList.begin(), orderList.end(), order);
 	if (search != orderList.end())
@@ -24,7 +24,7 @@ void clearOrder(Order order)
 	std::sort(orderList.begin(), orderList.end());
 }
 
-OrderList getOrdersOnFloorInDirection(int floor, button_type_t direction);
+OrderList orderManager_getOrdersOnFloorInDirection(int floor, button_type_t direction);
 {
 	OrderList returnList;
 	for (auto it = orderList.begin(); it != orderList.end(); ++it)
@@ -35,7 +35,7 @@ OrderList getOrdersOnFloorInDirection(int floor, button_type_t direction);
 	return returnList;
 }
 
-motor_direction_t getNextDirection(int floor, motor_direction_t lastDirection)
+motor_direction_t orderManager_getNextDirection(int floor, motor_direction_t lastDirection)
 {
 	// If the list is empty, stand still.
 	if (orderList.empty()) return DIRECTION_STOP;
@@ -68,7 +68,7 @@ motor_direction_t getNextDirection(int floor, motor_direction_t lastDirection)
 	return newDirection;
 }
 
-int getCost(int lastFloor, int newFloor, motor_direction_t lastDirection, button_type_t wantedDirection)
+int orderManager_getCost(int lastFloor, int newFloor, motor_direction_t lastDirection, button_type_t wantedDirection)
 {
 	int cost = abs(lastFloor - newFloor);
 	// Case: In the same direction
@@ -91,7 +91,7 @@ int getCost(int lastFloor, int newFloor, motor_direction_t lastDirection, button
 	return cost;
 }
 
-void mergeMyOrdersWith(OrderList orders)
+void orderManager_mergeMyOrdersWith(OrderList orders)
 {
 	for (auto it = orders.begin(); it != orders.end(); ++it)
 	{
@@ -101,7 +101,7 @@ void mergeMyOrdersWith(OrderList orders)
 	std::sort(orderList.begin(), orderList.end());
 }
 
-bool orderListEquals(OrderList rhs)
+bool orderManager_orderListEquals(OrderList rhs)
 {
 	auto rhsIterator = rhs.begin();
 	auto lhsIterator = orderList.begin();
