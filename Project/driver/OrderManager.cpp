@@ -5,6 +5,7 @@
 #include <cmath>
 
 OrderList orderList;
+static std::string IP = "102.01.01.105";
 
 void orderManager_newOrder(Order order)
 {
@@ -24,7 +25,7 @@ void orderManager_clearOrder(Order order)
 	std::sort(orderList.begin(), orderList.end());
 }
 
-OrderList orderManager_getOrdersOnFloorInDirection(int floor, button_type_t direction);
+OrderList orderManager_getOrdersOnFloorInDirection(int floor, button_type_t direction)
 {
 	OrderList returnList;
 	for (auto it = orderList.begin(); it != orderList.end(); ++it)
@@ -75,14 +76,14 @@ int orderManager_getCost(int lastFloor, int newFloor, motor_direction_t lastDire
 	if (((newFloor > lastFloor) && (lastDirection == DIRECTION_UP)) || ((newFloor < lastFloor) && (lastDirection == DIRECTION_DOWN)))
 	{
 		// Subcase: Wanting to go the other direction
-		if (((motor_direction_t)wantedDirection != lastDirection) && (wantedDirection != ORDER_INSIDE))
+		if (((motor_direction_t)wantedDirection != lastDirection) && (wantedDirection != BUTTON_COMMAND))
 			cost += N_FLOORS * 1;
 	}
 	// Case: You need to change direction
 	else
 	{
 		// Subcase: You need to change direction _again_
-		if (((motor_direction_t)wantedDirection == lastDirection) && (wantedDirection != ORDER_INSIDE))
+		if (((motor_direction_t)wantedDirection == lastDirection) && (wantedDirection != BUTTON_COMMAND))
 			cost += N_FLOORS * 3;
 		// Subcase: You only need to change direction once.
 		else
@@ -107,8 +108,8 @@ bool orderManager_orderListEquals(OrderList rhs)
 	auto lhsIterator = orderList.begin();
 	while (lhsIterator != orderList.end())
 	{
-		if (rhsIterator == rhs.end())			return false;
-		if ((*lhsIterator) != (*rhsIterator))	return false;
+		if (rhsIterator == rhs.end())				return false;
+		if (!((*lhsIterator) == (*rhsIterator)))	return false;
 
 		++lhsIterator;
 		++rhsIterator;
@@ -116,4 +117,8 @@ bool orderManager_orderListEquals(OrderList rhs)
 	if (rhsIterator != rhs.end())				return false;
 	
 	return true;
+}
+
+int main() {
+	return 0;
 }

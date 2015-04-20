@@ -1,7 +1,6 @@
 #ifndef ORDERMANAGERNEW_H
 #define ORDERMANAGERNEW_H
 
-#define IP 4
 #define N_FLOORS 4
 
 #include <vector>
@@ -16,9 +15,6 @@ typedef std::vector<Order> OrderList;
 void orderManager_newOrder(Order order);
 void orderManager_clearOrder(Order order);
 void orderManager_mergeMyOrdersWith(OrderList orders);
-
-// Pulling from orderlist
-OrderList orderManager_getOrders() { return orderList; }
 		
 // Logic and algorithms
 OrderList			orderManager_getOrdersOnFloorInDirection(int floor, button_type_t direction);

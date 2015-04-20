@@ -5,9 +5,6 @@
 #include <cmath>
 #include <ctime>
 
-int					lastFloor;
-motor_direction_t	lastDirection;
-
 void stateMachine_buttonPressed(int floor, button_type_t button)
 {
 	ioDriver_setOrderButtonLamp(button, floor);
@@ -29,7 +26,6 @@ void stateMachine_buttonPressed(int floor, button_type_t button)
 void stateMachine_floorReached(int floor, motor_direction_t direction)
 {
 	ioDriver_setFloorIndicator(floor)
-	lastFloor = floor;
 
 	button_type_t buttonDirection			= (button_type_t)direction;
 	button_type_t buttonOppositeDirection	= (button_type_t)abs((int)direction - 2);
@@ -66,7 +62,7 @@ void stateMachine_floorReached(int floor, motor_direction_t direction)
 	}
 }
 
-void stateMachine_doorTimeout()
+void stateMachine_doorTimeout(motor_direction_t &lastDirection)
 {
 	clearDoorOpenLamp();
 	// state is IDLE
