@@ -4,8 +4,9 @@
 #include <algorithm>
 #include <cmath>
 
+OrderList orderList;
 
-void OrderManager::newOrder(Order order)
+void newOrder(Order order)
 {
 	std::vector<Order>::iterator search = std::find(orderList.begin(), orderList.end(), order);
 	if (search == orderList.end())
@@ -15,7 +16,7 @@ void OrderManager::newOrder(Order order)
 	std::sort(orderList.begin(), orderList.end());
 }
 
-void OrderManager::clearOrder(Order order)
+void clearOrder(Order order)
 {
 	std::vector<Order>::iterator search = std::find(orderList.begin(), orderList.end(), order);
 	if (search != orderList.end())
@@ -23,7 +24,7 @@ void OrderManager::clearOrder(Order order)
 	std::sort(orderList.begin(), orderList.end());
 }
 
-OrderList OrderManager::getOrdersOnFloorInDirection(int floor, button_type_t direction);
+OrderList getOrdersOnFloorInDirection(int floor, button_type_t direction);
 {
 	OrderList returnList;
 	for (auto it = orderList.begin(); it != orderList.end(); ++it)
@@ -34,7 +35,7 @@ OrderList OrderManager::getOrdersOnFloorInDirection(int floor, button_type_t dir
 	return returnList;
 }
 
-motor_direction_t OrderManager::getNextDirection(int floor, motor_direction_t lastDirection)
+motor_direction_t getNextDirection(int floor, motor_direction_t lastDirection)
 {
 	// If the list is empty, stand still.
 	if (orderList.empty()) return DIRECTION_STOP;
@@ -67,7 +68,7 @@ motor_direction_t OrderManager::getNextDirection(int floor, motor_direction_t la
 	return newDirection;
 }
 
-int OrderManager::getCost(int lastFloor, int newFloor, motor_direction_t lastDirection, button_type_t wantedDirection)
+int getCost(int lastFloor, int newFloor, motor_direction_t lastDirection, button_type_t wantedDirection)
 {
 	int cost = abs(lastFloor - newFloor);
 	// Case: In the same direction
@@ -90,7 +91,7 @@ int OrderManager::getCost(int lastFloor, int newFloor, motor_direction_t lastDir
 	return cost;
 }
 
-void OrderManager::mergeMyOrdersWith(OrderList orders)
+void mergeMyOrdersWith(OrderList orders)
 {
 	for (auto it = orders.begin(); it != orders.end(); ++it)
 	{
@@ -100,12 +101,7 @@ void OrderManager::mergeMyOrdersWith(OrderList orders)
 	std::sort(orderList.begin(), orderList.end());
 }
 
-int main ()
-{
-	return 0;
-}
-
-bool OrderManager::orderListEquals(OrderList rhs)
+bool orderListEquals(OrderList rhs)
 {
 	auto rhsIterator = rhs.begin();
 	auto lhsIterator = orderList.begin();
