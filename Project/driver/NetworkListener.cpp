@@ -46,7 +46,7 @@ void listen()
 		}
 
 		receivedOrderList = getOrderListFromMessage(buf);
-		if (receivedOrderList != orderManager.getOrders())
+		if (!(orderManager.orderListEquals(receivedOrderList)))
 		{
 			orderManager.mergeMyOrdersWith(receivedOrderList);
 			sendUpdate(orderManager.getOrders());

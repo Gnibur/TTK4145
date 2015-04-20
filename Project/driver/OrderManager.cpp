@@ -117,7 +117,7 @@ bool OrderManager::orderListEquals(OrderList rhs)
 		++lhsIterator;
 		++rhsIterator;
 	}
-	if (rhsIterator != rhs.end())		return false;
+	if (rhsIterator != rhs.end())				return false;
 	
 	return true;
 }
