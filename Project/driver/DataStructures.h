@@ -4,7 +4,7 @@
 #include "Enums.h"
 
 struct Order {
-	order_direction_t direction;
+	button_type_t direction;
 	int floor;
 	int assignedIP; // Should be string? Or?
 	int timeAssigned;
@@ -19,11 +19,6 @@ struct Order {
 		if (direction < rhs.direction) 	return true;
 		return false;
 	}
-};
-
-struct button {
-	button_type_t direction;
-	int floor;
 };
 
 #endif

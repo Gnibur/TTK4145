@@ -5,6 +5,9 @@
 #include "DataStructures.h"
 //#include "IoDriver.h"
 
+#define BROADCAST_PORT 16
+#define MAXLENGTH_BUF 2048
+
 
 typedef struct {
   int lastFloor;
@@ -17,7 +20,7 @@ private:
 	ElevatorState state;
 	OrderManager orderManager;
 public:
-	void eventButtonPressed(button button);
+	void eventButtonPressed(button_type_t button, int floor);
   	void eventFloorReached(int floor, motor_direction_t direction);
   	void eventDoorTimeout();
   	void orderTimeOut(Order order);

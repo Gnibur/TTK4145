@@ -1,20 +1,26 @@
 #include "StateMachine.h"
-//#include "IoDriver.h"
+#include "IoDriver.h"
 #include <algorithm>
 #include <string>
+#include <cmath>
+#include <ctime>
 
-void StateMachine::eventButtonPressed(button button)
+void StateMachine::eventButtonPressed(button_type_t button, int floor)
 {
-	orderManager.newOrder(button.floor, (order_direction_t)button.direction);
-	setOrderButtonLamp(button.direction, button.floor);
-	if (button.direction == BUTTON_COMMAND)
+	orderManager.newOrder(floor, button);
+	setOrderButtonLamp(button, floor);
+	if (button == BUTTON_COMMAND)
 	{
-		orderManager.newOrder(button.floor, (order_direction_t)button.direction);
-		// Send out to others that you got a local order
+		time_t timer;
+		int assignedDate = time(&timer);
+		Order order = {button, floor, IP, assignedDate }; 
+		orderManager.newOrder(order);
+		std::string newOrderMsg = makeOrderListMsg(NEW_ORDER, orderManager.getOrders(), order);
+		udp.send(BROADCAST_PORT, newOrderMsg, MAXLENGTH_BUF);
 	}
 	else
 	{
-		budmanager.start(button);
+		budmanager.start(button, floor);
 	}
 }
 
@@ -22,20 +28,12 @@ void StateMachine::eventButtonPressed(button button)
 void StateMachine::eventFloorReached(int reachedFloor, motor_direction_t direction)
 {
 
-	//setFloorIndicator(reachedFloor)
+	setFloorIndicator(reachedFloor)
 	state.lastFloor = reachedFloor;
+	button_type_t buttonDirection = (button_type_t)direction;
 
-  // Ordermanager is also responsible for the light
-	if (shouldIStopHere(reachedFloor, direction)){
-		OrderList ordersToClear = orderManager.findOrdersOnFloorInDirection(reachedFloor, direction);
-		orderManager.clearOrders(ordersToClear);
-
-		string clearOrdersMsg = makeOrderListMsg(CLEAR_ORDER, orderManager.getGlobalList(), ordersToClear);
-		// send out order info to network. Also when internal?
-
-		// set door open light and start timer
-	}
-
+	OrderList ordersInDirection = getOrdersOnFloorInDirection(reachedFloor, buttonDirection);
+	OrderList ordersInOppositeDirection = getOrdersOnFloorInDirection(reachedFloor, 
 }
 
 void StateMachine::eventDoorTimeout()
@@ -54,16 +52,4 @@ void StateMachine::orderTimeOut(Order order)
 	// Send out msg
 	// Call eventbuttonpressed.
 	//eventButtonPressed();
-}
-
-bool StateMachine::shouldIStopHere(int floor, motor_direction_t direction)
-{
-	if (!orderManager.hasOrderOnFloor(floor)) 
-		return false;
-	OrderList ordersOnFloor = orderManager.findOrdersOnFloorInDirection(floor, direction);
-	if ((!ordersOnFloor.empty()) || (orderManager.getNextDirection(floor, direction) != direction))
-	{
-		return true;
-	}
-	return false;
 }

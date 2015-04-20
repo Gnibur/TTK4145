@@ -5,15 +5,25 @@
 #include <cmath>
 
 
-void OrderManager::newOrder(int floor, order_direction_t direction)
+void OrderManager::newOrder(int floor, button_type_t direction)
 {
 	time_t timer;
 	int assignedDate = time(&timer);
-	Order newOrder = {direction, floor, IP, assignedDate };
-	std::vector<Order>::iterator search = std::find(orderList.begin(), orderList.end(), newOrder); // See if the order is already there
+	Order order = {direction, floor, IP, assignedDate };
+	std::vector<Order>::iterator search = std::find(orderList.begin(), orderList.end(), order); // See if the order is already there
 	if (search == orderList.end())
 	{
-		orderList.push_back(newOrder);
+		orderList.push_back(order);
+	}
+	std::sort(orderList.begin(), orderList.end());
+}
+
+void OrderManager::newOrder(Order order)
+{
+	std::vector<Order>::iterator search = std::find(orderList.begin(), orderList.end(), order);
+	if (search == orderList.end())
+	{
+		orderList.push_back(order);
 	}
 	std::sort(orderList.begin(), orderList.end());
 }
@@ -23,6 +33,7 @@ void OrderManager::clearOrder(Order order)
 	std::vector<Order>::iterator search = std::find(orderList.begin(), orderList.end(), order);
 	if (search != orderList.end())
 		orderList.erase(search);
+	std::sort(orderList.begin(), orderList.end());
 }
 
 void OrderManager::clearOrders(OrderList orders)
@@ -31,27 +42,18 @@ void OrderManager::clearOrders(OrderList orders)
 	{
 		orderList.erase(it);
 	}
+	std::sort(orderList.begin(), orderList.end());
 }
 
-OrderList OrderManager::findOrdersOnFloorInDirection(int floor, motor_direction_t direction)
+OrderList OrderManager::getOrdersOnFloorInDirection(int floor, button_type_t direction);
 {
-	OrderList ordersOnFloor;
+	OrderList returnList;
 	for (auto it = orderList.begin(); it != orderList.end(); ++it)
 	{
-		if ((it->floor == floor) && ((it->direction == (order_direction_t)direction) || (it->direction == ORDER_INSIDE)))
-			ordersOnFloor.push_back(*it);
+		if ((it->floor == floor) && (it->assignedIP == IP) && ((it->direction == direction) || (it->direction == BUTTON_COMMAND)))
+			returnList.push_back(*it);
 	}
-	return ordersOnFloor;
-}
-
-bool OrderManager::hasOrderOnFloor(int floor)
-{
-	for (auto it = orderList.begin(); it != orderList.end(); ++it)
-	{
-		if ((it->floor == floor) && (it->assignedIP == IP))
-			return true;
-	}
-	return false;
+	return returnList;
 }
 
 motor_direction_t OrderManager::getNextDirection(int floor, motor_direction_t lastDirection)
@@ -87,7 +89,7 @@ motor_direction_t OrderManager::getNextDirection(int floor, motor_direction_t la
 	return newDirection;
 }
 
-int OrderManager::getCost(int lastFloor, int newFloor, motor_direction_t lastDirection, order_direction_t wantedDirection)
+int OrderManager::getCost(int lastFloor, int newFloor, motor_direction_t lastDirection, button_type_t wantedDirection)
 {
 	int cost = abs(lastFloor - newFloor);
 	// Case: In the same direction

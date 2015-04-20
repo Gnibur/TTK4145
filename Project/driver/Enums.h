@@ -15,18 +15,6 @@ typedef enum {
 } button_type_t;
 
 typedef enum {
-	ORDER_DOWN,
-	ORDER_INSIDE,
-	ORDER_UP
-} order_direction_t;
-
-typedef enum {
-	UP = 0,
-	INSIDE,
-	DOWN
-} button_t;
-
-typedef enum {
 	ADD_ORDER,
 	CLEAR_ORDER,
 	UPDATE_LIST
