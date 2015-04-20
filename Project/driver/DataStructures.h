@@ -24,4 +24,11 @@ struct Order {
 	}
 };
 
+struct Offer {
+	int cost;
+	int floor;
+	button_type_t direction;
+	std::string IP;
+};
+
 #endif

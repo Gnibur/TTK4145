@@ -20,7 +20,7 @@ private:
 	ElevatorState state;
 	OrderManager orderManager;
 public:
-	void eventButtonPressed(button_type_t button, int floor);
+	void eventButtonPressed(int floor, button_type_t button);
   	void eventFloorReached(int floor, motor_direction_t direction);
   	void eventDoorTimeout();
   	void orderTimeOut(Order order);

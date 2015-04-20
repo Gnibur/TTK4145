@@ -15,18 +15,21 @@ void listen()
 		switch (messageType) {
 
 		case ADD_ORDER:
-			order = getOrderFromMessage(buf);
+			Order order = getOrderFromMessage(buf);
 			orderManager.newOrder(order);
 			break;
 
 		case GET_FLOOR_COST:
-			cost = orderManager.getCost(currentFloor, currentDirection); // global variables
-			sendOffer(cost);
+			Order order				= getOrderCostRequestFromMessage(buf);
+			cost					= orderManager.getCost(currentFloor, order.floor, currentDirection, order.direction);
+			Offer offer				= {cost, order.floor, order.direction, IP};
+			std::string offerMsg; // TODO: Fill this out
+			udp.send(BROADCAST_PORT, offerMsg, MAXLENGTH_BUF)
 			break;
 
 		case REMOVE_ORDER:
 			order = getOrderFromMessage(buf);
-			orderManager.removeOrder(order);
+			orderManager.clearOrder(order);
 			break;
 
 		case ORDER_COST_OFFER: 

@@ -5,7 +5,7 @@
 #include <cmath>
 #include <ctime>
 
-void StateMachine::eventButtonPressed(button_type_t button, int floor)
+void StateMachine::eventButtonPressed(int floor, button_type_t button)
 {
 	orderManager.newOrder(floor, button);
 	setOrderButtonLamp(button, floor);
@@ -24,17 +24,16 @@ void StateMachine::eventButtonPressed(button_type_t button, int floor)
 	}
 }
 
-
-void StateMachine::eventFloorReached(int reachedFloor, motor_direction_t direction)
+void StateMachine::eventFloorReached(int floor, motor_direction_t direction)
 {
-	setFloorIndicator(reachedFloor)
-	state.lastFloor	= reachedFloor;
+	setFloorIndicator(floor)
+	state.lastFloor	= floor;
 
 	button_type_t buttonDirection			= (button_type_t)direction;
 	button_type_t buttonOppositeDirection	= (button_type_t)abs((int)direction - 2);
 
-	OrderList ordersInDirection			= getOrdersOnFloorInDirection(reachedFloor, buttonDirection);
-	OrderList ordersInOppositeDirection = getOrdersOnFloorInDirection(reachedFloor, buttonOppositeDirection);
+	OrderList ordersInDirection			= getOrdersOnFloorInDirection(floor, buttonDirection);
+	OrderList ordersInOppositeDirection = getOrdersOnFloorInDirection(floor, buttonOppositeDirection);
 	OrderList ordersToClear;
 
 	bool stop = false;
@@ -76,9 +75,13 @@ void StateMachine::eventDoorTimeout()
 
 void StateMachine::orderTimeOut(Order order)
 {
-	// How to:
-	// Clear order
-	// Send out msg
-	// Call eventbuttonpressed.
-	//eventButtonPressed();
+	if (order.direction != BUTTON_COMMAND)
+	{
+		orderManager.clearOrder(order);
+		std::string clearOrderMsg;
+		udp.send(BROADCOAST_PORT, clearOrderMsg, MAXLENGTH_BUF);
+
+		// TODO: Needs failsafe method, so the elevator doesn't die here and everything is lost..
+		eventButtonPressed(order.floor, order.direction);
+	}
 }

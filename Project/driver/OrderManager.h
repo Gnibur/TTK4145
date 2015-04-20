@@ -25,9 +25,9 @@ public:
 	OrderList getOrders() { return orderList; }
 		
 	// Logic and algorithms
-	OrderList getOrdersOnFloorInDirection(int floor, button_type_t direction);
-	motor_direction_t getNextDirection(int floor, motor_direction_t lastDirection);
-	int getCost(int lastFloor, int newFloor, motor_direction_t lastDirection, button_type_t wantedDirection); // This _might_ be confusing
+	OrderList			getOrdersOnFloorInDirection(int floor, button_type_t direction);
+	motor_direction_t	getNextDirection(int floor, motor_direction_t lastDirection);
+	int					getCost(int lastFloor, int newFloor, motor_direction_t lastDirection, button_type_t wantedDirection);
 };
 
 #endif
