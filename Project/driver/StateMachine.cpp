@@ -31,9 +31,26 @@ void StateMachine::eventFloorReached(int reachedFloor, motor_direction_t directi
 	setFloorIndicator(reachedFloor)
 	state.lastFloor = reachedFloor;
 	button_type_t buttonDirection = (button_type_t)direction;
+	button_type_t buttonOppositeDirection = (button_type_t)abs((int)direction - 2);
 
 	OrderList ordersInDirection = getOrdersOnFloorInDirection(reachedFloor, buttonDirection);
-	OrderList ordersInOppositeDirection = getOrdersOnFloorInDirection(reachedFloor, 
+	OrderList ordersInOppositeDirection = getOrdersOnFloorInDirection(reachedFloor, buttonOppositeDirection);
+
+	if (!ordersInDirection.empty())
+	{
+		// STOP
+	}
+	else
+	{
+		if ((ordersInOppositeDirection.empty()) && (orderManager.getNextDirection(reachedFloor, direction) != direction))
+		{
+			// STOP
+		}
+		else
+		{
+			// DON'T STOP
+		}
+	}
 }
 
 void StateMachine::eventDoorTimeout()
