@@ -8,7 +8,7 @@
 int					lastFloor;
 motor_direction_t	lastDirection;
 
-void eventButtonPressed(int floor, button_type_t button)
+void stateMachine_buttonPressed(int floor, button_type_t button)
 {
 	ioDriver_setOrderButtonLamp(button, floor);
 	if (button == BUTTON_COMMAND)
@@ -26,7 +26,7 @@ void eventButtonPressed(int floor, button_type_t button)
 	}
 }
 
-void eventFloorReached(int floor, motor_direction_t direction)
+void stateMachine_floorReached(int floor, motor_direction_t direction)
 {
 	ioDriver_setFloorIndicator(floor)
 	lastFloor = floor;
@@ -66,7 +66,7 @@ void eventFloorReached(int floor, motor_direction_t direction)
 	}
 }
 
-void StateMachine::eventDoorTimeout()
+void stateMachine_doorTimeout()
 {
 	clearDoorOpenLamp();
 	// state is IDLE
@@ -75,7 +75,7 @@ void StateMachine::eventDoorTimeout()
 	lastDirection = nextDirection;
 }
 
-void StateMachine::orderTimeOut(Order order)
+void stateMachine_orderTimeOut(Order order)
 {
 	if (order.direction != BUTTON_COMMAND)
 	{
