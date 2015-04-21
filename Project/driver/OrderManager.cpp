@@ -35,7 +35,7 @@ OrderList orderManager_getOrdersOnFloorInDirection(int floor, button_type_t dire
 	OrderList returnList;
 	for (auto it = orderList.begin(); it != orderList.end(); ++it)
 	{	// && (it->assignedIP == IP)
-		if ((it->floor == floor)  && ((it->direction == direction) || (it->direction == BUTTON_COMMAND)))
+		if ((it->floor == floor)  && ((it->direction == direction) || (it->direction == BUTTON_COMMAND) || (it->floor == N_FLOORS - 1) || (it->floor == 0)))
 			returnList.push_back(*it);
 	}
 	return returnList;

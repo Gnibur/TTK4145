@@ -54,6 +54,13 @@ struct Offer {
 	int floor;
 	button_type_t direction;
 	std::string fromIP;
+
+	bool operator < (const Offer& rhs) const
+	{
+		if (cost < rhs.cost) 					return true;
+		if (cost > rhs.cost) 					return false;
+		return false;
+	}
 };
 
 #endif

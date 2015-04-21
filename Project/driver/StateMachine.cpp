@@ -20,19 +20,20 @@ void stateMachine_initialize()
 void stateMachine_buttonPressed(int floor, button_type_t button)
 {
 	ioDriver_setOrderButtonLamp(button, floor);
-	//if (button == BUTTON_COMMAND)
-	//{
+	if (button == BUTTON_COMMAND)
+	{
 		time_t timer;
 		int assignedDate = time(&timer);
 		Order order(button, floor, testIP, assignedDate);
 		orderManager_newOrder(order);
 		std::string newOrderMsg = MsgParser::makeNewOrderMsg(order, orderManager_getOrders());
 		udp_send(BROADCAST_PORT, newOrderMsg.c_str(), MAXLENGTH_BUF);
-	//}
-	//else
-	//{
-		//budmanager.start(button, floor);
-	//}
+	}
+	else
+	{
+		auction_start(floor, button);
+		// Elevator should probably add own bid
+	}
 }
 
 void stateMachine_floorReached(int floor)
@@ -58,7 +59,7 @@ void stateMachine_floorReached(int floor)
 	else
 	{
 		std::cout << "Orders in opposite direction?\n";
-		if ((ordersInOppositeDirection.empty()) && (orderManager_getNextDirection(floor, lastDirection) != lastDirection))
+		if ((!ordersInOppositeDirection.empty()) && (orderManager_getNextDirection(floor, lastDirection) != lastDirection))
 		{
 			ordersToClear = ordersInOppositeDirection;
 			stop = true;
@@ -72,9 +73,10 @@ void stateMachine_floorReached(int floor)
 			std::cout << "Entering orders to clear...\n";
 			std::cout << "FLOOR: " << it->floor << std::endl;
 			orderManager_clearOrder(*it);
-			std::string clearOrderMsg;
+			std::string clearOrderMsg = MsgParser::makeClearOrderMsg(order, orderManager_getOrders());
 			udp_send(BROADCAST_PORT, clearOrderMsg.c_str(), MAXLENGTH_BUF);
 			ioDriver_clearOrderButtonLamp(it->direction, it->floor);
+			ioDriver_setDoorOpenLamp();
 		}
 		timer_start();
 	}
@@ -95,7 +97,7 @@ void stateMachine_orderTimeOut(Order order)
 	if (order.direction != BUTTON_COMMAND)
 	{
 		orderManager_clearOrder(order);
-		std::string clearOrderMsg;
+		std::string clearOrderMsg = MsgParser::makeClearOrderMsg(order, orderManager_getOrders());
 		udp_send(BROADCAST_PORT, clearOrderMsg.c_str(), MAXLENGTH_BUF);
 
 		// TODO: Needs failsafe method, so the elevator doesn't die here and everything is lost..

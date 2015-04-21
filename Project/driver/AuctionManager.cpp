@@ -6,8 +6,10 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <algorithm>
+#include <ctime>
 
-std::map<Order, std::vector<Offer> auctions;
+std::map<Order, std::vector<Offer>> auctions;
 
 static pthread_mutex_t auctionMutex;
 
@@ -21,7 +23,7 @@ void auctionManager_init()
 
 void auction_start(int floor, button_type_t direction)
 {
-  Order order = {direction, floor};
+  Order order(direction, floor, "", 0);
   pthread_t auction_id;
   pthread_create(&auction_id, NULL, runAuction, (void*)order);
 }
@@ -52,7 +54,9 @@ void *runAuction(void *args)
 
 void auction_addBid(Offer offer)
 {
-  Order order = {offer.direction, offer.floor};
+  time_t timer;
+  int timeNow = time(&timer);
+  Order order(offer.direction, offer.floor, "", 0);
 
   pthread_mutex_lock(&auctionMutex);
   if (auctions.find(order) != auctions.end())
