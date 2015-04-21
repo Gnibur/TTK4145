@@ -130,7 +130,3 @@ Order orderManager_checkForOrderTimeout()
 	Order defaultOrder;
 	return defaultOrder;
 }
-
-int main() {
-	return 0;
-}
