@@ -34,8 +34,8 @@ OrderList orderManager_getOrdersOnFloorInDirection(int floor, button_type_t dire
 {
 	OrderList returnList;
 	for (auto it = orderList.begin(); it != orderList.end(); ++it)
-	{
-		if ((it->floor == floor) && (it->assignedIP == IP) && ((it->direction == direction) || (it->direction == BUTTON_COMMAND)))
+	{	// && (it->assignedIP == IP)
+		if ((it->floor == floor)  && ((it->direction == direction) || (it->direction == BUTTON_COMMAND)))
 			returnList.push_back(*it);
 	}
 	return returnList;
@@ -45,6 +45,13 @@ motor_direction_t orderManager_getNextDirection(int floor, motor_direction_t las
 {
 	// If the list is empty, stand still.
 	if (orderList.empty()) return DIRECTION_STOP;
+
+	// If the elevator is idle, prioritize the floors closest
+	if (lastDirection == DIRECTION_STOP)
+	{
+		if (floor >= 2) lastDirection = DIRECTION_UP;
+		else			lastDirection = DIRECTION_DOWN;
+	}
 
 	// Find the directional multiplier, so we can use the same check whether you are going up or down.
 	int directionalMultiplier;

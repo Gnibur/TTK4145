@@ -5,6 +5,7 @@
 #include <string>
 #include <cmath>
 #include <ctime>
+#include <iostream>
 
 int					lastFloor;
 motor_direction_t	lastDirection;
@@ -13,25 +14,25 @@ std::string testIP	= "";
 void stateMachine_initialize()
 {
 	lastFloor		= ioDriver_getFloorSensorValue();
-	lastDirection	= DIRECTION_UP;
+	lastDirection	= DIRECTION_STOP;
 }
 
 void stateMachine_buttonPressed(int floor, button_type_t button)
 {
 	ioDriver_setOrderButtonLamp(button, floor);
-	if (button == BUTTON_COMMAND)
-	{
+	//if (button == BUTTON_COMMAND)
+	//{
 		time_t timer;
 		int assignedDate = time(&timer);
-		Order order(button, floor, testIP, assignedDate); 
+		Order order(button, floor, testIP, assignedDate);
 		orderManager_newOrder(order);
 		std::string newOrderMsg = MsgParser::makeNewOrderMsg(order, orderManager_getOrders());
 		udp_send(BROADCAST_PORT, newOrderMsg.c_str(), MAXLENGTH_BUF);
-	}
-	else
-	{
+	//}
+	//else
+	//{
 		//budmanager.start(button, floor);
-	}
+	//}
 }
 
 void stateMachine_floorReached(int floor)
@@ -50,11 +51,13 @@ void stateMachine_floorReached(int floor)
 
 	if (!ordersInDirection.empty())
 	{
+		std::cout << "Orders in direction is not empty!\n";
 		ordersToClear = ordersInDirection;
 		stop = true;
 	}
 	else
 	{
+		std::cout << "Orders in opposite direction?\n";
 		if ((ordersInOppositeDirection.empty()) && (orderManager_getNextDirection(floor, lastDirection) != lastDirection))
 		{
 			ordersToClear = ordersInOppositeDirection;
@@ -66,10 +69,12 @@ void stateMachine_floorReached(int floor)
 		ioDriver_setMotorDirection(DIRECTION_STOP);
 		for (auto it = ordersToClear.begin(); it != ordersToClear.end(); ++it) 
 		{
+			std::cout << "Entering orders to clear...\n";
+			std::cout << "FLOOR: " << it->floor << std::endl;
 			orderManager_clearOrder(*it);
 			std::string clearOrderMsg;
 			udp_send(BROADCAST_PORT, clearOrderMsg.c_str(), MAXLENGTH_BUF);
-			// open door, set light
+			ioDriver_clearOrderButtonLamp(it->direction, it->floor);
 		}
 		timer_start();
 	}
@@ -77,6 +82,7 @@ void stateMachine_floorReached(int floor)
 
 void stateMachine_doorTimeout()
 {
+	std::cout << "Entering doortimeout...\n";
 	timer_reset();
 	ioDriver_clearDoorOpenLamp();
 	motor_direction_t nextDirection = orderManager_getNextDirection(lastFloor, lastDirection);
