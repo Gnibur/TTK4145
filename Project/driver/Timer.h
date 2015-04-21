@@ -6,5 +6,6 @@
 void	timer_start();
 bool	timer_done();
 void	timer_reset();
+bool	timer_active();
 
 #endif

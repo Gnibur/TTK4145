@@ -25,7 +25,7 @@ Order MsgParser::getOrderFromMessage(string message)
 	int temp;
 	Order order;
 	elem->QueryIntAttribute("Direction", &temp);
-	order.direction = (button_t)temp;
+	order.direction = (button_type_t)temp;
 	elem->QueryIntAttribute("Floor", &order.floor);
 
 	if (getMessageType(message) == CLEAR_ORDER_MSG)
@@ -52,7 +52,7 @@ OrderList MsgParser::getOrderListFromMessage(string message)
 		int temp;
 		Order order;
 		childElement->QueryIntAttribute("Direction", &temp);
-		order.direction = (button_t)temp;
+		order.direction = (button_type_t)temp;
 		childElement->QueryIntAttribute("Floor", &order.floor);
 
 		if (getMessageType(message) != NEW_ORDER_MSG)
@@ -76,7 +76,7 @@ Order MsgParser::getOrderCostRequestFromMessage(string message)
 	elem->QueryIntAttribute("Floor", &temp);
 	order.floor = temp;
 	elem->QueryIntAttribute("Direction", &temp);
-	order.direction = (button_t)temp;
+	order.direction = (button_type_t)temp;
 
 
 	return order;
@@ -95,7 +95,7 @@ Offer MsgParser::getOrderCostReplyFromMessage(string message)
 	elem->QueryIntAttribute("Cost", &offer.cost);
 	elem->QueryIntAttribute("Floor", &offer.floor);
 	elem->QueryIntAttribute("Direction", &temp);
-	offer.direction = (button_t)temp;
+	offer.direction = (button_type_t)temp;
 
 	offer.fromIP = elem->Attribute("fromIP");
 
@@ -177,7 +177,7 @@ string MsgParser::makeOrderListMsg(OrderList orders)
 	return printer.CStr();
 }
 
-string MsgParser::makeOrderCostRequestMsg(int floor, button_t direction)
+string MsgParser::makeOrderCostRequestMsg(int floor, button_type_t direction)
 {
 	TiXmlDocument xmldoc;
 	TiXmlElement *msg = new TiXmlElement("RootElement");
@@ -192,7 +192,7 @@ string MsgParser::makeOrderCostRequestMsg(int floor, button_t direction)
 	return printer.CStr();
 }
 
-string MsgParser::makeOrderCostReplyMsg(int cost, int floor, button_t dir, string IP)
+string MsgParser::makeOrderCostReplyMsg(int cost, int floor, button_type_t dir, string IP)
 {
 	TiXmlDocument xmldoc;
 	TiXmlElement *msg = new TiXmlElement("RootElement");

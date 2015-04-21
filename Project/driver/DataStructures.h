@@ -2,6 +2,7 @@
 #define DATASTRUCTURES_H
 
 #include "Enums.h"
+#include <vector>
 #include <string>
 
 struct Order {
@@ -16,6 +17,15 @@ struct Order {
 		assignedIP = "";
 		timeAssigned = -1;
 	}
+
+	Order(button_type_t cdirection, int cfloor, std::string cassignedIP, int ctimeAssigned)
+	{
+		direction = cdirection;
+		floor = cfloor;
+		assignedIP = cassignedIP;
+		timeAssigned = ctimeAssigned;
+	}	
+
 	bool operator==(const Order& rhs) const
 	{
 	    return (floor == rhs.floor && direction == rhs.direction && assignedIP.compare(rhs.assignedIP) == 0);
@@ -37,11 +47,13 @@ struct Order {
 	}
 };
 
+typedef std::vector<Order> OrderList;
+
 struct Offer {
 	int cost;
 	int floor;
 	button_type_t direction;
-	std::string IP;
+	std::string fromIP;
 };
 
 #endif

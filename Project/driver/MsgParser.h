@@ -17,29 +17,29 @@ enum MsgType {
 	INVALID_MESSAGE
 };
 
-/* Should this be defined here? */
+/* Should this be defined here?
 struct Offer {
 	int cost;
 	int floor;
 	button_t direction;
 	string fromIP; // necessary?
-};
+};*/
 
 
 
 class MsgParser {
 public:
-	MsgType   getMessageType(string message);
-	Order     getOrderFromMessage(string message);
-	OrderList getOrderListFromMessage(string message);
-	Order     getOrderCostRequestFromMessage(string message);
-	Offer     getOrderCostReplyFromMessage(string message);
+	static MsgType   getMessageType(string message);
+	static Order     getOrderFromMessage(string message);
+	static OrderList getOrderListFromMessage(string message);
+	static Order     getOrderCostRequestFromMessage(string message);
+	static Offer     getOrderCostReplyFromMessage(string message);
 
-	string    makeNewOrderMsg(Order order, OrderList updatedOrderList);
-	string    makeClearOrderMsg(Order order, OrderList updatedOrderList);
-	string    makeOrderListMsg(OrderList orderList);
-	string    makeOrderCostRequestMsg(int floor, button_t direction);
-	string    makeOrderCostReplyMsg(int cost, int floor, button_t dir, string IP);
+	static string    makeNewOrderMsg(Order order, OrderList updatedOrderList);
+	static string    makeClearOrderMsg(Order order, OrderList updatedOrderList);
+	static string    makeOrderListMsg(OrderList orderList);
+	static string    makeOrderCostRequestMsg(int floor, button_type_t direction);
+	static string    makeOrderCostReplyMsg(int cost, int floor, button_type_t dir, string IP);
 
 private:
 

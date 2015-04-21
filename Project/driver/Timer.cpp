@@ -2,13 +2,13 @@
 #include <ctime>
 
 int		time_start;
-bool	timer_active;
+bool	time_active;
 
 void timer_start() {
 	time_t timer;
 	
 	time_start		= time(&timer);
-	timer_active	= true;
+	time_active	= true;
 }
 
 bool timer_done() {
@@ -22,5 +22,10 @@ bool timer_done() {
 
 void timer_reset() {
 	time_start		= -1;
-	timer_active	= false;
+	time_active		= false;
+}
+
+bool timer_active()
+{
+	return time_active;
 }

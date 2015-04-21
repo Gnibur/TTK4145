@@ -10,12 +10,11 @@
 
 struct Order;
 
-typedef std::vector<Order> OrderList;
-
 // Pushing and popping from the orderlist
 void orderManager_newOrder(Order order);
 void orderManager_clearOrder(Order order);
 void orderManager_mergeMyOrdersWith(OrderList orders);
+OrderList orderManager_getOrders();
 		
 // Logic and algorithms
 OrderList			orderManager_getOrdersOnFloorInDirection(int floor, button_type_t direction);

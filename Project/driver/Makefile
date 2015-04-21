@@ -1,18 +1,22 @@
 # Which compiler to use
-CC = g++
+CC = clang
+CCC = gcc
 
 # Compiler flags go here.
 CFLAGS = -g -Wall -std=c++11
+CCFLAGS = -g -Wall -std=c99
 
 # Linker flags go here.
-LDFLAGS =  -lm  
+LDFLAGS =  -lm -lcomedi -lstdc++
 
 SOURCES = $(wildcard *.cpp)
+CSOURCES = $(wildcard *.c)
 
 OBJECTS := $(SOURCES:%.cpp=%.o)
+COBJECTS := $(CSOURCES:%.c=%.o)
 
 
-all: $(OBJECTS)
+all: $(COBJECTS) $(OBJECTS)
 	$(CC) $(LDFLAGS) -o $@ $^ 
 
 %.o: %.cpp %.h
@@ -21,11 +25,16 @@ all: $(OBJECTS)
 %.o: %.cpp 
 	$(CC) $(CFLAGS) -c $< 
 
+%.o: %.c %.h
+	$(CCC) $(CCFLAGS) -c $<
+
+%.o: %.cc
+	$(CCC) $(CCFLAGS) -c $< 
+
 clean:
 	rm -r *.o $(TARGET)
 
 rebuild:	clean all
 
 .PHONY: all rebuild clean 
-
 

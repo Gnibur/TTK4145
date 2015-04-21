@@ -15,7 +15,7 @@
 
 #include <unistd.h>
 
-bool udp_send(int targetPort, char *data, size_t dataLength)
+bool udp_send(int targetPort, const char *data, size_t dataLength)
 {
   int socketfd = socket(AF_INET, SOCK_DGRAM, 0);
 

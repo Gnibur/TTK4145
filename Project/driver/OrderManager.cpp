@@ -25,6 +25,11 @@ void orderManager_clearOrder(Order order)
 	std::sort(orderList.begin(), orderList.end());
 }
 
+OrderList orderManager_getOrders()
+{
+	return orderList;
+}
+
 OrderList orderManager_getOrdersOnFloorInDirection(int floor, button_type_t direction)
 {
 	OrderList returnList;
@@ -71,19 +76,27 @@ motor_direction_t orderManager_getNextDirection(int floor, motor_direction_t las
 
 int orderManager_getCost(int lastFloor, int newFloor, motor_direction_t lastDirection, button_type_t wantedDirection)
 {
+	motor_direction_t motorDirection;
+	if (wantedDirection == BUTTON_CALL_DOWN)
+		motorDirection = DIRECTION_DOWN;
+	else if (wantedDirection == BUTTON_CALL_UP)
+		motorDirection = DIRECTION_UP;
+	else
+		motorDirection = DIRECTION_STOP;
+
 	int cost = abs(lastFloor - newFloor);
 	// Case: In the same direction
 	if (((newFloor > lastFloor) && (lastDirection == DIRECTION_UP)) || ((newFloor < lastFloor) && (lastDirection == DIRECTION_DOWN)))
 	{
 		// Subcase: Wanting to go the other direction
-		if (((motor_direction_t)wantedDirection != lastDirection) && (wantedDirection != BUTTON_COMMAND))
+		if ((motorDirection != lastDirection) && (motorDirection != DIRECTION_STOP))
 			cost += N_FLOORS * 1;
 	}
 	// Case: You need to change direction
 	else
 	{
 		// Subcase: You need to change direction _again_
-		if (((motor_direction_t)wantedDirection == lastDirection) && (wantedDirection != BUTTON_COMMAND))
+		if ((motorDirection == lastDirection) && (motorDirection != DIRECTION_STOP))
 			cost += N_FLOORS * 3;
 		// Subcase: You only need to change direction once.
 		else

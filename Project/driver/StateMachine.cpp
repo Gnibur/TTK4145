@@ -1,5 +1,6 @@
 #include "StateMachine.h"
 #include "IoDriver.h"
+#include "MsgParser.h"
 #include <algorithm>
 #include <string>
 #include <cmath>
@@ -7,10 +8,11 @@
 
 int					lastFloor;
 motor_direction_t	lastDirection;
+std::string testIP	= "";
 
 void stateMachine_initialize()
 {
-	lastFloor		= getFloorSensorValue();
+	lastFloor		= ioDriver_getFloorSensorValue();
 	lastDirection	= DIRECTION_UP;
 }
 
@@ -21,24 +23,24 @@ void stateMachine_buttonPressed(int floor, button_type_t button)
 	{
 		time_t timer;
 		int assignedDate = time(&timer);
-		Order order = {button, floor, IP, assignedDate }; 
+		Order order(button, floor, testIP, assignedDate); 
 		orderManager_newOrder(order);
-		std::string newOrderMsg = makeOrderListMsg(NEW_ORDER, orderManager.getOrders(), order);
-		udp_send(BROADCAST_PORT, newOrderMsg, MAXLENGTH_BUF);
+		std::string newOrderMsg = MsgParser::makeNewOrderMsg(order, orderManager_getOrders());
+		udp_send(BROADCAST_PORT, newOrderMsg.c_str(), MAXLENGTH_BUF);
 	}
 	else
 	{
-		budmanager.start(button, floor);
+		//budmanager.start(button, floor);
 	}
 }
 
 void stateMachine_floorReached(int floor)
 {
 	lastFloor = floor;
-	ioDriver_setFloorIndicator(floor)
+	ioDriver_setFloorIndicator(floor);
 
-	button_type_t buttonDirection			= (button_type_t)lastDirection;
-	button_type_t buttonOppositeDirection	= (button_type_t)abs((int)lastDirection - 2);
+	button_type_t buttonDirection			= (lastDirection == DIRECTION_UP)? BUTTON_CALL_UP : BUTTON_CALL_DOWN;
+	button_type_t buttonOppositeDirection	= (lastDirection == DIRECTION_UP)? BUTTON_CALL_DOWN : BUTTON_CALL_UP;
 
 	OrderList ordersInDirection			= orderManager_getOrdersOnFloorInDirection(floor, buttonDirection);
 	OrderList ordersInOppositeDirection = orderManager_getOrdersOnFloorInDirection(floor, buttonOppositeDirection);
@@ -66,7 +68,7 @@ void stateMachine_floorReached(int floor)
 		{
 			orderManager_clearOrder(*it);
 			std::string clearOrderMsg;
-			udp_send(BROADCAST_PORT, clearOrderMsg, MAXLENGTH_BUF);
+			udp_send(BROADCAST_PORT, clearOrderMsg.c_str(), MAXLENGTH_BUF);
 			// open door, set light
 		}
 		timer_start();
@@ -76,9 +78,9 @@ void stateMachine_floorReached(int floor)
 void stateMachine_doorTimeout()
 {
 	timer_reset();
-	clearDoorOpenLamp();
+	ioDriver_clearDoorOpenLamp();
 	motor_direction_t nextDirection = orderManager_getNextDirection(lastFloor, lastDirection);
-	setMotorDirection(nextDirection);
+	ioDriver_setMotorDirection(nextDirection);
 	lastDirection = nextDirection;
 }
 
@@ -88,9 +90,18 @@ void stateMachine_orderTimeOut(Order order)
 	{
 		orderManager_clearOrder(order);
 		std::string clearOrderMsg;
-		udp_send(BROADCOAST_PORT, clearOrderMsg, MAXLENGTH_BUF);
+		udp_send(BROADCAST_PORT, clearOrderMsg.c_str(), MAXLENGTH_BUF);
 
 		// TODO: Needs failsafe method, so the elevator doesn't die here and everything is lost..
-		ioDriver_eventButtonPressed(order.floor, order.direction);
+		stateMachine_buttonPressed(order.floor, order.direction);
 	}
+}
+
+int getLastFloor()
+{
+	return lastFloor;
+}
+motor_direction_t getLastDirection()
+{
+	return lastDirection;
 }

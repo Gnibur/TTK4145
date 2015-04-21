@@ -2,6 +2,7 @@
 #define IO_DRIVER_H
 
 #include <stdbool.h>
+#include "Enums.h"
 
 // Number of floors
 #define N_FLOORS 4
@@ -11,15 +12,6 @@
   @return Non-zero on success, 0 on failure.
 */
 bool IoDriver_initialize(void);
-
-
-
-typedef enum { 
-    DIRECTION_DOWN,
-    DIRECTION_STOP,
-    DIRECTION_UP
-} motor_direction_t;
-
 
 
 /**
@@ -63,11 +55,6 @@ void ioDriver_setFloorIndicator(int floor);
 /**
   Button types for function elev_set_button_lamp() and elev_get_button().
 */
-typedef enum {
-  BUTTON_CALL_UP,
-  BUTTON_CALL_DOWN,
-  BUTTON_COMMAND
-} button_type_t;
 
 
 

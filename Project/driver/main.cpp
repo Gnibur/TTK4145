@@ -17,37 +17,39 @@ void init_elevator()
 void run_physical()
 {
 	int newFloor;
-	cout << "initializing statemachine..\n";
+	std::cout << "initializing statemachine..\n";
 	stateMachine_initialize();
-	cout << "entering while loop! Press STOP to end the program\n";
+	std::cout << "entering while loop! Press STOP to end the program\n";
 	while (1)
 	{
 		// Check for buttons being pressed
-		for (button_type_t button = 0; (int)button < 3; button++)
+		for (int button = 0; button < 3; button++)
 		{
 			for (int floor = 0; floor < N_FLOORS; floor++)
 			{
-				if (ioDriver_isOrderButtonPressed(button, floor))
-					stateMachine_buttonPressed(floor, button); // Make sure this happens only once.
+				if (((button_type_t)button == BUTTON_CALL_UP) && (floor == 3)) continue;
+				if (((button_type_t)button == BUTTON_CALL_DOWN) && (floor == 0)) continue;
+				if (ioDriver_isOrderButtonPressed((button_type_t)button, floor))
+					stateMachine_buttonPressed(floor, (button_type_t)button); // Make sure this happens only once.
 			}
 		}
 
 		// Check for new floors
-		newFloor = ioDriver_getFloorSensorSignal();
-		if ((newFloor != -1) && (newFloor != lastFloor))
-			stateMachine_floorReached(newFloor)
+		newFloor = ioDriver_getFloorSensorValue();
+		if ((newFloor != -1) && (newFloor != getLastFloor()))
+			stateMachine_floorReached(newFloor);
 
 		// Check for timeout
-		if ((timer_active) && (timer_done()))
+		if ((timer_active()) && (timer_done()))
 			stateMachine_doorTimeout();
 
 		// Check for order timeout
-		Order timedoutOrder = orderManager_checkForOrderTimeout();
+		Order timedOutOrder = orderManager_checkForOrderTimeout();
 		if (timedOutOrder)
-			stateMachine_orderTimeout(timedoutOrder);
+			stateMachine_orderTimeOut(timedOutOrder);
 
 		// Stop the program if stop button is pressed
-		if (isStopButtonPressed()) {
+		if (ioDriver_isStopButtonPressed()) {
 			ioDriver_setMotorDirection(DIRECTION_STOP);
 			break;
 		}
