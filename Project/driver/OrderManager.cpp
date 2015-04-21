@@ -119,6 +119,18 @@ bool orderManager_orderListEquals(OrderList rhs)
 	return true;
 }
 
+Order orderManager_checkForOrderTimeout()
+{
+	for (auto it = orderList.begin(); it != orderList.end(); ++it)
+	{ 
+		time_t timer;
+		int time_now = time(&timer);
+		if ((it->timeAssigned - DOOR_TIMEOUT) < time_now) return (*it);
+	}
+	Order defaultOrder;
+	return defaultOrder;
+}
+
 int main() {
 	return 0;
 }

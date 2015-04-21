@@ -21,6 +21,8 @@ void run_physical()
 			stateMachine_floorReached(newFloor)
 
 		// Check for timeout
+		if ((timer_active) && (timer_done()))
+			stateMachine_doorTimeout();
 	}
 }
 

@@ -61,15 +61,16 @@ void stateMachine_floorReached(int floor)
 			orderManager_clearOrder(*it);
 			std::string clearOrderMsg;
 			udp_send(BROADCAST_PORT, clearOrderMsg, MAXLENGTH_BUF);
-			// open door, set light, start timer
+			// open door, set light
 		}
+		timer_start();
 	}
 }
 
 void stateMachine_doorTimeout()
 {
+	timer_reset();
 	clearDoorOpenLamp();
-	// state is IDLE
 	motor_direction_t nextDirection = orderManager_getNextDirection(lastFloor, lastDirection);
 	setMotorDirection(nextDirection);
 	lastDirection = nextDirection;

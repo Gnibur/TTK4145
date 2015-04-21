@@ -2,6 +2,7 @@
 #define ORDERMANAGERNEW_H
 
 #define N_FLOORS 4
+#define ORDER_TIMEOUT 10
 
 #include <vector>
 #include <string>
@@ -21,5 +22,6 @@ OrderList			orderManager_getOrdersOnFloorInDirection(int floor, button_type_t di
 motor_direction_t	orderManager_getNextDirection(int floor, motor_direction_t lastDirection);
 int					orderManager_getCost(int lastFloor, int newFloor, motor_direction_t lastDirection, button_type_t wantedDirection);
 bool				orderManager_orderListEquals(OrderList rhs);
+Order				orderManager_checkForOrderTimeout();
 
 #endif
