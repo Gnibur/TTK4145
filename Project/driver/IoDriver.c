@@ -50,7 +50,7 @@ bool IoDriver_initialize(void) {
     return true;
 }
 
-void setMotorDirection(motor_direction_t direction) {
+void ioDriver_setMotorDirection(motor_direction_t direction) {
   switch (direction) {
   case DIRECTION_DOWN:
     io_set_bit(MOTORDIR);
@@ -66,30 +66,30 @@ void setMotorDirection(motor_direction_t direction) {
   }
 }
 
-void setDoorOpenLamp(void) {
+void ioDriver_setDoorOpenLamp(void) {
   io_set_bit(LIGHT_DOOR_OPEN);
 }
-void clearDoorOpenLamp(void){
+void ioDriver_clearDoorOpenLamp(void){
   io_clear_bit(LIGHT_DOOR_OPEN);
 }
 
 
-bool isElevatorObstructed(void) {
+bool ioDriver_isElevatorObstructed(void) {
     return io_read_bit(OBSTRUCTION);
 }
 
-bool isStopButtonPressed(void) {
+bool ioDriver_isStopButtonPressed(void) {
     return io_read_bit(STOP);
 }
 
-void setStopLamp(void) {
+void ioDriver_setStopLamp(void) {
   io_set_bit(LIGHT_STOP);
 }
-void clearStopLamp(void){
+void ioDriver_clearStopLamp(void){
   io_clear_bit(LIGHT_STOP);
 }
 
-int getFloorSensorValue(void) {
+int ioDriver_getFloorSensorValue(void) {
     if (io_read_bit(SENSOR_FLOOR1))
         return 0;
     else if (io_read_bit(SENSOR_FLOOR2))
@@ -102,7 +102,7 @@ int getFloorSensorValue(void) {
         return -1;
 }
 
-void setFloorIndicator(int floor) {
+void ioDriver_setFloorIndicator(int floor) {
     assert(floor >= 0);
     assert(floor < N_FLOORS);
 
@@ -118,7 +118,7 @@ void setFloorIndicator(int floor) {
         io_clear_bit(LIGHT_FLOOR_IND2);
 }
 
-bool isOrderButtonPressed(button_type_t type, int floor) {
+bool ioDriver_isOrderButtonPressed(button_type_t type, int floor) {
     assert(floor >= 0);
     assert(floor < N_FLOORS);
     assert(!(type == BUTTON_CALL_UP && floor == N_FLOORS - 1));
@@ -132,7 +132,7 @@ bool isOrderButtonPressed(button_type_t type, int floor) {
 }
 
 
-void setOrderButtonLamp(button_type_t type, int floor){
+void ioDriver_setOrderButtonLamp(button_type_t type, int floor){
     assert(floor >= 0);
     assert(floor < N_FLOORS);
     assert(!(type == BUTTON_CALL_UP && floor == N_FLOORS - 1));
@@ -143,7 +143,7 @@ void setOrderButtonLamp(button_type_t type, int floor){
     io_set_bit(lamp_channel_matrix[floor][type]);
 }
 
-void clearOrderButtonLamp(button_type_t type, int floor){
+void ioDriver_clearOrderButtonLamp(button_type_t type, int floor){
     assert(floor >= 0);
     assert(floor < N_FLOORS);
     assert(!(type == BUTTON_CALL_UP && floor == N_FLOORS - 1));

@@ -9,6 +9,7 @@
 #define BROADCAST_PORT 16
 #define MAXLENGTH_BUF 2048
 
+void stateMachine_initialize();
 void stateMachine_buttonPressed(int floor, button_type_t button);
 void stateMachine_floorReached(int floor, motor_direction_t direction);
 void stateMachine_doorTimeout();

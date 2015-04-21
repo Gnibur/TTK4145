@@ -26,29 +26,29 @@ typedef enum {
   Sets the motor direction of the elevator.
   @param direction New direction of the elevator.
 */
-void setMotorDirection(motor_direction_t direction);
+void ioDriver_setMotorDirection(motor_direction_t direction);
 
-void setDoorOpenLamp(void);
-void clearDoorOpenLamp(void);
+void ioDriver_setDoorOpenLamp(void);
+void ioDriver_clearDoorOpenLamp(void);
 
 
 /**
   Get signal from obstruction switch.
   @return 1 if obstruction is enabled. 0 if not.
 */
-bool isElevatorObstructed(void);
+bool ioDriver_isElevatorObstructed(void);
 
-bool isStopButtonPressed(void);
+bool ioDriver_isStopButtonPressed(void);
 
-void setStopLamp(void);
-void clearStopLamp(void); 
+void ioDriver_setStopLamp(void);
+void ioDriver_clearStopLamp(void);
 
 /**
   Get floor sensor signal.
   @return -1 if elevator is not on a floor. 0-3 if elevator is on floor. 0 is
     ground floor, 3 is top floor.
 */
-int getFloorSensorValue(void);
+int ioDriver_getFloorSensorValue(void);
 
 
 
@@ -56,7 +56,7 @@ int getFloorSensorValue(void);
   Set floor indicator lamp for a given floor.
   @param floor Which floor lamp to turn on. Other floor lamps are turned off.
 */
-void setFloorIndicator(int floor);
+void ioDriver_setFloorIndicator(int floor);
 
 
 
@@ -78,7 +78,7 @@ typedef enum {
   @param floor Which floor to check button. Must be 0-3.
   @return 0 if button is not pushed. 1 if button is pushed.
 */
-bool isOrderButtonPressed(button_type_t type, int floor);
+bool ioDriver_isOrderButtonPressed(button_type_t type, int floor);
 
 
 
@@ -90,8 +90,8 @@ bool isOrderButtonPressed(button_type_t type, int floor);
   @param value Non-zero value turns lamp on, 0 turns lamp off.
 */
 
-void setOrderButtonLamp(button_type_t type, int floor);
-void clearOrderButtonLamp(button_type_t type, int floor); 
+void ioDriver_setOrderButtonLamp(button_type_t type, int floor);
+void ioDriver_clearOrderButtonLamp(button_type_t type, int floor);
 
 
 #endif // #ifndef IO_DRIVER_H

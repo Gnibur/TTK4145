@@ -8,6 +8,12 @@
 int					lastFloor;
 motor_direction_t	lastDirection;
 
+void stateMachine_initialize()
+{
+	lastFloor		= getFloorSensorValue();
+	lastDirection	= DIRECTION_UP;
+}
+
 void stateMachine_buttonPressed(int floor, button_type_t button)
 {
 	ioDriver_setOrderButtonLamp(button, floor);

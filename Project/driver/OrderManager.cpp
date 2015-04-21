@@ -125,7 +125,7 @@ Order orderManager_checkForOrderTimeout()
 	{ 
 		time_t timer;
 		int time_now = time(&timer);
-		if ((it->timeAssigned - DOOR_TIMEOUT) < time_now) return (*it);
+		if ((it->timeAssigned - ORDER_TIMEOUT) < time_now) return (*it);
 	}
 	Order defaultOrder;
 	return defaultOrder;
