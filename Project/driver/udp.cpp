@@ -13,30 +13,14 @@
 #include <pthread.h>
 #include <stdio.h>
 
-
 #include <unistd.h>
 
-
-/* TODO:
-   - check last parameter in socket(...)
- */
-Udp::Udp() 
+bool udp_send(int targetPort, char *data, size_t dataLength)
 {
-    socketfd = socket(AF_INET, SOCK_DGRAM, 0);
+  int socketfd = socket(AF_INET, SOCK_DGRAM, 0);
 
-    int yes = 1;
-    setsockopt(socketfd, SOL_SOCKET, SO_BROADCAST, &yes, sizeof yes);
-}
-/* TODO:
-   - Check if socket is initialized before calling close
-
- */
-Udp::~Udp()
-{
-  close(socketfd);
-}
-
-bool Udp::send(int targetPort, char *data, size_t dataLength){
+  int yes = 1;
+  setsockopt(socketfd, SOL_SOCKET, SO_BROADCAST, &yes, sizeof yes);
   
   struct sockaddr_in target;
   ssize_t bytes_sent;
@@ -48,13 +32,21 @@ bool Udp::send(int targetPort, char *data, size_t dataLength){
     
   bytes_sent  = sendto(socketfd, data, dataLength, 0, (struct sockaddr *)&target, sizeof target);
 
+  close(socketfd);
+
   if (bytes_sent == dataLength)
     return true;
   else 
     return false;
 }
 
-bool Udp::receive(int port, char *data, size_t dataLength){
+bool udp_receive(int port, char *data, size_t dataLength)
+{
+  int socketfd = socket(AF_INET, SOCK_DGRAM, 0);
+
+  int yes = 1;
+  setsockopt(socketfd, SOL_SOCKET, SO_BROADCAST, &yes, sizeof yes);
+
   struct sockaddr_in target;
   ssize_t bytes_received;
 
@@ -80,29 +72,3 @@ bool Udp::receive(int port, char *data, size_t dataLength){
     return false;
 }
 
-
-bool Udp::sendtoIP(char *destinationIP, int port, char *data, size_t dataLength){
-  /*  struct addrinfo hints, *servinfo;
-	
-  memset(&hints, 0, sizeof hints);
-  hints.ai_family = AF_UNSPEC;
-  hints.ai_socktype = SOCK_DGRAM;
-
-  if (getaddrinfo(destinationIP, targetPort, &hints, &servinfo) != 0)
-    {
-      perror("talker: gettaddr");
-      return 0;
-    }
-  if ((sockfd = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol)) == -1)
-    {
-      perror("talker: socket");
-      return 0;
-    }
-  if (sendto(sockfd, data, dataLength, 0, servinfo->ai_addr, servinfo->ai_addrlen) == -1)
-    {
-      perror("talker: send");
-      return 0;
-    }
-  freeaddrinfo(servinfo);
-  */
-}

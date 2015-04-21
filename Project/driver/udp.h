@@ -2,21 +2,7 @@
 
 #include <cstddef>
 
-class Udp {
-  
- public:
-  Udp();
-  ~Udp();
+bool udp_send(int targetPort, char *data, size_t dataLength);
 
-  bool send(int targetPort, char *data, size_t dataLength);
-
-  bool receive(int port, char *data, size_t dataLength);
+bool udp_receive(int port, char *data, size_t dataLength);
  
-  bool sendtoIP(char *ip, int port, char *data, size_t dataLength); 
- 
-  bool receiveFrom(char *ip, int port, char *buffer, size_t bufferLength);
- private:
-
-  int socketfd;
-
-};
