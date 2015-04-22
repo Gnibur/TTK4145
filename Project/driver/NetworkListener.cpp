@@ -24,17 +24,15 @@ void *listen(void*)
 {
 	char buf[BUFLENGTH];
 	while (true) {
-        std::cout << "WHO IS GIVING THE SEG FAULT\n";
 		udp_receive(BROADCAST_PORT, buf, BUFLENGTH); // blocking read into buf
-
 		MsgType messageType = msgParser_getMessageType(buf);
-        /*
+        
 		switch (messageType) {
 
 		case NEW_ORDER_MSG:{
 			Order order = msgParser_getOrderFromMessage(buf);
 			orderManager_newOrder(order);
-			stateMachine_newOrder();
+			stateMachine_newOrder(order.floor, order.direction);
 			break;
 		}
 		case ORDER_COST_REQUEST: {
@@ -61,7 +59,6 @@ void *listen(void*)
 		default:
             std::cout << "Unknown message received!\n";
 			// Unknown message
-			return NULL;
 		}
 
 		OrderList receivedOrderList = msgParser_getOrderListFromMessage(buf);
@@ -71,7 +68,7 @@ void *listen(void*)
 
 			std::string updateMsg = msgParser_makeOrderListMsg(orderManager_getOrders());
 			udp_send(BROADCAST_PORT, updateMsg.c_str(), strlen(updateMsg.c_str()));	
-		}*/
+		}
     
 	}
 	return NULL;

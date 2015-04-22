@@ -81,7 +81,7 @@ int main()
 
 	orderManager_init();	
 
-	//networkListener_run();
+	networkListener_run();
 
 	run_physical();
 

@@ -24,7 +24,6 @@ void orderManager_newOrder(Order order)
 	std::vector<Order>::iterator search = std::find(orderList.begin(), orderList.end(), order);
 	if (search == orderList.end())
 	{
-		std::cout << "Pushing back new order :) \n\n";
 		orderList.push_back(order);
 	}
 	std::sort(orderList.begin(), orderList.end());
@@ -49,15 +48,12 @@ OrderList orderManager_getOrders()
 OrderList orderManager_getOrdersOnFloor(int floor)
 {
 	pthread_mutex_lock(&orderManagerMutex);
-	std::cout << "Now soon doing the for-dance\n";	
 	OrderList returnList;
 	for (auto it = orderList.begin(); it != orderList.end(); ++it)
 	{	
-		std::cout << "Searching for floor: " << floor << std::endl;
-		std::cout << "Found floor: " << it->floor << std::endl;
 		// && (it->assignedIP == IP)
 		if (it->floor == floor)
-			returnList.push_back(*it); std::cout << "Adding...?\n";
+			returnList.push_back(*it);
 	}
 	pthread_mutex_unlock(&orderManagerMutex);	
 	return returnList;
@@ -125,7 +121,6 @@ int orderManager_getCost(int lastFloor, int newFloor, motor_direction_t lastDire
 void orderManager_mergeMyOrdersWith(OrderList orders)
 {
 	pthread_mutex_lock(&orderManagerMutex);
-	std::cout << "Entering merge my orders with..\n\n";
 	for (auto it = orders.begin(); it != orders.end(); ++it)
 	{
 		if (std::find(orderList.begin(), orderList.end(), (*it)) == orderList.end())

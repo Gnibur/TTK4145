@@ -1,5 +1,6 @@
 #include "MsgParser.h"
 #include "tinyxml.h"
+#include <iostream>
 
 
 MsgType msgParser_getMessageType(string message)
@@ -7,7 +8,8 @@ MsgType msgParser_getMessageType(string message)
 	TiXmlDocument xmldoc;
 	xmldoc.Parse(message.c_str());
 	TiXmlElement *elem = xmldoc.RootElement();
-
+	if (!elem)
+		return INVALID_MESSAGE;
 	int temp;
 	elem->QueryIntAttribute("Type", &temp);
 	return (MsgType)temp;
@@ -21,6 +23,10 @@ Order msgParser_getOrderFromMessage(string message)
 
 
 	TiXmlElement *elem = xmldoc.RootElement();
+	if (!elem)
+		return Order();
+
+
 
 	int temp;
 	Order order;
@@ -30,6 +36,7 @@ Order msgParser_getOrderFromMessage(string message)
 
 	if (msgParser_getMessageType(message) == CLEAR_ORDER_MSG)
 		order.assignedIP = elem->Attribute("AssignedIP");
+
 
 	return order;
 }
@@ -42,6 +49,8 @@ OrderList msgParser_getOrderListFromMessage(string message)
 	TiXmlDocument xmldoc;
 	xmldoc.Parse(message.c_str());
 	TiXmlElement *root = xmldoc.RootElement();
+	if (!root)
+		return OrderList { }; // ooops, how to return invalid orderlist?
 
 	OrderList orderlist;
 
@@ -71,6 +80,8 @@ Order msgParser_getOrderCostRequestFromMessage(string message)
 	xmldoc.Parse(message.c_str());
 
 	TiXmlElement *elem = xmldoc.RootElement();
+	if (!elem)
+		return Order();
 
 	int temp;
 	elem->QueryIntAttribute("Floor", &temp);
@@ -90,6 +101,8 @@ Offer msgParser_getOfferFromMessage(string message)
 	xmldoc.Parse(message.c_str());
 
 	TiXmlElement *elem = xmldoc.RootElement();
+	if (!elem)
+		return Offer();
 
 	int temp;
 	elem->QueryIntAttribute("Cost", &offer.cost);

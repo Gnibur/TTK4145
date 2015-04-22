@@ -29,7 +29,6 @@ void stateMachine_initialize()
 
 void stateMachine_buttonPressed(int floor, button_type_t button)
 {
-	std::cout << "Entering buttonPressed \n";
 
 	if (button == BUTTON_COMMAND)
 	{
@@ -43,7 +42,6 @@ void stateMachine_buttonPressed(int floor, button_type_t button)
 	}
 	else
 	{
-		std::cout << "Auction start... \n";
 		auction_start(floor, button);
 
 		// Elevator should probably add own bid
@@ -55,7 +53,6 @@ void stateMachine_newOrder(int floor, button_type_t button)
 	ioDriver_setOrderButtonLamp(button, floor);
 	switch (state){
 	case IDLE:
-		std::cout << "newOrder in state idle\n";
 		stateMachine_updateDirection();
 		break;
 	case DOOROPEN:
@@ -68,7 +65,7 @@ void stateMachine_newOrder(int floor, button_type_t button)
 
 void stateMachine_floorReached(int floor)
 {
-	std::cout << "Floor: " << floor << std::endl;
+	std::cout << "Floor reached: " << floor << std::endl;
 	lastFloor = floor;
 
 	ioDriver_setFloorIndicator(floor);
@@ -76,14 +73,10 @@ void stateMachine_floorReached(int floor)
 
 	if (!ordersToClear.empty())
 	{
-		std::cout << "I AM NOT EMPTY GOD DAMNIT!\n";
 		ioDriver_setMotorDirection(DIRECTION_STOP);
 
 		for (auto it = ordersToClear.begin(); it != ordersToClear.end(); ++it) 
 			{
-			std::cout << "Entering orders to clear...\n";
-			std::cout << "FLOOR: " << it->floor << std::endl;
-
 			orderManager_clearOrder(*it);
 			std::string clearOrderMsg = msgParser_makeClearOrderMsg(*it, orderManager_getOrders());
 
@@ -101,7 +94,6 @@ void stateMachine_floorReached(int floor)
 
 void stateMachine_doorTimeout()
 {
-	std::cout << "Entering doortimeout...\n";
 	timer_reset();
 	ioDriver_clearDoorOpenLamp();
 
@@ -116,20 +108,17 @@ void stateMachine_updateDirection()
 		motor_direction_t nextDirection = orderManager_getNextDirection(lastFloor, lastDirection);
 		if (nextDirection != DIRECTION_STOP)
 		{
-			std::cout << "Lets start moving!\n";
 			ioDriver_setMotorDirection(nextDirection);
 			lastDirection = nextDirection;
 			state = MOVING;
 		}
 		else
 		{
-			std::cout << "Go back to idle.\n";
 			state = IDLE;
 		}
 	}
 	else
 	{
-		std::cout << "Floor reached.\n";
 		stateMachine_floorReached(ioDriver_getFloorSensorValue());
 	}
 }

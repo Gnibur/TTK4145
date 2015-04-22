@@ -12,6 +12,7 @@
 #include <errno.h>
 #include <pthread.h>
 #include <stdio.h>
+#include <iostream>
 
 #include <unistd.h>
 
@@ -43,15 +44,12 @@ bool udp_send(int targetPort, const char *data, size_t dataLength)
 bool udp_receive(int port, char *data, size_t dataLength)
 {
   int socketfd = socket(AF_INET, SOCK_DGRAM, 0);
-
   int yes = 1;
   setsockopt(socketfd, SOL_SOCKET, SO_BROADCAST, &yes, sizeof yes);
-
   struct sockaddr_in target;
   ssize_t bytes_received;
 
   memset(&target, 0, sizeof target);
-  
   target.sin_family = AF_INET;
   target.sin_addr.s_addr = htonl(INADDR_ANY); 
   target.sin_port = htons(port);
@@ -62,11 +60,9 @@ bool udp_receive(int port, char *data, size_t dataLength)
   if (setsockopt(socketfd, SOL_SOCKET, SO_RCVTIMEO,&tv,sizeof(tv)) < 0) {
     perror("Error");
   }
-    
   bind(socketfd, (struct sockaddr*)&target, sizeof target);
-
   bytes_received = recv(socketfd, data, dataLength, 0);
-  if (bytes_received != -1)
+	if (bytes_received != -1)
     return true;
   else 
     return false;
