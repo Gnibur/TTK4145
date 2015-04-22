@@ -2,7 +2,7 @@
 #include "tinyxml.h"
 
 
-MsgType MsgParser::getMessageType(string message)
+MsgType msgParser_getMessageType(string message)
 {
 	TiXmlDocument xmldoc;
 	xmldoc.Parse(message.c_str());
@@ -14,7 +14,7 @@ MsgType MsgParser::getMessageType(string message)
 }
 
 
-Order MsgParser::getOrderFromMessage(string message)
+Order msgParser_getOrderFromMessage(string message)
 {
 	TiXmlDocument xmldoc;
 	xmldoc.Parse(message.c_str());
@@ -28,14 +28,14 @@ Order MsgParser::getOrderFromMessage(string message)
 	order.direction = (button_type_t)temp;
 	elem->QueryIntAttribute("Floor", &order.floor);
 
-	if (getMessageType(message) == CLEAR_ORDER_MSG)
+	if (msgParser_getMessageType(message) == CLEAR_ORDER_MSG)
 		order.assignedIP = elem->Attribute("AssignedIP");
 
 	return order;
 }
 
 
-OrderList MsgParser::getOrderListFromMessage(string message)
+OrderList msgParser_getOrderListFromMessage(string message)
 {
 	//  printf("Received message: %s\n", message.c_str());
 
@@ -55,7 +55,7 @@ OrderList MsgParser::getOrderListFromMessage(string message)
 		order.direction = (button_type_t)temp;
 		childElement->QueryIntAttribute("Floor", &order.floor);
 
-		if (getMessageType(message) != NEW_ORDER_MSG)
+		if (msgParser_getMessageType(message) != NEW_ORDER_MSG)
 			order.assignedIP = childElement->Attribute("AssignedIP");
 		orderlist.push_back(order);
 	}
@@ -63,7 +63,7 @@ OrderList MsgParser::getOrderListFromMessage(string message)
 }
 
 
-Order MsgParser::getOrderCostRequestFromMessage(string message)
+Order msgParser_getOrderCostRequestFromMessage(string message)
 {
 	Order order;
 
@@ -82,7 +82,7 @@ Order MsgParser::getOrderCostRequestFromMessage(string message)
 	return order;
 }
 
-Offer MsgParser::getOrderCostReplyFromMessage(string message)
+Offer msgParser_getOfferFromMessage(string message)
 {
 	Offer offer;
 
@@ -104,7 +104,7 @@ Offer MsgParser::getOrderCostReplyFromMessage(string message)
 
 /* ------------------Make messages  ---------------------------------- */
 
-string MsgParser::makeNewOrderMsg(Order order, OrderList updatedOrderList)
+string msgParser_makeNewOrderMsg(Order order, OrderList updatedOrderList)
 {
 	TiXmlDocument xmldoc;
 	TiXmlElement *root = new TiXmlElement("Order");
@@ -130,7 +130,7 @@ string MsgParser::makeNewOrderMsg(Order order, OrderList updatedOrderList)
 	return printer.CStr();
 }
 
-string MsgParser::makeClearOrderMsg(Order order, OrderList updatedOrderList)
+string msgParser_makeClearOrderMsg(Order order, OrderList updatedOrderList)
 {
 	TiXmlDocument xmldoc;
 	TiXmlElement *root = new TiXmlElement("Order");
@@ -155,7 +155,7 @@ string MsgParser::makeClearOrderMsg(Order order, OrderList updatedOrderList)
 	return printer.CStr();
 }
 
-string MsgParser::makeOrderListMsg(OrderList orders)
+string msgParser_makeOrderListMsg(OrderList orders)
 {
 	TiXmlDocument xmldoc;
 	TiXmlElement *root = new TiXmlElement("root");
@@ -177,7 +177,7 @@ string MsgParser::makeOrderListMsg(OrderList orders)
 	return printer.CStr();
 }
 
-string MsgParser::makeOrderCostRequestMsg(int floor, button_type_t direction)
+string msgParser_makeOrderCostRequestMsg(int floor, button_type_t direction)
 {
 	TiXmlDocument xmldoc;
 	TiXmlElement *msg = new TiXmlElement("RootElement");
@@ -192,7 +192,7 @@ string MsgParser::makeOrderCostRequestMsg(int floor, button_type_t direction)
 	return printer.CStr();
 }
 
-string MsgParser::makeOrderCostReplyMsg(int cost, int floor, button_type_t dir, string IP)
+string msgParser_makeOrderCostReplyMsg(Offer offer)
 {
 	TiXmlDocument xmldoc;
 	TiXmlElement *msg = new TiXmlElement("RootElement");
@@ -200,10 +200,10 @@ string MsgParser::makeOrderCostReplyMsg(int cost, int floor, button_type_t dir, 
 	xmldoc.LinkEndChild(msg);
 
 	msg->SetAttribute("Type", ORDER_COST_REPLY);
-	msg->SetAttribute("Cost", cost);
-	msg->SetAttribute("Floor", floor);
-	msg->SetAttribute("Direction", dir);
-	msg->SetAttribute("fromIP", IP.c_str());
+	msg->SetAttribute("Cost", offer.cost);
+	msg->SetAttribute("Floor", offer.floor);
+	msg->SetAttribute("Direction", offer.direction);
+	msg->SetAttribute("fromIP", offer.fromIP.c_str());
 
 	TiXmlPrinter printer;
 	xmldoc.Accept(&printer);

@@ -7,16 +7,16 @@ CFLAGS = -g -Wall -std=c++11
 CCFLAGS = -g -Wall -std=c99
 
 # Linker flags go here.
-LDFLAGS =  -lm -lcomedi -lstdc++
+LDFLAGS =  -lm -lcomedi -lstdc++ -lpthread
 
 SOURCES = $(wildcard *.cpp)
-CSOURCES = $(wildcard *.c)
+#CSOURCES = $(wildcard *.c)
 
 OBJECTS := $(SOURCES:%.cpp=%.o)
-COBJECTS := $(CSOURCES:%.c=%.o)
+#COBJECTS := $(CSOURCES:%.c=%.o)
 
-
-all: $(COBJECTS) $(OBJECTS)
+#$(COBJECTS)
+all:  $(OBJECTS) 
 	$(CC) $(LDFLAGS) -o $@ $^ 
 
 %.o: %.cpp %.h
@@ -25,11 +25,11 @@ all: $(COBJECTS) $(OBJECTS)
 %.o: %.cpp 
 	$(CC) $(CFLAGS) -c $< 
 
-%.o: %.c %.h
-	$(CCC) $(CCFLAGS) -c $<
+#%.o: %.c %.h
+#	$(CCC) $(CCFLAGS) -c $<
 
-%.o: %.cc
-	$(CCC) $(CCFLAGS) -c $< 
+#%.o: %.cc
+#	$(CCC) $(CCFLAGS) -c $< 
 
 clean:
 	rm -r *.o $(TARGET)

@@ -48,10 +48,6 @@ void run_physical()
 		if (timedOutOrder)
 			stateMachine_orderTimeOut(timedOutOrder);
 
-		// Check for idletime
-		if ((getLastDirection() == DIRECTION_STOP) && (!(orderManager_getOrders()).empty()))
-			stateMachine_doorTimeout();
-
 		// Stop the program if stop button is pressed
 		if (ioDriver_isStopButtonPressed()) {
 			ioDriver_setMotorDirection(DIRECTION_STOP);
@@ -72,6 +68,9 @@ int main()
 	std::cout << "Initializing elevator..\n";
 	init_elevator();
 	std::cout << "Going into run physical..\n";
+
+
+
 	run_physical();
 
 	return 0;

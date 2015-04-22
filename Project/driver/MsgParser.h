@@ -27,20 +27,16 @@ struct Offer {
 
 
 
-class MsgParser {
-public:
-	static MsgType   getMessageType(string message);
-	static Order     getOrderFromMessage(string message);
-	static OrderList getOrderListFromMessage(string message);
-	static Order     getOrderCostRequestFromMessage(string message);
-	static Offer     getOrderCostReplyFromMessage(string message);
+MsgType   msgParser_getMessageType(string message);
+Order     msgParser_getOrderFromMessage(string message);
+OrderList msgParser_getOrderListFromMessage(string message);
+Order     msgParser_getOrderCostRequestFromMessage(string message);
+Offer     msgParser_getOfferFromMessage(string message);
 
-	static string    makeNewOrderMsg(Order order, OrderList updatedOrderList);
-	static string    makeClearOrderMsg(Order order, OrderList updatedOrderList);
-	static string    makeOrderListMsg(OrderList orderList);
-	static string    makeOrderCostRequestMsg(int floor, button_type_t direction);
-	static string    makeOrderCostReplyMsg(int cost, int floor, button_type_t dir, string IP);
+string    msgParser_makeNewOrderMsg(Order order, OrderList updatedOrderList);
+string    msgParser_makeClearOrderMsg(Order order, OrderList updatedOrderList);
+string    msgParser_makeOrderListMsg(OrderList orderList);
+string    msgParser_makeOrderCostRequestMsg(int floor, button_type_t direction);
+string    msgParser_makeOrderCostReplyMsg(Offer offer);
 
-private:
 
-};

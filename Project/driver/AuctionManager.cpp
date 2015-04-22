@@ -1,5 +1,7 @@
 #include "AuctionManager.h"
 #include "DataStructures.h"
+#include "udp.h"
+#include "OrderManager.h"
 #include "MsgParser.h"
 #include <pthread.h>
 #include <time.h>
@@ -8,6 +10,7 @@
 #include <string>
 #include <algorithm>
 #include <ctime>
+#include <cstring>
 
 std::map<Order, std::vector<Offer>> auctions;
 
@@ -23,14 +26,14 @@ void auctionManager_init()
 
 void auction_start(int floor, button_type_t direction)
 {
-  Order order(direction, floor, "", 0);
+  Order order(direction, floor, "", -1);
   pthread_t auction_id;
-  pthread_create(&auction_id, NULL, runAuction, (void*)order);
+  pthread_create(&auction_id, NULL, runAuction, (void*)&order);
 }
 
 void *runAuction(void *args)
 {
-  Order order = (order)args;
+  Order order = *(Order*)args;
 
   time_t timeAtStart = time(0);
 
@@ -47,16 +50,18 @@ void *runAuction(void *args)
   pthread_mutex_unlock(&auctionMutex);
   
   order.assignedIP = bestOffer.fromIP;
-  MsgParser parser;
-  std::string newOrderMessage = parser.makeNewOrderMsg(order, updatedList);
-  udp_send(BROADCAST_PORT; newOrderMessage.c_str(), strlen(newOrderMessage.c_str());
+
+	OrderList updatedList; 
+	updatedList.push_back(order);
+	orderManager_mergeMyOrdersWith(updatedList);
+
+  std::string newOrderMessage = msgParser_makeNewOrderMsg(order, updatedList);
+  udp_send(BROADCAST_PORT, newOrderMessage.c_str(), strlen(newOrderMessage.c_str()));
 }
 
 void auction_addBid(Offer offer)
 {
-  time_t timer;
-  int timeNow = time(&timer);
-  Order order(offer.direction, offer.floor, "", 0);
+  Order order(offer.direction, offer.floor, "", -1);
 
   pthread_mutex_lock(&auctionMutex);
   if (auctions.find(order) != auctions.end())

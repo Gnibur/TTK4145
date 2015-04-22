@@ -1,15 +1,24 @@
 #include "StateMachine.h"
 #include "IoDriver.h"
 #include "MsgParser.h"
+#include "AuctionManager.h"
 #include <algorithm>
 #include <string>
+#include <cstring>
 #include <cmath>
 #include <ctime>
 #include <iostream>
 
 int					lastFloor;
 motor_direction_t	lastDirection;
-std::string testIP	= "";
+
+typedef enum state {
+	IDLE,
+	MOVING,
+	DOOROPEN
+} state_t;
+
+static state_t state;
 
 void stateMachine_initialize()
 {
@@ -24,10 +33,13 @@ void stateMachine_buttonPressed(int floor, button_type_t button)
 	{
 		time_t timer;
 		int assignedDate = time(&timer);
-		Order order(button, floor, testIP, assignedDate);
+		Order order(button, floor, getMyIP(), assignedDate);
 		orderManager_newOrder(order);
-		std::string newOrderMsg = MsgParser::makeNewOrderMsg(order, orderManager_getOrders());
-		udp_send(BROADCAST_PORT, newOrderMsg.c_str(), MAXLENGTH_BUF);
+		std::string newOrderMsg = msgParser_makeNewOrderMsg(order, orderManager_getOrders());
+		udp_send(BROADCAST_PORT, newOrderMsg.c_str(), strlen(newOrderMsg.c_str()));
+
+
+		stateMachine_newOrder();
 	}
 	else
 	{
@@ -36,49 +48,48 @@ void stateMachine_buttonPressed(int floor, button_type_t button)
 	}
 }
 
+void stateMachine_newOrder()
+{
+	switch (state){
+	case IDLE:
+		stateMachine_updateDirection();
+		break;
+	case DOOROPEN:
+		break;
+	case MOVING:
+		break;
+	}	
+	
+}
+
 void stateMachine_floorReached(int floor)
 {
 	lastFloor = floor;
+
 	ioDriver_setFloorIndicator(floor);
+	OrderList ordersToClear = orderManager_getOrdersOnFloor(floor);
 
-	button_type_t buttonDirection			= (lastDirection == DIRECTION_UP)? BUTTON_CALL_UP : BUTTON_CALL_DOWN;
-	button_type_t buttonOppositeDirection	= (lastDirection == DIRECTION_UP)? BUTTON_CALL_DOWN : BUTTON_CALL_UP;
-
-	OrderList ordersInDirection			= orderManager_getOrdersOnFloorInDirection(floor, buttonDirection);
-	OrderList ordersInOppositeDirection = orderManager_getOrdersOnFloorInDirection(floor, buttonOppositeDirection);
-	OrderList ordersToClear;
-
-	bool stop = false;
-
-	if (!ordersInDirection.empty())
-	{
-		std::cout << "Orders in direction is not empty!\n";
-		ordersToClear = ordersInDirection;
-		stop = true;
-	}
-	else
-	{
-		std::cout << "Orders in opposite direction?\n";
-		if ((!ordersInOppositeDirection.empty()) && (orderManager_getNextDirection(floor, lastDirection) != lastDirection))
-		{
-			ordersToClear = ordersInOppositeDirection;
-			stop = true;
-		}
-	}
-	if (stop == true)
+	if (!ordersToClear.empty())
 	{
 		ioDriver_setMotorDirection(DIRECTION_STOP);
+
 		for (auto it = ordersToClear.begin(); it != ordersToClear.end(); ++it) 
-		{
+			{
 			std::cout << "Entering orders to clear...\n";
 			std::cout << "FLOOR: " << it->floor << std::endl;
+
 			orderManager_clearOrder(*it);
-			std::string clearOrderMsg = MsgParser::makeClearOrderMsg(order, orderManager_getOrders());
-			udp_send(BROADCAST_PORT, clearOrderMsg.c_str(), MAXLENGTH_BUF);
+			std::string clearOrderMsg = msgParser_makeClearOrderMsg(*it, orderManager_getOrders());
+
+			udp_send(BROADCAST_PORT, clearOrderMsg.c_str(), strlen(clearOrderMsg.c_str()));
 			ioDriver_clearOrderButtonLamp(it->direction, it->floor);
-			ioDriver_setDoorOpenLamp();
+			
 		}
+
+		ioDriver_setDoorOpenLamp();
 		timer_start();
+
+		state = DOOROPEN;
 	}
 }
 
@@ -87,9 +98,29 @@ void stateMachine_doorTimeout()
 	std::cout << "Entering doortimeout...\n";
 	timer_reset();
 	ioDriver_clearDoorOpenLamp();
-	motor_direction_t nextDirection = orderManager_getNextDirection(lastFloor, lastDirection);
-	ioDriver_setMotorDirection(nextDirection);
-	lastDirection = nextDirection;
+
+	stateMachine_updateDirection();
+}
+
+void stateMachine_updateDirection()
+{
+	OrderList ordersOnFloor = orderManager_getOrdersOnFloor(ioDriver_getFloorSensorValue());
+	if (ordersOnFloor.empty())
+	{
+		motor_direction_t nextDirection = orderManager_getNextDirection(lastFloor, lastDirection);
+		if (nextDirection != DIRECTION_STOP)
+		{
+			ioDriver_setMotorDirection(nextDirection);
+			lastDirection = nextDirection;
+			state = MOVING;
+		}
+		else
+			state = IDLE;
+	}
+	else
+	{
+		stateMachine_floorReached(ioDriver_getFloorSensorValue());
+	}
 }
 
 void stateMachine_orderTimeOut(Order order)
@@ -97,8 +128,8 @@ void stateMachine_orderTimeOut(Order order)
 	if (order.direction != BUTTON_COMMAND)
 	{
 		orderManager_clearOrder(order);
-		std::string clearOrderMsg = MsgParser::makeClearOrderMsg(order, orderManager_getOrders());
-		udp_send(BROADCAST_PORT, clearOrderMsg.c_str(), MAXLENGTH_BUF);
+		std::string clearOrderMsg = msgParser_makeClearOrderMsg(order, orderManager_getOrders());
+		udp_send(BROADCAST_PORT, clearOrderMsg.c_str(), strlen(clearOrderMsg.c_str()));
 
 		// TODO: Needs failsafe method, so the elevator doesn't die here and everything is lost..
 		stateMachine_buttonPressed(order.floor, order.direction);

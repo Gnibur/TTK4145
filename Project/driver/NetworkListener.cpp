@@ -1,3 +1,12 @@
+#include "udp.h"
+#include "MsgParser.h"
+#include "OrderManager.h"
+#include "StateMachine.h"
+#include "AuctionManager.h"
+
+#include <cstring>
+
+#define BUFLENGTH 1024
 
 void run()
 {
@@ -8,36 +17,38 @@ void run()
 void listen() 
 {
 	while (true) {
-		socket.read(buf); // blocking read into buf
+		char buf[BUFLENGTH];
+		udp_receive(BROADCAST_PORT, buf, BUFLENGTH); // blocking read into buf
 
-		messageType = getMessageType(buf);
+		MsgType messageType = msgParser_getMessageType(buf);
   
 		switch (messageType) {
 
-		case ADD_ORDER:
-			Order order = getOrderFromMessage(buf);
+		case NEW_ORDER_MSG:{
+			Order order = msgParser_getOrderFromMessage(buf);
 			orderManager_newOrder(order);
+			stateMachine_newOrder();
 			break;
-
-		case GET_FLOOR_COST:
-			Order order				= getOrderCostRequestFromMessage(buf);
-			cost					= orderManager_getCost(currentFloor, order.floor, currentDirection, order.direction);
-			Offer offer				= {cost, order.floor, order.direction, IP};
-			std::string offerMsg; // TODO: Fill this out
-			udp_send(BROADCAST_PORT, offerMsg, MAXLENGTH_BUF)
+		}
+		case ORDER_COST_REQUEST: {
+			Order order				= msgParser_getOrderCostRequestFromMessage(buf);
+			int cost					= orderManager_getCost(getLastFloor(), order.floor, getLastDirection(), order.direction);
+			Offer offer				= {cost, order.floor, order.direction, getMyIP()};
+			std::string offerMsg = msgParser_makeOrderCostReplyMsg(offer);
+			udp_send(BROADCAST_PORT, offerMsg.c_str(), strlen(offerMsg.c_str()));
 			break;
-
-		case REMOVE_ORDER:
-			order = getOrderFromMessage(buf);
+		}
+		case CLEAR_ORDER_MSG: {
+			Order order = msgParser_getOrderFromMessage(buf);
 			orderManager_clearOrder(order);
 			break;
-
-		case ORDER_COST_OFFER: 
-			offer = getOfferFromMessage(buf);
-			budmanager.addOffer(offer);
+		}
+		case ORDER_COST_REPLY: {
+			Offer offer = msgParser_getOfferFromMessage(buf);
+			auction_addBid(offer);
 			break;
-
-		case UPDATE_LIST:
+	 	}
+		case ORDER_LIST_MSG:
 			// we want to merge anyway. That happens below
 
 		default:
@@ -45,11 +56,13 @@ void listen()
 			return;
 		}
 
-		receivedOrderList = getOrderListFromMessage(buf);
+		OrderList receivedOrderList = msgParser_getOrderListFromMessage(buf);
 		if (!(orderManager_orderListEquals(receivedOrderList)))
 		{
 			orderManager_mergeMyOrdersWith(receivedOrderList);
-			sendUpdate(orderManager.getOrders());
+
+			std::string updateMsg = msgParser_makeOrderListMsg(orderManager_getOrders());
+			udp_send(BROADCAST_PORT, updateMsg.c_str(), strlen(updateMsg.c_str()));	
 		}
 
 	}

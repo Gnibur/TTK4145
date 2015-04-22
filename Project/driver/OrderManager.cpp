@@ -1,11 +1,9 @@
-//#include "Globals.h"
 #include "OrderManager.h"
 #include <ctime>
 #include <algorithm>
 #include <cmath>
 
 OrderList orderList;
-static std::string IP = "102.01.01.105";
 
 void orderManager_newOrder(Order order)
 {
@@ -30,12 +28,12 @@ OrderList orderManager_getOrders()
 	return orderList;
 }
 
-OrderList orderManager_getOrdersOnFloorInDirection(int floor, button_type_t direction)
+OrderList orderManager_getOrdersOnFloor(int floor)
 {
 	OrderList returnList;
 	for (auto it = orderList.begin(); it != orderList.end(); ++it)
 	{	// && (it->assignedIP == IP)
-		if ((it->floor == floor)  && ((it->direction == direction) || (it->direction == BUTTON_COMMAND) || (it->floor == N_FLOORS - 1) || (it->floor == 0)))
+		if (it->floor == floor)
 			returnList.push_back(*it);
 	}
 	return returnList;
@@ -43,7 +41,6 @@ OrderList orderManager_getOrdersOnFloorInDirection(int floor, button_type_t dire
 
 motor_direction_t orderManager_getNextDirection(int floor, motor_direction_t lastDirection)
 {
-	// If the list is empty, stand still.
 	if (orderList.empty()) return DIRECTION_STOP;
 
 	// If the elevator is idle, prioritize the floors closest
@@ -92,22 +89,11 @@ int orderManager_getCost(int lastFloor, int newFloor, motor_direction_t lastDire
 		motorDirection = DIRECTION_STOP;
 
 	int cost = abs(lastFloor - newFloor);
-	// Case: In the same direction
-	if (((newFloor > lastFloor) && (lastDirection == DIRECTION_UP)) || ((newFloor < lastFloor) && (lastDirection == DIRECTION_DOWN)))
+	
+	// In case of opposite direction
+	if (((newFloor < lastFloor) && (lastDirection == DIRECTION_UP)) || ((newFloor > lastFloor) && (lastDirection == DIRECTION_DOWN)))
 	{
-		// Subcase: Wanting to go the other direction
-		if ((motorDirection != lastDirection) && (motorDirection != DIRECTION_STOP))
-			cost += N_FLOORS * 1;
-	}
-	// Case: You need to change direction
-	else
-	{
-		// Subcase: You need to change direction _again_
-		if ((motorDirection == lastDirection) && (motorDirection != DIRECTION_STOP))
-			cost += N_FLOORS * 3;
-		// Subcase: You only need to change direction once.
-		else
-			cost += N_FLOORS * 2;
+		cost += N_FLOORS;
 	}
 	return cost;
 }

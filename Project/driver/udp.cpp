@@ -72,3 +72,9 @@ bool udp_receive(int port, char *data, size_t dataLength)
     return false;
 }
 
+std::string getMyIP()
+{
+	return "192.168.1.1";
+}
+
+
