@@ -26,7 +26,6 @@ void *listen(void*)
 	while (true) {
 		udp_receive(BROADCAST_PORT, buf, BUFLENGTH); // blocking read into buf
 		MsgType messageType = msgParser_getMessageType(buf);
-        
 		switch (messageType) {
 
 		case NEW_ORDER_MSG:{
@@ -44,8 +43,9 @@ void *listen(void*)
 			break;
 		}
 		case CLEAR_ORDER_MSG: {
-			Order order = msgParser_getOrderFromMessage(buf);
-			orderManager_clearOrder(order);
+			std::cout << buf;
+			//Order order = msgParser_getOrderFromMessage(buf);
+			//orderManager_clearOrder(order);
 			break;
 		}
 		case ORDER_COST_REPLY: {
@@ -62,14 +62,14 @@ void *listen(void*)
             continue;
 		}
 
-		OrderList receivedOrderList = msgParser_getOrderListFromMessage(buf);
+		/*OrderList receivedOrderList = msgParser_getOrderListFromMessage(buf);
 		if (!(orderManager_orderListEquals(receivedOrderList)))
 		{
 			orderManager_mergeMyOrdersWith(receivedOrderList);
 
 			std::string updateMsg = msgParser_makeOrderListMsg(orderManager_getOrders());
 			udp_send(BROADCAST_PORT, updateMsg.c_str(), strlen(updateMsg.c_str()));	
-		}
+		}*/
     
 	}
 	return NULL;

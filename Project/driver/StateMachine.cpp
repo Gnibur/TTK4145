@@ -73,6 +73,7 @@ void stateMachine_floorReached(int floor)
 
 	if (!ordersToClear.empty())
 	{
+		std::cout << "Stop.\n";
 		ioDriver_setMotorDirection(DIRECTION_STOP);
 
 		for (auto it = ordersToClear.begin(); it != ordersToClear.end(); ++it) 

@@ -47,8 +47,10 @@ OrderList orderManager_getOrders()
 
 OrderList orderManager_getOrdersOnFloor(int floor)
 {
+	std::cout << "Threading soon\n";
 	pthread_mutex_lock(&orderManagerMutex);
 	OrderList returnList;
+	std::cout << "Finding orders on floor...\n";
 	for (auto it = orderList.begin(); it != orderList.end(); ++it)
 	{	
 		// && (it->assignedIP == IP)
@@ -135,17 +137,21 @@ bool orderManager_orderListEquals(OrderList rhs)
 	pthread_mutex_lock(&orderManagerMutex);
 	auto rhsIterator = rhs.begin();
 	auto lhsIterator = orderList.begin();
+	bool returnVal = true;
 	while (lhsIterator != orderList.end())
 	{
-		if (rhsIterator == rhs.end())				return false;
-		if (!((*lhsIterator) == (*rhsIterator)))	return false;
+		if (rhsIterator == rhs.end())
+			returnVal = false;
+		if (!((*lhsIterator) == (*rhsIterator)))
+			returnVal = false;
 
 		++lhsIterator;
 		++rhsIterator;
 	}
-	if (rhsIterator != rhs.end())				return false;
+	if (rhsIterator != rhs.end())
+		returnVal = false;
 	pthread_mutex_unlock(&orderManagerMutex);	
-	return true;
+	return returnVal;
 }
 
 Order orderManager_checkForOrderTimeout()
