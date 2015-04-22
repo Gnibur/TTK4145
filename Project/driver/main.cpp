@@ -1,5 +1,9 @@
 #include "StateMachine.h"
+#include "NetworkListener.h"
 #include <iostream>
+
+button_type_t 	lastButton;
+int 			lastButtonFloor;
 
 void init_elevator()
 {
@@ -30,7 +34,13 @@ void run_physical()
 				if (((button_type_t)button == BUTTON_CALL_UP) && (floor == 3)) continue;
 				if (((button_type_t)button == BUTTON_CALL_DOWN) && (floor == 0)) continue;
 				if (ioDriver_isOrderButtonPressed((button_type_t)button, floor))
-					stateMachine_buttonPressed(floor, (button_type_t)button); // Make sure this happens only once.
+				{
+					if ((lastButton == (button_type_t)button) && (lastButtonFloor == floor)) continue;
+					std::cout << "fjgjgjgjgj\n";
+					stateMachine_buttonPressed(floor, (button_type_t)button);
+					lastButton = (button_type_t)button;
+					lastButtonFloor = floor;
+				}
 			}
 		}
 
@@ -69,9 +79,13 @@ int main()
 	init_elevator();
 	std::cout << "Going into run physical..\n";
 
+	orderManager_init();	
 
+	//networkListener_run();
 
 	run_physical();
+
+	
 
 	return 0;
 }

@@ -28,7 +28,7 @@ struct Order {
 
 	bool operator==(const Order& rhs) const
 	{
-	    return (floor == rhs.floor && direction == rhs.direction && assignedIP.compare(rhs.assignedIP) == 0);
+	    return (floor == rhs.floor && direction == rhs.direction /*&& assignedIP.compare(rhs.assignedIP) == 0*/);
 	}
 	bool operator < (const Order& rhs) const
 	{

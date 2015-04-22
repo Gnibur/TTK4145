@@ -2,6 +2,9 @@
 
 #include "DataStructures.h"
 
+
+#define AUCTION_TIME 1
+
 void auctionManager_init();
 
 void auction_start(int floor, button_type_t direction);

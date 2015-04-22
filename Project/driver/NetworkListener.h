@@ -1,7 +1,6 @@
 #ifndef NETWORKLISTENER_H
 #define NETWORKLISTENER_H
 
-void run();
-void listen();
+void networkListener_run();
 
 #endif

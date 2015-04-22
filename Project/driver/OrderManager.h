@@ -10,6 +10,8 @@
 
 struct Order;
 
+void orderManager_init();
+
 // Pushing and popping from the orderlist
 void orderManager_newOrder(Order order);
 void orderManager_clearOrder(Order order);

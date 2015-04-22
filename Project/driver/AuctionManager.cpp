@@ -3,6 +3,7 @@
 #include "udp.h"
 #include "OrderManager.h"
 #include "MsgParser.h"
+#include "StateMachine.h"
 #include <pthread.h>
 #include <time.h>
 #include <map>
@@ -11,6 +12,7 @@
 #include <algorithm>
 #include <ctime>
 #include <cstring>
+#include <iostream>
 
 std::map<Order, std::vector<Offer>> auctions;
 
@@ -26,37 +28,49 @@ void auctionManager_init()
 
 void auction_start(int floor, button_type_t direction)
 {
-  Order order(direction, floor, "", -1);
+  Order *order = new Order(direction, floor, "", -1);
+
+	Offer offer = {1, floor, direction, getMyIP()};
+
+  auctions[*order].push_back(offer);
   pthread_t auction_id;
-  pthread_create(&auction_id, NULL, runAuction, (void*)&order);
+  pthread_create(&auction_id, NULL, runAuction, (void*)order);
+  std::cout << "Pthread now created\n";
 }
 
 void *runAuction(void *args)
 {
-  Order order = *(Order*)args;
+  	Order *order = (Order*)args;
 
-  time_t timeAtStart = time(0);
+  	std::cout << "AUCTION STARTED for floor " << order->floor << ", dir " << order->direction << std::endl;
 
-  while (time(0) < timeAtStart + 3)
-    ;
+  	time_t timeAtStart = time(0);
 
-  pthread_mutex_lock(&auctionMutex);
+  	while (time(0) < timeAtStart + AUCTION_TIME)
+    	;
 
-  std::sort(auctions[order].begin(), auctions[order].end());
+  	pthread_mutex_lock(&auctionMutex);
+
+  	std::sort(auctions[(*order)].begin(), auctions[(*order)].end());
+  	// hopefully there are some bids
+  	Offer bestOffer = auctions[(*order)][0];
+
+  	pthread_mutex_unlock(&auctionMutex);
+  	order->assignedIP = bestOffer.fromIP;
+
+	//OrderList updatedList;
+	orderManager_newOrder(*order);
+	stateMachine_newOrder(order->floor, order->direction);
+	OrderList updatedList = orderManager_getOrders();
+
+  	std::string newOrderMessage = msgParser_makeNewOrderMsg(*order, updatedList);
+  	udp_send(BROADCAST_PORT, newOrderMessage.c_str(), strlen(newOrderMessage.c_str()));
+
   
-  // hopefully there are some bids
-  Offer bestOffer = auctions[order][0];
-  
-  pthread_mutex_unlock(&auctionMutex);
-  
-  order.assignedIP = bestOffer.fromIP;
-
-	OrderList updatedList; 
-	updatedList.push_back(order);
-	orderManager_mergeMyOrdersWith(updatedList);
-
-  std::string newOrderMessage = msgParser_makeNewOrderMsg(order, updatedList);
-  udp_send(BROADCAST_PORT, newOrderMessage.c_str(), strlen(newOrderMessage.c_str()));
+  	std::cout << "AUCTION FINISHED, for floor " << order->floor << ", dir " << order->direction 
+            	<< ", IP " << bestOffer.fromIP << " won\n";
+  	delete order;
+	return NULL;
 }
 
 void auction_addBid(Offer offer)

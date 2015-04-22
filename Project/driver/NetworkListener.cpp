@@ -1,3 +1,5 @@
+#include <pthread.h>
+
 #include "udp.h"
 #include "MsgParser.h"
 #include "OrderManager.h"
@@ -5,23 +7,28 @@
 #include "AuctionManager.h"
 
 #include <cstring>
+#include <iostream>
 
 #define BUFLENGTH 1024
 
-void run()
+void *listen(void*);
+
+void networkListener_run()
 {
-	/* set up network */
+	pthread_t networkListener;
+	pthread_create(&networkListener, NULL, listen, NULL);
 }
 
 
-void listen() 
+void *listen(void*) 
 {
+	char buf[BUFLENGTH];
 	while (true) {
-		char buf[BUFLENGTH];
+        std::cout << "WHO IS GIVING THE SEG FAULT\n";
 		udp_receive(BROADCAST_PORT, buf, BUFLENGTH); // blocking read into buf
 
 		MsgType messageType = msgParser_getMessageType(buf);
-  
+        /*
 		switch (messageType) {
 
 		case NEW_ORDER_MSG:{
@@ -52,8 +59,9 @@ void listen()
 			// we want to merge anyway. That happens below
 
 		default:
+            std::cout << "Unknown message received!\n";
 			// Unknown message
-			return;
+			return NULL;
 		}
 
 		OrderList receivedOrderList = msgParser_getOrderListFromMessage(buf);
@@ -63,9 +71,10 @@ void listen()
 
 			std::string updateMsg = msgParser_makeOrderListMsg(orderManager_getOrders());
 			udp_send(BROADCAST_PORT, updateMsg.c_str(), strlen(updateMsg.c_str()));	
-		}
-
+		}*/
+    
 	}
+	return NULL;
 
 }
 
