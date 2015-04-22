@@ -90,6 +90,15 @@ void stateMachine_floorReached(int floor)
 
 		state = DOOROPEN;
 	}
+	// FAILSAFE: STOP THE ELEVATOR AT BOUNDARY FLOORS ANYWAY.
+	else
+	{
+		if ((floor == 0) || (floor == N_FLOORS - 1))
+		{
+			ioDriver_setMotorDirection(DIRECTION_STOP);
+			state = IDLE;
+		}
+	}
 }
 
 void stateMachine_doorTimeout()

@@ -2,8 +2,7 @@
 #include "NetworkListener.h"
 #include <iostream>
 
-button_type_t 	lastButton;
-int 			lastButtonFloor;
+int	oldButtonStates[3][N_FLOORS] = {{0}};
 
 void init_elevator()
 {
@@ -35,11 +34,15 @@ void run_physical()
 				if (((button_type_t)button == BUTTON_CALL_DOWN) && (floor == 0)) continue;
 				if (ioDriver_isOrderButtonPressed((button_type_t)button, floor))
 				{
-					if ((lastButton == (button_type_t)button) && (lastButtonFloor == floor)) continue;
-					std::cout << "fjgjgjgjgj\n";
-					stateMachine_buttonPressed(floor, (button_type_t)button);
-					lastButton = (button_type_t)button;
-					lastButtonFloor = floor;
+					if (oldButtonStates[button][floor] != 1)
+					{
+						stateMachine_buttonPressed(floor, (button_type_t)button);
+						oldButtonStates[button][floor] = 1;
+					}
+				}
+				else
+				{
+					if (oldButtonStates[button][floor] == 1) oldButtonStates[button][floor] = 0;
 				}
 			}
 		}
@@ -79,7 +82,8 @@ int main()
 	init_elevator();
 	std::cout << "Going into run physical..\n";
 
-	orderManager_init();	
+	orderManager_init();
+	findMyIP();
 
 	networkListener_run();
 

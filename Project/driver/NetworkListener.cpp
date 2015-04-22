@@ -57,8 +57,9 @@ void *listen(void*)
 			// we want to merge anyway. That happens below
 
 		default:
-            std::cout << "Unknown message received!\n";
+            //std::cout << "Unknown message received!\n";
 			// Unknown message
+            continue;
 		}
 
 		OrderList receivedOrderList = msgParser_getOrderListFromMessage(buf);
