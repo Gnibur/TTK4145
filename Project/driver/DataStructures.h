@@ -41,7 +41,7 @@ struct Order {
 		if (floor > rhs.floor) 					return false;
 		if (direction < rhs.direction) 			return true;
 		if (direction > rhs.direction)			return false;
-		if (timeAssigned > rhs.timeAssigned)	return true;
+		if (assignedIP > rhs.assignedIP)		return true;
 		return false;
 	}
 

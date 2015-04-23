@@ -160,6 +160,8 @@ void orderManager_mergeMyOrdersWith(OrderList orders)
 bool orderManager_orderListEquals(OrderList rhs)
 {
 	pthread_mutex_lock(&orderManagerMutex);
+	std::sort(rhs.begin(), rhs.end());
+	std::sort(orderList.begin(), orderList.end());
 	auto rhsIterator = rhs.begin();
 	auto lhsIterator = orderList.begin();
 	bool returnVal = true;
