@@ -29,7 +29,8 @@ void auctionManager_init()
 void auction_start(int floor, button_type_t direction)
 {
 	Order *order = new Order(direction, floor, "", -1);
-	Offer offer = {1, floor, direction, getMyIP()};
+	int cost = orderManager_getCost(getLastFloor(), floor, getLastDirection(), direction);
+	Offer offer = {cost, floor, direction, getMyIP()};
 	auctions[*order].push_back(offer);
 	pthread_t auction_id;
 	pthread_create(&auction_id, NULL, runAuction, (void*)order);
