@@ -45,7 +45,7 @@ void *listen(void*)
 			int cost = orderManager_getCost(getLastFloor(), order.floor, getLastDirection(), order.direction);
 			Offer offer = {cost, order.floor, order.direction, getMyIP()};
 			std::string offerMsg = msgParser_makeOrderCostReplyMsg(offer);
-			std::cout << "I should send a reply"\n
+			std::cout << "I should send a reply\n";
 			udp_send(BROADCAST_PORT, offerMsg.c_str(), strlen(offerMsg.c_str()) + 1);
 			usleep(10000);
 			break;
