@@ -19,6 +19,7 @@ enum MsgType {
 
 
 MsgType   msgParser_getMessageType(string message);
+std::string msgParser_getSenderIP(string message);
 Order     msgParser_getOrderFromMessage(string message);
 OrderList msgParser_getOrderListFromMessage(string message);
 Order     msgParser_getOrderCostRequestFromMessage(string message);

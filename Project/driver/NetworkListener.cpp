@@ -28,6 +28,7 @@ void *listen(void*)
 	while (true) {
 		udp_receive(buf, BUFLENGTH); // blocking read into buf
 		MsgType messageType = msgParser_getMessageType(buf);
+		if (getMyIP() == msgParser_getSenderIP(buf)) continue;
 		switch (messageType) {
 
 		case NEW_ORDER_MSG:{
