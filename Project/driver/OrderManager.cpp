@@ -47,10 +47,8 @@ OrderList orderManager_getOrders()
 
 OrderList orderManager_getOrdersOnFloor(int floor)
 {
-	std::cout << "Threading soon\n";
 	pthread_mutex_lock(&orderManagerMutex);
 	OrderList returnList;
-	std::cout << "Finding orders on floor...\n";
 	for (auto it = orderList.begin(); it != orderList.end(); ++it)
 	{	
 		// && (it->assignedIP == IP)

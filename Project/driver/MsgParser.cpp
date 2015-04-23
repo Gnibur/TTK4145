@@ -23,20 +23,21 @@ Order msgParser_getOrderFromMessage(string message)
 
 
 	TiXmlElement *elem = xmldoc.RootElement();
-	if (!elem)
+	if (!elem){
+		std::cout << "Could not obtain order from message, root was not found\n";
 		return Order();
-
-
+	}
 
 	int temp;
 	Order order;
+	elem->QueryIntAttribute("Floor", &order.floor);
 	elem->QueryIntAttribute("Direction", &temp);
 	order.direction = (button_type_t)temp;
-	elem->QueryIntAttribute("Floor", &order.floor);
+
+
 
 	if (msgParser_getMessageType(message) == CLEAR_ORDER_MSG)
 		order.assignedIP = elem->Attribute("AssignedIP");
-
 
 	return order;
 }
@@ -60,9 +61,10 @@ OrderList msgParser_getOrderListFromMessage(string message)
 		TiXmlElement *childElement = childNode->ToElement();
 		int temp;
 		Order order;
+		childElement->QueryIntAttribute("Floor", &order.floor);
 		childElement->QueryIntAttribute("Direction", &temp);
 		order.direction = (button_type_t)temp;
-		childElement->QueryIntAttribute("Floor", &order.floor);
+
 
 		if (msgParser_getMessageType(message) != NEW_ORDER_MSG)
 			order.assignedIP = childElement->Attribute("AssignedIP");
@@ -123,8 +125,8 @@ string msgParser_makeNewOrderMsg(Order order, OrderList updatedOrderList)
 	TiXmlElement *root = new TiXmlElement("Order");
 
 	root->SetAttribute("Type", NEW_ORDER_MSG);
-	root->SetAttribute("Direction", order.direction);
 	root->SetAttribute("Floor", order.floor);
+	root->SetAttribute("Direction", order.direction);
 	xmldoc.LinkEndChild(root);
 
 
@@ -132,9 +134,9 @@ string msgParser_makeNewOrderMsg(Order order, OrderList updatedOrderList)
 	xmldoc.LinkEndChild(orderList);
 	for (auto it = updatedOrderList.begin(); it != updatedOrderList.end(); ++it){
 		TiXmlElement *orderListElement = new TiXmlElement("Order");
-		orderListElement->LinkEndChild(orderListElement);
-		orderListElement->SetAttribute("Direction", it->direction);
+		orderList->LinkEndChild(orderListElement);
 		orderListElement->SetAttribute("Floor", it->floor);
+		orderListElement->SetAttribute("Direction", it->direction);
 		orderListElement->SetAttribute("AssignedIP", it->assignedIP.c_str());
 	}
 
@@ -150,17 +152,18 @@ string msgParser_makeClearOrderMsg(Order order, OrderList updatedOrderList)
 
 	xmldoc.LinkEndChild(root);
 	root->SetAttribute("Type", CLEAR_ORDER_MSG);
-	root->SetAttribute("Direction", order.direction);
 	root->SetAttribute("Floor", order.floor);
+	root->SetAttribute("Direction", order.direction);
+	root->SetAttribute("AssignedIP", order.assignedIP.c_str());
 
 	TiXmlElement *orderList = new TiXmlElement("OrderList");
 	xmldoc.LinkEndChild(orderList);
 	for (auto it = updatedOrderList.begin(); it != updatedOrderList.end(); ++it){
 		TiXmlElement *orderListElement = new TiXmlElement("Order");
-		orderListElement->LinkEndChild(orderListElement);
-		orderListElement->SetAttribute("Direction", it->direction);
 		orderListElement->SetAttribute("Floor", it->floor);
+		orderListElement->SetAttribute("Direction", it->direction);
 		orderListElement->SetAttribute("AssignedIP", it->assignedIP.c_str());
+		orderList->LinkEndChild(orderListElement);
 	}
 
 	TiXmlPrinter printer;
@@ -180,8 +183,8 @@ string msgParser_makeOrderListMsg(OrderList orders)
 	for (auto it = orders.begin(); it != orders.end(); ++it){
 		TiXmlElement *orderListElement = new TiXmlElement("Order");
 		orderList->LinkEndChild(orderListElement);
-		orderListElement->SetAttribute("Direction", it->direction);
 		orderListElement->SetAttribute("Floor", it->floor);
+		orderListElement->SetAttribute("Direction", it->direction);
 		orderListElement->SetAttribute("AssignedIP", it->assignedIP.c_str());
 	}
 
@@ -195,8 +198,8 @@ string msgParser_makeOrderCostRequestMsg(int floor, button_type_t direction)
 	TiXmlDocument xmldoc;
 	TiXmlElement *msg = new TiXmlElement("RootElement");
 	xmldoc.LinkEndChild(msg);
-	msg->SetAttribute("Type", ORDER_COST_REQUEST);
 	msg->SetAttribute("Floor", floor);
+	msg->SetAttribute("Type", ORDER_COST_REQUEST);
 	msg->SetAttribute("Direction", direction);
 
 	TiXmlPrinter printer;
