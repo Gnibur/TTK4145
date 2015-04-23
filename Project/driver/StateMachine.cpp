@@ -38,7 +38,7 @@ void stateMachine_buttonPressed(int floor, button_type_t button)
 		orderManager_newOrder(order);
 		std::string newOrderMsg = msgParser_makeNewOrderMsg(order, orderManager_getOrders());
 		udp_send(BROADCAST_PORT, newOrderMsg.c_str(), strlen(newOrderMsg.c_str()) + 1);
-
+        usleep(10000);
 		stateMachine_newOrder(order);
 	}
 	else
