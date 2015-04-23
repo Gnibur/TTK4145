@@ -44,14 +44,12 @@ void *runAuction(void *args)
 
 	std::string orderCostRequestMsg = msgParser_makeOrderCostRequestMsg(order->floor, order->direction);
 	udp_send(BROADCAST_PORT, orderCostRequestMsg.c_str(), strlen(orderCostRequestMsg.c_str()) + 1);
-
 	time_t timeAtStart = time(0);
 
 	while (time(0) < timeAtStart + AUCTION_TIME)
 		;
 
 	pthread_mutex_lock(&auctionMutex);
-
 	std::sort(auctions[(*order)].begin(), auctions[(*order)].end());
   	// hopefully there are some bids
 	Offer bestOffer = auctions[(*order)][0];

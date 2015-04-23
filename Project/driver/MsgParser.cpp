@@ -46,7 +46,6 @@ Order msgParser_getOrderFromMessage(string message)
 OrderList msgParser_getOrderListFromMessage(string message)
 {
 	//  printf("Received message: %s\n", message.c_str());
-
 	TiXmlDocument xmldoc;
 	xmldoc.Parse(message.c_str());
 	TiXmlElement *root = xmldoc.RootElement();

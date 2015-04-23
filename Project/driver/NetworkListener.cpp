@@ -70,14 +70,18 @@ void *listen(void*)
             continue;
 		}
 
-		OrderList receivedOrderList = msgParser_getOrderListFromMessage(buf);
-		if (!(orderManager_orderListEquals(receivedOrderList)))
+		if ((messageType != ORDER_COST_REQUEST) && (messageType != ORDER_COST_REPLY))
 		{
-			orderManager_mergeMyOrdersWith(receivedOrderList);
+			OrderList receivedOrderList = msgParser_getOrderListFromMessage(buf);
+			//OrderList receivedOrderList = orderManager_getOrders();
+			if (!(orderManager_orderListEquals(receivedOrderList)))
+			{
+				orderManager_mergeMyOrdersWith(receivedOrderList);
 
-			std::string updateMsg = msgParser_makeOrderListMsg(orderManager_getOrders());
-			udp_send(BROADCAST_PORT, updateMsg.c_str(), strlen(updateMsg.c_str()));
-			usleep(10000);
+				std::string updateMsg = msgParser_makeOrderListMsg(orderManager_getOrders());
+				udp_send(BROADCAST_PORT, updateMsg.c_str(), strlen(updateMsg.c_str()));
+				usleep(10000);
+			}
 		}
     
 	}
