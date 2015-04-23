@@ -1,5 +1,9 @@
 #include "StateMachine.h"
 #include "NetworkListener.h"
+#include "IoDriver.h"
+#include "Timer.h"
+#include "udp.h"
+#include "OrderManager.h"
 #include <iostream>
 
 int	oldButtonStates[3][N_FLOORS] = {{0}};
@@ -80,6 +84,7 @@ int main()
 
 	std::cout << "Initializing elevator..\n";
 	init_elevator();
+	udp_initialize(BROADCAST_PORT);
 	std::cout << "Going into run physical..\n";
 
 	orderManager_init();

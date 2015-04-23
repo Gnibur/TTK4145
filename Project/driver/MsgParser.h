@@ -17,15 +17,6 @@ enum MsgType {
 	INVALID_MESSAGE
 };
 
-/* Should this be defined here?
-struct Offer {
-	int cost;
-	int floor;
-	button_t direction;
-	string fromIP; // necessary?
-};*/
-
-
 
 MsgType   msgParser_getMessageType(string message);
 Order     msgParser_getOrderFromMessage(string message);

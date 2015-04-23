@@ -26,7 +26,7 @@ void *listen(void*)
 {
 	char buf[BUFLENGTH];
 	while (true) {
-		udp_receive(BROADCAST_PORT, buf, BUFLENGTH); // blocking read into buf
+		udp_receive(buf, BUFLENGTH); // blocking read into buf
 		MsgType messageType = msgParser_getMessageType(buf);
 		switch (messageType) {
 
@@ -46,7 +46,7 @@ void *listen(void*)
 			Offer offer = {cost, order.floor, order.direction, getMyIP()};
 			std::string offerMsg = msgParser_makeOrderCostReplyMsg(offer);
 			std::cout << "I should send a reply\n";
-			udp_send(BROADCAST_PORT, offerMsg.c_str(), strlen(offerMsg.c_str()) + 1);
+			udp_send(offerMsg.c_str(), strlen(offerMsg.c_str()) + 1);
 			//usleep(10000);
 			break;
 		}
@@ -81,7 +81,7 @@ void *listen(void*)
 			{
 				orderManager_mergeMyOrdersWith(receivedOrderList);
 				std::string updateMsg = msgParser_makeOrderListMsg(orderManager_getOrders());
-				udp_send(BROADCAST_PORT, updateMsg.c_str(), strlen(updateMsg.c_str()));
+				udp_send(updateMsg.c_str(), strlen(updateMsg.c_str()));
 				//usleep(10000);
 			}
 		}

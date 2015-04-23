@@ -43,7 +43,7 @@ void *runAuction(void *args)
 	std::cout << "AUCTION STARTED for floor " << order->floor << ", dir " << order->direction << std::endl;
 
 	std::string orderCostRequestMsg = msgParser_makeOrderCostRequestMsg(order->floor, order->direction);
-	udp_send(BROADCAST_PORT, orderCostRequestMsg.c_str(), strlen(orderCostRequestMsg.c_str()) + 1);
+	udp_send(orderCostRequestMsg.c_str(), strlen(orderCostRequestMsg.c_str()) + 1);
 	time_t timeAtStart = time(0);
 
 	while (time(0) < timeAtStart + AUCTION_TIME)
@@ -64,21 +64,28 @@ void *runAuction(void *args)
 	OrderList updatedList = orderManager_getOrders();
 
 	std::string newOrderMessage = msgParser_makeNewOrderMsg(*order, updatedList);
-	udp_send(BROADCAST_PORT, newOrderMessage.c_str(), strlen(newOrderMessage.c_str()));
+	udp_send(newOrderMessage.c_str(), strlen(newOrderMessage.c_str()));
 
 
 	std::cout << "AUCTION FINISHED, for floor " << order->floor << ", dir " << order->direction 
             	<< ", IP " << bestOffer.fromIP << " won\n";
+	
+
+	pthread_mutex_lock(&auctionMutex);
+	auctions.erase(*order);
+	pthread_mutex_unlock(&auctionMutex);
+
 	delete order;
 	return NULL;
 }
 
 void auction_addBid(Offer offer)
 {
-  Order order(offer.direction, offer.floor, "", -1);
+	Order order(offer.direction, offer.floor, "", -1);
 
-  pthread_mutex_lock(&auctionMutex);
-  if (auctions.find(order) != auctions.end())
-    auctions[order].push_back(offer);
-  pthread_mutex_unlock(&auctionMutex);
+	pthread_mutex_lock(&auctionMutex);
+	if (auctions.find(order) != auctions.end())
+		auctions[order].push_back(offer);
+	std::cout << "THE NUMBER OF BIDS IS NOW " << auctions.size() << std::endl; 
+	pthread_mutex_unlock(&auctionMutex);
 }
