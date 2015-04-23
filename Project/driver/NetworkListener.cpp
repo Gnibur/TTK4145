@@ -81,7 +81,7 @@ void *listen(void*)
 			if (!(orderManager_orderListEquals(receivedOrderList)))
 			{
 				orderManager_mergeMyOrdersWith(receivedOrderList);
-
+				std::cout << "Merging!\n\n\n";
 				std::string updateMsg = msgParser_makeOrderListMsg(orderManager_getOrders());
 				udp_send(BROADCAST_PORT, updateMsg.c_str(), strlen(updateMsg.c_str()));
 				//usleep(10000);
