@@ -11,6 +11,7 @@
 void stateMachine_initialize();
 void stateMachine_buttonPressed(int floor, button_type_t button);
 void stateMachine_floorReached(int floor);
+bool stateMachine_shouldIStopHere(OrderList ordersOnFloor);
 void stateMachine_doorTimeout();
 void stateMachine_orderTimeOut(Order order);
 

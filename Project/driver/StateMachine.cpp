@@ -69,12 +69,12 @@ void stateMachine_floorReached(int floor)
 	ioDriver_setFloorIndicator(floor);
 	OrderList ordersToClear = orderManager_getOrdersOnFloor(floor);
 
-	if (!ordersToClear.empty())
+	if (!ordersToClear.empty() && stateMachine_shouldIStopHere(ordersToClear))
 	{
 		ioDriver_setMotorDirection(DIRECTION_STOP);
 
 		for (auto it = ordersToClear.begin(); it != ordersToClear.end(); ++it) 
-			{
+		{
 			orderManager_clearOrder(*it);
 			std::string clearOrderMsg = msgParser_makeClearOrderMsg(*it, orderManager_getOrders());
 
@@ -97,6 +97,20 @@ void stateMachine_floorReached(int floor)
 			state = IDLE;
 		}
 	}
+}
+
+bool stateMachine_shouldIStopHere(OrderList ordersOnFloor)
+{
+    button_type_t buttonDirection = (lastDirection == DIRECTION_DOWN)? BUTTON_CALL_DOWN : BUTTON_CALL_UP;
+    for (auto it = ordersOnFloor.begin(); it != ordersOnFloor.end(); ++it)
+    {
+        if ((buttonDirection == it->direction) || (it->direction == BUTTON_COMMAND) || (lastDirection == DIRECTION_STOP))
+            return true;
+    }
+    if (orderManager_getNextDirection(lastFloor, lastDirection) != lastDirection)
+        return true;
+        
+    return false;
 }
 
 void stateMachine_doorTimeout()
