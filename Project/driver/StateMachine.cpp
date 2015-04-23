@@ -122,6 +122,7 @@ void stateMachine_updateDirection()
 		else
 		{
 			state = IDLE;
+			lastDirection = DIRECTION_STOP;
 		}
 	}
 	else
