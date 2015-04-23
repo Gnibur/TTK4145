@@ -54,7 +54,6 @@ void *listen(void*)
 			std::cout << "Received Clear order:\n" << buf << "\n\n";
 			Order order = msgParser_getOrderFromMessage(buf);
 			orderManager_clearOrder(order);
-			stateMachine_clearOrder(order);
 			break;
 		}
 		case ORDER_COST_REPLY: {

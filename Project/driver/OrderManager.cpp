@@ -1,5 +1,6 @@
 #include "OrderManager.h"
 #include "udp.h"
+#include "IoDriver.h"
 #include <ctime>
 #include <algorithm>
 #include <cmath>
@@ -28,7 +29,10 @@ void orderManager_newOrder(Order order)
 		orderList.push_back(order);
 	
 	std::sort(orderList.begin(), orderList.end());
-	pthread_mutex_unlock(&orderManagerMutex);	
+	pthread_mutex_unlock(&orderManagerMutex);
+	
+	if (((order.direction == BUTTON_COMMAND) && (order.assignedIP == getMyIP())) || (order.direction != BUTTON_COMMAND))
+		ioDriver_setOrderButtonLamp(order.direction, order.floor);
 }
 
 void orderManager_clearOrder(Order order)
@@ -40,7 +44,10 @@ void orderManager_clearOrder(Order order)
 		orderList.erase(search);
 
 	std::sort(orderList.begin(), orderList.end());
-	pthread_mutex_unlock(&orderManagerMutex);	
+	pthread_mutex_unlock(&orderManagerMutex);
+	
+	if (((order.direction == BUTTON_COMMAND) && (order.assignedIP == getMyIP())) || (order.direction != BUTTON_COMMAND))
+		ioDriver_clearOrderButtonLamp(order.direction, order.floor);
 }
 
 OrderList orderManager_getOrders()

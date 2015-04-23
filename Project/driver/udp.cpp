@@ -19,6 +19,19 @@
 #include <unistd.h>
 
 std::string myIP;
+/*int socketfd;
+
+void udp_init ()
+{
+    socketfd = socket(AF_INET, SOCK_DGRAM, 0);
+    int yes = 1;
+    setsockopt(socketfd, SOL_SOCKET, SO_BROADCAST, &yes, sizeof yes);
+    
+}
+
+void udp_close ()
+{
+}*/
 
 bool udp_send(int targetPort, const char *data, size_t dataLength)
 {

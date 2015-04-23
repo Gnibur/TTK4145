@@ -1,12 +1,7 @@
 #ifndef STATEMACHINE_H
 #define STATEMACHINE_H
 
-#include "OrderManager.h"
 #include "DataStructures.h"
-#include "Timer.h"
-#include "IoDriver.h"
-#include "udp.h"
-
 
 void stateMachine_initialize();
 void stateMachine_buttonPressed(int floor, button_type_t button);

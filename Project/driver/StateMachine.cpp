@@ -2,6 +2,9 @@
 #include "IoDriver.h"
 #include "MsgParser.h"
 #include "AuctionManager.h"
+#include "OrderManager.h"
+#include "udp.h"
+#include "Timer.h"
 #include <algorithm>
 #include <string>
 #include <cstring>
@@ -49,8 +52,6 @@ void stateMachine_buttonPressed(int floor, button_type_t button)
 
 void stateMachine_newOrder(Order order)
 {
-    if (((order.direction == BUTTON_COMMAND) && (order.assignedIP.compare(getMyIP()) == 0)) || (order.direction != BUTTON_COMMAND))
-	    ioDriver_setOrderButtonLamp(order.direction, order.floor);
 	switch (state){
 	case IDLE:
 		stateMachine_updateDirection();
@@ -60,12 +61,6 @@ void stateMachine_newOrder(Order order)
 	case MOVING:
 		break;
 	}	
-}
-
-void stateMachine_clearOrder(Order order)
-{
-    if (((order.direction == BUTTON_COMMAND) && (order.assignedIP.compare(getMyIP()) == 0)) || (order.direction != BUTTON_COMMAND))
-        ioDriver_clearOrderButtonLamp(order.direction, order.floor);
 }
 
 void stateMachine_floorReached(int floor)
@@ -88,7 +83,6 @@ void stateMachine_floorReached(int floor)
             std::cout << "Sending clearorder...\n";
 			udp_send(BROADCAST_PORT, clearOrderMsg.c_str(), strlen(clearOrderMsg.c_str()) + 1);
 			usleep(10000);
-			stateMachine_clearOrder(*it);
 		}
 
 		ioDriver_setDoorOpenLamp();
