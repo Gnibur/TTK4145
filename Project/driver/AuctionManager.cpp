@@ -41,6 +41,9 @@ void *runAuction(void *args)
 
 	std::cout << "AUCTION STARTED for floor " << order->floor << ", dir " << order->direction << std::endl;
 
+	std::string orderCostRequestMsg = msgParser_makeOrderCostRequestMsg(order->floor, order->direction);
+	udp_send(BROADCAST_PORT, orderCostRequestMsg.c_str(), strlen(orderCostRequestMsg.c_str()) + 1);
+
 	time_t timeAtStart = time(0);
 
 	while (time(0) < timeAtStart + AUCTION_TIME)

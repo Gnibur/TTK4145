@@ -43,6 +43,8 @@ void *listen(void*)
 			Order order	= msgParser_getOrderCostRequestFromMessage(buf);
 			int cost = orderManager_getCost(getLastFloor(), order.floor, getLastDirection(), order.direction);
 			Offer offer = {cost, order.floor, order.direction, getMyIP()};
+			std::cout << "MY OFFER: \n";
+			std::cout << "COST: " << offer.cost << " FLOOR: " << offer.floor << " DIR: " << offer.direction << " IP: " << offer.fromIP << "\n\n";
 			std::string offerMsg = msgParser_makeOrderCostReplyMsg(offer);
 			udp_send(BROADCAST_PORT, offerMsg.c_str(), strlen(offerMsg.c_str()) + 1);
 			break;

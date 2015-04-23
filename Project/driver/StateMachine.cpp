@@ -43,8 +43,6 @@ void stateMachine_buttonPressed(int floor, button_type_t button)
 	else
 	{
 		auction_start(floor, button);
-
-		// Elevator should probably add own bid
 	}
 }
 
