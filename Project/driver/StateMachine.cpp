@@ -36,7 +36,7 @@ void stateMachine_buttonPressed(int floor, button_type_t button)
 		Order order(button, floor, getMyIP(), -1);
 		orderManager_newOrder(order);
 		std::string newOrderMsg = msgParser_makeNewOrderMsg(order, orderManager_getOrders());
-		udp_send(BROADCAST_PORT, newOrderMsg.c_str(), strlen(newOrderMsg.c_str()));
+		udp_send(BROADCAST_PORT, newOrderMsg.c_str(), strlen(newOrderMsg.c_str()) + 1);
 
 		stateMachine_newOrder(floor, button);
 	}
@@ -80,7 +80,7 @@ void stateMachine_floorReached(int floor)
 			orderManager_clearOrder(*it);
 			std::string clearOrderMsg = msgParser_makeClearOrderMsg(*it, orderManager_getOrders());
 
-			udp_send(BROADCAST_PORT, clearOrderMsg.c_str(), strlen(clearOrderMsg.c_str()));
+			udp_send(BROADCAST_PORT, clearOrderMsg.c_str(), strlen(clearOrderMsg.c_str()) + 1);
 			ioDriver_clearOrderButtonLamp(it->direction, it->floor);
 			
 		}

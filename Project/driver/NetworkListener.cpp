@@ -31,23 +31,28 @@ void *listen(void*)
 		case NEW_ORDER_MSG:{
 			std::cout << "Received New order:\n" << buf << std::endl;
 			Order order = msgParser_getOrderFromMessage(buf);
+			std::cout << "------------------------------\n";
+			std::cout << "FLOOR: " << order.floor << " DIR: " << order.direction << " IP: " << order.assignedIP << "\n";
+			std::cout << "------------------------------\n\n";
 			orderManager_newOrder(order);
 			stateMachine_newOrder(order.floor, order.direction);
 			break;
 		}
 		case ORDER_COST_REQUEST: {
 			std::cout << "Received Order cost request:\n" << buf << std::endl;;
-			Order order				= msgParser_getOrderCostRequestFromMessage(buf);
-			int cost					= orderManager_getCost(getLastFloor(), order.floor, getLastDirection(), order.direction);
-			Offer offer				= {cost, order.floor, order.direction, getMyIP()};
+			Order order	= msgParser_getOrderCostRequestFromMessage(buf);
+			int cost = orderManager_getCost(getLastFloor(), order.floor, getLastDirection(), order.direction);
+			Offer offer = {cost, order.floor, order.direction, getMyIP()};
 			std::string offerMsg = msgParser_makeOrderCostReplyMsg(offer);
 			udp_send(BROADCAST_PORT, offerMsg.c_str(), strlen(offerMsg.c_str()) + 1);
 			break;
 		}
 		case CLEAR_ORDER_MSG: {
 			std::cout << "Received Clear order:\n" << buf << std::endl;
-
 			Order order = msgParser_getOrderFromMessage(buf);
+			std::cout << "------------------------------\n";
+			std::cout << "FLOOR: " << order.floor << " DIR: " << order.direction << " IP: " << order.assignedIP << "\n";
+			std::cout << "------------------------------\n\n";
 			orderManager_clearOrder(order);
 			break;
 		}

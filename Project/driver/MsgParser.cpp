@@ -33,12 +33,12 @@ Order msgParser_getOrderFromMessage(string message)
 	elem->QueryIntAttribute("Floor", &order.floor);
 	elem->QueryIntAttribute("Direction", &temp);
 	order.direction = (button_type_t)temp;
+	order.assignedIP = elem->Attribute("AssignedIP");
 
 
-
-	if (msgParser_getMessageType(message) == CLEAR_ORDER_MSG)
+	/*if (msgParser_getMessageType(message) == CLEAR_ORDER_MSG)
 		order.assignedIP = elem->Attribute("AssignedIP");
-
+	*/
 	return order;
 }
 
@@ -127,6 +127,7 @@ string msgParser_makeNewOrderMsg(Order order, OrderList updatedOrderList)
 	root->SetAttribute("Type", NEW_ORDER_MSG);
 	root->SetAttribute("Floor", order.floor);
 	root->SetAttribute("Direction", order.direction);
+	root->SetAttribute("AssignedIP", order.assignedIP.c_str());
 	xmldoc.LinkEndChild(root);
 
 
