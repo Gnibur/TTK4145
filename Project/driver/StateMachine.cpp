@@ -150,15 +150,20 @@ void stateMachine_updateDirection()
 
 void stateMachine_orderTimeOut(Order order)
 {
-	/*if (order.direction != BUTTON_COMMAND)
+	if (order.direction != BUTTON_COMMAND)
 	{
+		std::cout << "----------------------\n";
+		std::cout << "WARNING WARNING WARNING\n";
+		std::cout << "ORDER TIMED OUT\n";
+		std::cout << "IP: " << order.assignedIP << " FLOOR: " << order.floor << " DIRECTION: " << order.direction << "\n";
+		std::cout << "----------------------\n";
 		orderManager_clearOrder(order);
 		std::string clearOrderMsg = msgParser_makeClearOrderMsg(order, orderManager_getOrders());
-		udp_send(CAST_PORT, clearOrderMsg.c_str(), strlen(clearOrderMsg.c_str()));
+		udp_send(clearOrderMsg.c_str(), strlen(clearOrderMsg.c_str()) + 1);
 
 		// TODO: Needs failsafe method, so the elevator doesn't die here and everything is lost..
-		//stateMachine_buttonPressed(order.floor, order.direction);
-	}*/
+		stateMachine_buttonPressed(order.floor, order.direction);
+	}
 }
 
 int getLastFloor()

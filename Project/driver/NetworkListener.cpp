@@ -11,7 +11,7 @@
 #include <unistd.h>
 #include <ctime>
 
-#define BUFLENGTH 1024
+#define BUFLENGTH 4096
 
 void *listen(void*);
 
