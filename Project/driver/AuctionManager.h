@@ -3,7 +3,7 @@
 #include "DataStructures.h"
 
 
-#define AUCTION_TIME 1
+#define AUCTION_TIME 2
 
 void auctionManager_init();
 
