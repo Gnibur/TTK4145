@@ -29,7 +29,7 @@ void *listen(void*)
 		switch (messageType) {
 
 		case NEW_ORDER_MSG:{
-			std::cout << "Received New order:\n" << buf << std::endl;
+			std::cout << "Received New order:\n";
 			Order order = msgParser_getOrderFromMessage(buf);
 			std::cout << "------------------------------\n";
 			std::cout << "FLOOR: " << order.floor << " DIR: " << order.direction << " IP: " << order.assignedIP << "\n";
@@ -39,18 +39,19 @@ void *listen(void*)
 			break;
 		}
 		case ORDER_COST_REQUEST: {
-			std::cout << "Received Order cost request:\n" << buf << std::endl;;
+			std::cout << "Received Order cost request:\n";
 			Order order	= msgParser_getOrderCostRequestFromMessage(buf);
 			int cost = orderManager_getCost(getLastFloor(), order.floor, getLastDirection(), order.direction);
 			Offer offer = {cost, order.floor, order.direction, getMyIP()};
-			std::cout << "MY OFFER: \n";
+			std::cout << "------------------------------\n";
 			std::cout << "COST: " << offer.cost << " FLOOR: " << offer.floor << " DIR: " << offer.direction << " IP: " << offer.fromIP << "\n\n";
+			std::cout << "------------------------------\n\n";
 			std::string offerMsg = msgParser_makeOrderCostReplyMsg(offer);
 			udp_send(BROADCAST_PORT, offerMsg.c_str(), strlen(offerMsg.c_str()) + 1);
 			break;
 		}
 		case CLEAR_ORDER_MSG: {
-			std::cout << "Received Clear order:\n" << buf << std::endl;
+			std::cout << "Received Clear order:\n";
 			Order order = msgParser_getOrderFromMessage(buf);
 			std::cout << "------------------------------\n";
 			std::cout << "FLOOR: " << order.floor << " DIR: " << order.direction << " IP: " << order.assignedIP << "\n";
@@ -59,8 +60,11 @@ void *listen(void*)
 			break;
 		}
 		case ORDER_COST_REPLY: {
-			std::cout << "Received Order cost reply:\n" << buf << std::endl;
+			std::cout << "Received Order cost reply:\n";
 			Offer offer = msgParser_getOfferFromMessage(buf);
+			std::cout << "------------------------------\n";
+			std::cout << "COST: " << offer.cost << " FLOOR: " << offer.floor << " DIR: " << offer.direction << " IP: " << offer.fromIP << "\n\n";
+			std::cout << "------------------------------\n\n";
 			auction_addBid(offer);
 			break;
 	 	}

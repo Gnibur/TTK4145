@@ -105,11 +105,27 @@ int orderManager_getCost(int lastFloor, int newFloor, motor_direction_t lastDire
 {
 	int cost = abs(lastFloor - newFloor);
 	std::cout << "Lastdir: " << lastDirection << "\n";
-	// In case of opposite direction
-	if (((newFloor < lastFloor) && (lastDirection == DIRECTION_UP)) || ((newFloor > lastFloor) && (lastDirection == DIRECTION_DOWN)))
+	motor_direction_t wantedMotorDirection;
+	
+	if (wantedDirection == BUTTON_CALL_UP)
+		wantedMotorDirection = DIRECTION_UP;
+	else if (wantedDirection == BUTTON_CALL_DOWN)
+		wantedMotorDirection = DIRECTION_DOWN;
+	else
+		wantedMotorDirection = DIRECTION_STOP;
+
+	if (((lastDirection == DIRECTION_UP) && (newFloor < lastFloor)) || ((lastDirection == DIRECTION_DOWN) && (newFloor > lastFloor)))
 	{
-		cost += N_FLOORS;
+		cost += N_FLOORS * 2;
+		if (wantedMotorDirection == lastDirection)
+			cost += N_FLOORS;
 	}
+	else
+	{
+		if (lastDirection != wantedMotorDirection)
+			cost += N_FLOORS;
+	}
+
 	return cost;
 }
 
