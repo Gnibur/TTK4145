@@ -113,6 +113,7 @@ int orderManager_getCost(int lastFloor, int newFloor, motor_direction_t lastDire
 	int cost = abs(lastFloor - newFloor);
 	motor_direction_t wantedMotorDirection;
 	
+	// Regular cost function
 	if (wantedDirection == BUTTON_CALL_UP)
 		wantedMotorDirection = DIRECTION_UP;
 	else if (wantedDirection == BUTTON_CALL_DOWN)
@@ -130,6 +131,13 @@ int orderManager_getCost(int lastFloor, int newFloor, motor_direction_t lastDire
 	{
 		if (lastDirection != wantedMotorDirection)
 			cost += N_FLOORS;
+	}
+
+	// Expansion for the cost function, so one elevator doesn't take all.
+	for (auto it = orderList.begin(); it != orderList.end(); ++it)
+	{
+		if (it->assignedIP.compare(getMyIP()) == 0)
+			cost += 2;
 	}
 
 	return cost;

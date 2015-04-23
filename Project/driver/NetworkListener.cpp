@@ -9,6 +9,7 @@
 #include <cstring>
 #include <iostream>
 #include <unistd.h>
+#include <ctime>
 
 #define BUFLENGTH 1024
 
@@ -32,6 +33,8 @@ void *listen(void*)
 		case NEW_ORDER_MSG:{
 			std::cout << "Received New order:\n" << buf << "\n\n";
 			Order order = msgParser_getOrderFromMessage(buf);
+			int timeNow = time(0);
+			order.timeAssigned = timeNow;
 			orderManager_newOrder(order);
 			stateMachine_newOrder(order);
 			break;
