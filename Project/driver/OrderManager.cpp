@@ -1,4 +1,5 @@
 #include "OrderManager.h"
+#include "udp.h"
 #include <ctime>
 #include <algorithm>
 #include <cmath>
@@ -22,10 +23,10 @@ void orderManager_newOrder(Order order)
 {
 	pthread_mutex_lock(&orderManagerMutex);
 	std::vector<Order>::iterator search = std::find(orderList.begin(), orderList.end(), order);
+	
 	if (search == orderList.end())
-	{
 		orderList.push_back(order);
-	}
+	
 	std::sort(orderList.begin(), orderList.end());
 	pthread_mutex_unlock(&orderManagerMutex);	
 }
@@ -34,8 +35,10 @@ void orderManager_clearOrder(Order order)
 {
 	pthread_mutex_lock(&orderManagerMutex);
 	std::vector<Order>::iterator search = std::find(orderList.begin(), orderList.end(), order);
+
 	if (search != orderList.end())
 		orderList.erase(search);
+
 	std::sort(orderList.begin(), orderList.end());
 	pthread_mutex_unlock(&orderManagerMutex);	
 }
@@ -50,9 +53,8 @@ OrderList orderManager_getOrdersOnFloor(int floor)
 	pthread_mutex_lock(&orderManagerMutex);
 	OrderList returnList;
 	for (auto it = orderList.begin(); it != orderList.end(); ++it)
-	{	
-		// && (it->assignedIP == IP)
-		if (it->floor == floor)
+	{
+		if ((it->floor == floor) && (it->assignedIP.compare(getMyIP()) == 0))
 			returnList.push_back(*it);
 	}
 	pthread_mutex_unlock(&orderManagerMutex);	
@@ -61,6 +63,7 @@ OrderList orderManager_getOrdersOnFloor(int floor)
 
 motor_direction_t orderManager_getNextDirection(int floor, motor_direction_t lastDirection)
 {
+	// If there are no orders, don't move
 	if (orderList.empty()) return DIRECTION_STOP;
 
 	// If the elevator is idle, prioritize the floors closest
@@ -90,11 +93,11 @@ motor_direction_t orderManager_getNextDirection(int floor, motor_direction_t las
 	for (auto it = orderList.begin(); it != orderList.end(); ++it)
 	{
 		int orderedFloor = it->floor * directionalMultiplier;
-		if (orderedFloor > floor)
+		if ((orderedFloor > floor) && (it->assignedIP.compare(getMyIP()) == 0))
 			return lastDirection;
 	}
 
-	// If you get this far, you need to change the direction.
+	// If you don't find anything in your direction ,change.
 	return newDirection;
 }
 
@@ -121,11 +124,13 @@ int orderManager_getCost(int lastFloor, int newFloor, motor_direction_t lastDire
 void orderManager_mergeMyOrdersWith(OrderList orders)
 {
 	pthread_mutex_lock(&orderManagerMutex);
+	
 	for (auto it = orders.begin(); it != orders.end(); ++it)
 	{
 		if (std::find(orderList.begin(), orderList.end(), (*it)) == orderList.end())
 			orderList.push_back((*it));
 	}
+	
 	std::sort(orderList.begin(), orderList.end());
 	pthread_mutex_unlock(&orderManagerMutex);	
 }

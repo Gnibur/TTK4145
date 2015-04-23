@@ -18,17 +18,22 @@ struct Order {
 		timeAssigned = -1;
 	}
 
-	Order(button_type_t cdirection, int cfloor, std::string cassignedIP, int ctimeAssigned)
+	Order(button_type_t d, int f, std::string i, int t)
 	{
-		direction = cdirection;
-		floor = cfloor;
-		assignedIP = cassignedIP;
-		timeAssigned = ctimeAssigned;
+		direction = d;
+		floor = f;
+		assignedIP = i;
+		timeAssigned = t;
 	}	
 
 	bool operator==(const Order& rhs) const
 	{
-	    return (floor == rhs.floor && direction == rhs.direction /*&& assignedIP.compare(rhs.assignedIP) == 0*/);
+	    if ((rhs.floor == floor) && (rhs.direction == direction) &&  (assignedIP.compare(rhs.assignedIP) == 0))
+			return true;
+		else if ((rhs.floor == floor) && (rhs.direction == direction) && (direction != BUTTON_COMMAND))
+			return true;
+		else
+			return false;
 	}
 	bool operator < (const Order& rhs) const
 	{
