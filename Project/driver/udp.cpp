@@ -39,7 +39,7 @@ bool udp_initialize(int targetPort)
 
   	memset(&target, 0, sizeof target);
 	target.sin_family = AF_INET;
-	target.sin_addr.s_addr = htonl(INADDR_ANY);  // broadcast address
+	target.sin_addr.s_addr = htonl(-1);  // broadcast address
 	target.sin_port = htons(targetPort);
 
   	bind(recvsocketfd, (struct sockaddr*)&target, sizeof target);
