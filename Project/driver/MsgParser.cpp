@@ -65,8 +65,8 @@ OrderList msgParser_getOrderListFromMessage(string message)
 		order.direction = (button_type_t)temp;
 
 
-		if (msgParser_getMessageType(message) != NEW_ORDER_MSG)
-			order.assignedIP = childElement->Attribute("AssignedIP");
+		//if (msgParser_getMessageType(message) != NEW_ORDER_MSG)
+		order.assignedIP = childElement->Attribute("AssignedIP");
 		orderlist.push_back(order);
 	}
 	return orderlist;

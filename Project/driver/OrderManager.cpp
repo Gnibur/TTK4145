@@ -150,7 +150,10 @@ void orderManager_mergeMyOrdersWith(OrderList orders)
 	for (auto it = orders.begin(); it != orders.end(); ++it)
 	{
 		if (std::find(orderList.begin(), orderList.end(), (*it)) == orderList.end())
+		{
+			std::cout << "Pushing back this with IP: " << it->assignedIP << std::endl;
 			orderList.push_back((*it));
+		}
 	}
 	
 	std::sort(orderList.begin(), orderList.end());

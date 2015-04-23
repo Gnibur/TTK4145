@@ -77,6 +77,10 @@ void *listen(void*)
 		if ((messageType != ORDER_COST_REQUEST) && (messageType != ORDER_COST_REPLY))
 		{
 			OrderList receivedOrderList = msgParser_getOrderListFromMessage(buf);
+			for (auto it = receivedOrderList.begin(); it != receivedOrderList.end(); ++it)
+			{
+				std::cout << "AssignedIP FROM NETLISTENER: " << it->assignedIP << "\n";
+			}
 			//OrderList receivedOrderList = orderManager_getOrders();
 			if (!(orderManager_orderListEquals(receivedOrderList)))
 			{
