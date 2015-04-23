@@ -38,7 +38,7 @@ void stateMachine_buttonPressed(int floor, button_type_t button)
 		std::string newOrderMsg = msgParser_makeNewOrderMsg(order, orderManager_getOrders());
 		udp_send(BROADCAST_PORT, newOrderMsg.c_str(), strlen(newOrderMsg.c_str()) + 1);
 
-		stateMachine_newOrder(floor, button);
+		stateMachine_newOrder(order);
 	}
 	else
 	{
@@ -46,9 +46,10 @@ void stateMachine_buttonPressed(int floor, button_type_t button)
 	}
 }
 
-void stateMachine_newOrder(int floor, button_type_t button)
+void stateMachine_newOrder(Order order)
 {
-	ioDriver_setOrderButtonLamp(button, floor);
+    if (((order.direction == BUTTON_COMMAND) && (order.assignedIP.compare(getMyIP()) == 0)) || (order.direction != BUTTON_COMMAND))
+	    ioDriver_setOrderButtonLamp(order.direction, order.floor);
 	switch (state){
 	case IDLE:
 		stateMachine_updateDirection();
@@ -62,7 +63,8 @@ void stateMachine_newOrder(int floor, button_type_t button)
 
 void stateMachine_clearOrder(Order order)
 {
-    ioDriver_clearOrderButtonLamp(order.direction, order.floor);
+    if (order.direction != BUTTON_COMMAND)
+        ioDriver_clearOrderButtonLamp(order.direction, order.floor);
 }
 
 void stateMachine_floorReached(int floor)

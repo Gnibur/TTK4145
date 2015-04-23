@@ -61,7 +61,7 @@ void *runAuction(void *args)
 
 	//OrderList updatedList;
 	orderManager_newOrder(*order);
-	stateMachine_newOrder(order->floor, order->direction);
+	stateMachine_newOrder(*order);
 	OrderList updatedList = orderManager_getOrders();
 
 	std::string newOrderMessage = msgParser_makeNewOrderMsg(*order, updatedList);

@@ -63,8 +63,15 @@ OrderList orderManager_getOrdersOnFloor(int floor)
 
 motor_direction_t orderManager_getNextDirection(int floor, motor_direction_t lastDirection)
 {
-	// If there are no orders, don't move
-	if (orderList.empty()) return DIRECTION_STOP;
+	bool empty = true;
+
+	// If there are no orders on your IP, don't move
+	for (auto it = orderList.begin(); it != orderList.end(); ++it)
+	{
+		if (it->assignedIP.compare(getMyIP()) == 0)
+			empty = false;
+	}
+	if (empty) return DIRECTION_STOP;
 
 	// If the elevator is idle, prioritize the floors closest
 	if (lastDirection == DIRECTION_STOP)

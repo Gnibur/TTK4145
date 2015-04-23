@@ -32,7 +32,7 @@ void *listen(void*)
 			std::cout << "Received New order:\n" << buf << "\n\n";
 			Order order = msgParser_getOrderFromMessage(buf);
 			orderManager_newOrder(order);
-			stateMachine_newOrder(order.floor, order.direction);
+			stateMachine_newOrder(order);
 			break;
 		}
 		case ORDER_COST_REQUEST: {
