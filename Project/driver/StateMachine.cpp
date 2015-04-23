@@ -58,7 +58,11 @@ void stateMachine_newOrder(int floor, button_type_t button)
 	case MOVING:
 		break;
 	}	
-	
+}
+
+void stateMachine_clearOrder(Order order)
+{
+    ioDriver_clearOrderButtonLamp(order.direction, order.floor);
 }
 
 void stateMachine_floorReached(int floor)
@@ -80,7 +84,6 @@ void stateMachine_floorReached(int floor)
 
 			udp_send(BROADCAST_PORT, clearOrderMsg.c_str(), strlen(clearOrderMsg.c_str()) + 1);
 			ioDriver_clearOrderButtonLamp(it->direction, it->floor);
-			
 		}
 
 		ioDriver_setDoorOpenLamp();

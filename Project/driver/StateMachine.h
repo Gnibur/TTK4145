@@ -16,6 +16,7 @@ void stateMachine_doorTimeout();
 void stateMachine_orderTimeOut(Order order);
 
 void stateMachine_newOrder(int floor, button_type_t button);
+void stateMachine_clearOrder(Order order);
 void stateMachine_updateDirection();
 
 int 			getLastFloor();

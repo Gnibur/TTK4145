@@ -39,15 +39,14 @@ bool udp_send(int targetPort, const char *data, size_t dataLength)
 
   close(socketfd);
 
-  if (bytes_sent == dataLength)
+    if (bytes_sent == dataLength)
 	{
-		std::cout << "Sent!" << std::endl;
-    return true;
+        return true;
 	}
-  else
+    else
 	{
 		std::cout << "Not sent!" << std::endl; 
-    return false;
+        return false;
 	}
 }
 

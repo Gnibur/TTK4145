@@ -29,42 +29,31 @@ void *listen(void*)
 		switch (messageType) {
 
 		case NEW_ORDER_MSG:{
-			std::cout << "Received New order:\n";
+			std::cout << "Received New order:\n" << buf << "\n\n";
 			Order order = msgParser_getOrderFromMessage(buf);
-			std::cout << "------------------------------\n";
-			std::cout << "FLOOR: " << order.floor << " DIR: " << order.direction << " IP: " << order.assignedIP << "\n";
-			std::cout << "------------------------------\n\n";
 			orderManager_newOrder(order);
 			stateMachine_newOrder(order.floor, order.direction);
 			break;
 		}
 		case ORDER_COST_REQUEST: {
-			std::cout << "Received Order cost request:\n";
+			std::cout << "Received Order cost request:\n" << buf << "\n\n";
 			Order order	= msgParser_getOrderCostRequestFromMessage(buf);
 			int cost = orderManager_getCost(getLastFloor(), order.floor, getLastDirection(), order.direction);
 			Offer offer = {cost, order.floor, order.direction, getMyIP()};
-			std::cout << "------------------------------\n";
-			std::cout << "COST: " << offer.cost << " FLOOR: " << offer.floor << " DIR: " << offer.direction << " IP: " << offer.fromIP << "\n\n";
-			std::cout << "------------------------------\n\n";
 			std::string offerMsg = msgParser_makeOrderCostReplyMsg(offer);
 			udp_send(BROADCAST_PORT, offerMsg.c_str(), strlen(offerMsg.c_str()) + 1);
 			break;
 		}
 		case CLEAR_ORDER_MSG: {
-			std::cout << "Received Clear order:\n";
+			std::cout << "Received Clear order:\n" << buf << "\n\n";
 			Order order = msgParser_getOrderFromMessage(buf);
-			std::cout << "------------------------------\n";
-			std::cout << "FLOOR: " << order.floor << " DIR: " << order.direction << " IP: " << order.assignedIP << "\n";
-			std::cout << "------------------------------\n\n";
 			orderManager_clearOrder(order);
+			stateMachine_clearOrder(order);
 			break;
 		}
 		case ORDER_COST_REPLY: {
-			std::cout << "Received Order cost reply:\n";
+			std::cout << "Received Order cost reply:\n" << buf << "\n\n";
 			Offer offer = msgParser_getOfferFromMessage(buf);
-			std::cout << "------------------------------\n";
-			std::cout << "COST: " << offer.cost << " FLOOR: " << offer.floor << " DIR: " << offer.direction << " IP: " << offer.fromIP << "\n\n";
-			std::cout << "------------------------------\n\n";
 			auction_addBid(offer);
 			break;
 	 	}
