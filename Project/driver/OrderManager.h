@@ -13,10 +13,10 @@ struct Order;
 void orderManager_init();
 
 // Pushing and popping from the orderlist
-void orderManager_newOrder(Order order);
-void orderManager_clearOrder(Order order);
-void orderManager_mergeMyOrdersWith(OrderList orders);
-OrderList orderManager_getOrders();
+bool 				orderManager_newOrder(Order order);
+bool 				orderManager_clearOrder(Order order);
+void				orderManager_mergeMyOrdersWith(OrderList orders);
+OrderList 			orderManager_getOrders();
 		
 // Logic and algorithms
 OrderList			orderManager_getOrdersOnFloor(int floor);

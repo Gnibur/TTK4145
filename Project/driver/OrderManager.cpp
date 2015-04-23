@@ -20,34 +20,46 @@ void orderManager_init()
 
 
 
-void orderManager_newOrder(Order order)
+bool orderManager_newOrder(Order order)
 {
+	bool orderAdded = false;
 	pthread_mutex_lock(&orderManagerMutex);
 	std::vector<Order>::iterator search = std::find(orderList.begin(), orderList.end(), order);
 	
 	if (search == orderList.end())
+	{
 		orderList.push_back(order);
+		orderAdded = true;
+	}
 	
 	std::sort(orderList.begin(), orderList.end());
 	pthread_mutex_unlock(&orderManagerMutex);
 	
 	if (((order.direction == BUTTON_COMMAND) && (order.assignedIP == getMyIP())) || (order.direction != BUTTON_COMMAND))
 		ioDriver_setOrderButtonLamp(order.direction, order.floor);
+
+	return orderAdded;
 }
 
-void orderManager_clearOrder(Order order)
+bool orderManager_clearOrder(Order order)
 {
+	bool orderCleared = false;
 	pthread_mutex_lock(&orderManagerMutex);
 	std::vector<Order>::iterator search = std::find(orderList.begin(), orderList.end(), order);
 
 	if (search != orderList.end())
+	{
 		orderList.erase(search);
+		orderCleared = true;
+	}
 
 	std::sort(orderList.begin(), orderList.end());
 	pthread_mutex_unlock(&orderManagerMutex);
 	
 	if (((order.direction == BUTTON_COMMAND) && (order.assignedIP == getMyIP())) || (order.direction != BUTTON_COMMAND))
 		ioDriver_clearOrderButtonLamp(order.direction, order.floor);
+
+	return orderCleared;
 }
 
 OrderList orderManager_getOrders()

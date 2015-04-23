@@ -35,14 +35,15 @@ void stateMachine_buttonPressed(int floor, button_type_t button)
 {
 
 	if (button == BUTTON_COMMAND)
-	{
-
+	{	
 		Order order(button, floor, getMyIP(), -1);
-		orderManager_newOrder(order);
-		std::string newOrderMsg = msgParser_makeNewOrderMsg(order, orderManager_getOrders());
-		udp_send(newOrderMsg.c_str(), strlen(newOrderMsg.c_str()) + 1);
-        usleep(10000);
-		stateMachine_newOrder(order);
+		if(orderManager_newOrder(order))
+		{
+			std::string newOrderMsg = msgParser_makeNewOrderMsg(order, orderManager_getOrders());
+			udp_send(newOrderMsg.c_str(), strlen(newOrderMsg.c_str()) + 1);
+        	//usleep(10000);
+			stateMachine_newOrder(order);
+		}
 	}
 	else
 	{
@@ -82,7 +83,7 @@ void stateMachine_floorReached(int floor)
 
             std::cout << "Sending clearorder...\n";
 			udp_send(clearOrderMsg.c_str(), strlen(clearOrderMsg.c_str()) + 1);
-			usleep(10000);
+			//usleep(10000);
 		}
 
 		ioDriver_setDoorOpenLamp();
