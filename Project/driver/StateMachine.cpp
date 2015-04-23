@@ -8,6 +8,7 @@
 #include <cmath>
 #include <ctime>
 #include <iostream>
+#include <unistd.h>
 
 int					lastFloor;
 motor_direction_t	lastDirection;
@@ -84,7 +85,9 @@ void stateMachine_floorReached(int floor)
 			orderManager_clearOrder(*it);
 			std::string clearOrderMsg = msgParser_makeClearOrderMsg(*it, orderManager_getOrders());
 
+            std::cout << "Sending clearorder...\n";
 			udp_send(BROADCAST_PORT, clearOrderMsg.c_str(), strlen(clearOrderMsg.c_str()) + 1);
+			usleep(10000);
 			ioDriver_clearOrderButtonLamp(it->direction, it->floor);
 		}
 
