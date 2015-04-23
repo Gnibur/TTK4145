@@ -64,7 +64,7 @@ void stateMachine_newOrder(Order order)
 
 void stateMachine_clearOrder(Order order)
 {
-    if (order.direction != BUTTON_COMMAND)
+    if (((order.direction == BUTTON_COMMAND) && (order.assignedIP.compare(getMyIP()) == 0)) || (order.direction != BUTTON_COMMAND))
         ioDriver_clearOrderButtonLamp(order.direction, order.floor);
 }
 
@@ -88,7 +88,7 @@ void stateMachine_floorReached(int floor)
             std::cout << "Sending clearorder...\n";
 			udp_send(BROADCAST_PORT, clearOrderMsg.c_str(), strlen(clearOrderMsg.c_str()) + 1);
 			usleep(10000);
-			ioDriver_clearOrderButtonLamp(it->direction, it->floor);
+			stateMachine_clearOrder(*it);
 		}
 
 		ioDriver_setDoorOpenLamp();
