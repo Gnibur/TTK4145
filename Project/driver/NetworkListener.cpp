@@ -47,7 +47,7 @@ void *listen(void*)
 			std::string offerMsg = msgParser_makeOrderCostReplyMsg(offer);
 			std::cout << "I should send a reply\n";
 			udp_send(BROADCAST_PORT, offerMsg.c_str(), strlen(offerMsg.c_str()) + 1);
-			usleep(10000);
+			//usleep(10000);
 			break;
 		}
 		case CLEAR_ORDER_MSG: {
@@ -84,7 +84,7 @@ void *listen(void*)
 
 				std::string updateMsg = msgParser_makeOrderListMsg(orderManager_getOrders());
 				udp_send(BROADCAST_PORT, updateMsg.c_str(), strlen(updateMsg.c_str()));
-				usleep(10000);
+				//usleep(10000);
 			}
 		}
     
