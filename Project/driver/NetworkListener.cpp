@@ -8,6 +8,7 @@
 
 #include <cstring>
 #include <iostream>
+#include <unistd.h>
 
 #define BUFLENGTH 1024
 
@@ -42,6 +43,7 @@ void *listen(void*)
 			Offer offer = {cost, order.floor, order.direction, getMyIP()};
 			std::string offerMsg = msgParser_makeOrderCostReplyMsg(offer);
 			udp_send(BROADCAST_PORT, offerMsg.c_str(), strlen(offerMsg.c_str()) + 1);
+			usleep(10000);
 			break;
 		}
 		case CLEAR_ORDER_MSG: {
@@ -68,14 +70,15 @@ void *listen(void*)
             continue;
 		}
 
-		/*OrderList receivedOrderList = msgParser_getOrderListFromMessage(buf);
+		OrderList receivedOrderList = msgParser_getOrderListFromMessage(buf);
 		if (!(orderManager_orderListEquals(receivedOrderList)))
 		{
 			orderManager_mergeMyOrdersWith(receivedOrderList);
 
 			std::string updateMsg = msgParser_makeOrderListMsg(orderManager_getOrders());
-			udp_send(BROADCAST_PORT, updateMsg.c_str(), strlen(updateMsg.c_str()));	
-		}*/
+			udp_send(BROADCAST_PORT, updateMsg.c_str(), strlen(updateMsg.c_str()));
+			usleep(10000);
+		}
     
 	}
 	return NULL;
