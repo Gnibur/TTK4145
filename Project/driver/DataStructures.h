@@ -1,95 +1,52 @@
-#ifndef DATASTRUCTURES_H
-#define DATASTRUCTURES_H
+#pragma once
 
 #include "Enums.h"
 #include <vector>
 #include <string>
+#include <time.h>
 
-using std::string;
+bool isValidIP(std::string ip);
+
 
 class Order {
-
-
 public:
 	button_type_t direction;
 	int floor;
-	string assignedIP;
-	int timeAssigned;
+	std::string assignedIP;
+	time_t timeAssigned;
 
 	Order(); 
-	Order(button_type_t direction, int floor, string assignedIP, int timeAssigned);
+	Order(	button_type_t direction, 
+			int floor, 
+			std::string assignedIP, 
+			time_t timeAssigned);
 
 	bool isValid();
 
 	bool operator==(const Order& rhs) const;
 	
 	bool operator < (const Order& rhs) const;
-
-
-	{
-	    if ((rhs.floor == floor) && (rhs.direction == direction) &&  (assignedIP.compare(rhs.assignedIP) == 0))
-			return true;
-		else if ((rhs.floor == floor) && (rhs.direction == direction) && (direction != BUTTON_COMMAND))
-			return true;
-		else
-			return false;
-	}
-	
-	{
-		if (floor < rhs.floor) 					return true;
-		if (floor > rhs.floor) 					return false;
-		if (direction < rhs.direction) 			return true;
-		if (direction > rhs.direction)			return false;
-		if (assignedIP > rhs.assignedIP)		return true;
-		return false;
-	}
-
 };
 
 typedef std::vector<Order> OrderList;
 
-struct Offer {
+class Offer {
+public:
 	int cost;
 	int floor;
 	button_type_t direction;
 	std::string fromIP;
 
-	Offer() {
-		cost = -1;
-		floor = -1;
-		direction = BUTTON_COMMAND;
-		fromIP = "invalidIP";
-	}
+	Offer();
 
-	Offer(int c, int f, button_type_t d, std::string i)
-	{
-		cost = c;
-		floor = f;
-		direction = d;
-		fromIP = i;
-	}
-
-	bool isValid()
-	{
+	Offer(	int cost, 
+			int floor, 
+			button_type_t direction, 
+			std::string fromIP);
 
 
-	}
+	bool isValid();
 
-	bool operator < (const Offer& rhs) const
-	{
-		if (cost < rhs.cost) 					return true;
-		if (cost > rhs.cost) 					return false;
-		return false;
-	}
-
-
-
-
+	bool operator < (const Offer& rhs) const;
 };
 
-bool isValidIP(std::string ip)
-{
-}
-
-
-#endif

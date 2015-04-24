@@ -62,7 +62,7 @@ void run_physical()
 
 		// Check for order timeout
 		Order timedOutOrder = orderManager_checkForOrderTimeout();
-		if (timedOutOrder)
+		if (timedOutOrder.isValid())
 			stateMachine_orderTimeOut(timedOutOrder);
 
 		// Stop the program if stop button is pressed

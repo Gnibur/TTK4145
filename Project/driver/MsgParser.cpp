@@ -33,6 +33,11 @@ bool msgParser_getSenderIP(string message, std::string *senderIP)
 		return false;
 
 	*senderIP = xmlHeader->Attribute("fromIP");
+	
+	if (isValidIP(*senderIP))
+		return true;
+	else
+		return false;
 }
 
 bool msgParser_getOrderFromMessage(string message, Order *order)
