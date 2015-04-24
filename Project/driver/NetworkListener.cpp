@@ -27,39 +27,71 @@ void *listen(void*)
 	char buf[BUFLENGTH];
 	while (true) {
 		udp_receive(buf, BUFLENGTH); // blocking read into buf
-		MsgType messageType = msgParser_getMessageType(buf);
-		if (getMyIP() == msgParser_getSenderIP(buf)) continue;
+
+		MsgType messageType;
+		if (msgParser_getMessageType(buf, &messageType) == false)
+			continue;
+
+		std::string senderIP;
+		if (msgParser_getSenderIP(buf, &senderIP) == false)
+			continue;
+
+		if (senderIP == getMyIP())
+			continue;
+
 		switch (messageType) {
 
 		case NEW_ORDER_MSG:{
 			std::cout << "Received New order:\n" << buf << "\n\n";
-			Order order = msgParser_getOrderFromMessage(buf);
+			
+			Order order;
+			if (msgParser_getOrderFromMessage(buf, &order) == false)
+				continue;
+
 			int timeNow = time(0);
 			order.timeAssigned = timeNow;
 			orderManager_newOrder(order);
 			stateMachine_newOrder(order);
 			break;
 		}
+		case CLEAR_ORDER_MSG: {
+			std::cout << "Received Clear order:\n" << buf << "\n\n";
+
+			Order order;
+			if (msgParser_getOrderFromMessage(buf, &order) == false)
+				continue;
+
+			orderManager_clearOrder(order);
+			break;
+		}
+
 		case ORDER_COST_REQUEST: {
 			std::cout << "Received Order cost request:\n" << buf << "\n\n";
-			Order order	= msgParser_getOrderCostRequestFromMessage(buf);
-			int cost = orderManager_getCost(getLastFloor(), order.floor, getLastDirection(), order.direction);
-			Offer offer = {cost, order.floor, order.direction, getMyIP()};
+
+			int floor;
+			button_type_t direction; 
+
+
+			if (msgParser_getOrderCostRequestFromMessage(buf, &floor, &direction) == false)
+				continue;
+
+			int cost = orderManager_getCost(getLastFloor(), floor, getLastDirection(), direction);
+			
+			Offer offer = {cost, floor, direction, getMyIP()};
 			std::string offerMsg = msgParser_makeOrderCostReplyMsg(offer);
-			std::cout << "I should send a reply\n";
+
 			udp_send(offerMsg.c_str(), strlen(offerMsg.c_str()) + 1);
 			//usleep(10000);
 			break;
 		}
-		case CLEAR_ORDER_MSG: {
-			std::cout << "Received Clear order:\n" << buf << "\n\n";
-			Order order = msgParser_getOrderFromMessage(buf);
-			orderManager_clearOrder(order);
-			break;
-		}
+
 		case ORDER_COST_REPLY: {
 			std::cout << "Received Order cost reply:\n" << buf << "\n\n";
-			Offer offer = msgParser_getOfferFromMessage(buf);
+
+			Offer offer;
+			if (msgParser_getOfferFromMessage(buf, &offer))
+				continue;
+
 			auction_addBid(offer);
 			break;
 	 	}
@@ -76,7 +108,9 @@ void *listen(void*)
 
 		if ((messageType != ORDER_COST_REQUEST) && (messageType != ORDER_COST_REPLY))
 		{
-			OrderList receivedOrderList = msgParser_getOrderListFromMessage(buf);
+			OrderList receivedOrderList;
+			if (msgParser_getOrderListFromMessage(buf, &receivedOrderList) == false)
+				continue;
 			//OrderList receivedOrderList = orderManager_getOrders();
 			if (!(orderManager_orderListEquals(receivedOrderList)))
 			{

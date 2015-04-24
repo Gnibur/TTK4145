@@ -13,17 +13,16 @@ enum MsgType {
 	CLEAR_ORDER_MSG,
 	ORDER_LIST_MSG,
 	ORDER_COST_REQUEST,
-	ORDER_COST_REPLY,
-	INVALID_MESSAGE
+	ORDER_COST_REPLY
 };
 
 
-MsgType   msgParser_getMessageType(string message);
-std::string msgParser_getSenderIP(string message);
-Order     msgParser_getOrderFromMessage(string message);
-OrderList msgParser_getOrderListFromMessage(string message);
-Order     msgParser_getOrderCostRequestFromMessage(string message);
-Offer     msgParser_getOfferFromMessage(string message);
+bool msgParser_getMessageType(string message, MsgType *msgType);
+bool msgParser_getSenderIP(string message, std::string *senderIp);
+bool msgParser_getOrderFromMessage(string message, Order *order);
+bool msgParser_getOrderListFromMessage(string message, OrderList *orderList);
+bool msgParser_getOrderCostRequestFromMessage(string message, int *floor, button_type_t *direction);
+bool msgParser_getOfferFromMessage(string message, Offer *offer);
 
 string    msgParser_makeNewOrderMsg(Order order, OrderList updatedOrderList);
 string    msgParser_makeClearOrderMsg(Order order, OrderList updatedOrderList);

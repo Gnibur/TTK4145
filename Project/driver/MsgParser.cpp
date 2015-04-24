@@ -1,10 +1,11 @@
 #include "MsgParser.h"
 #include "tinyxml.h"
 #include "udp.h"
+#include "IoDriver.h" // remove when N_FLOORS is moved
 #include <iostream>
 
 
-MsgType msgParser_getMessageType(string message)
+bool msgParser_getMessageType(string message, MsgType *msgTypeFromMessage)
 {
 	TiXmlDocument xmldoc;
 	xmldoc.Parse(message.c_str());
@@ -12,14 +13,16 @@ MsgType msgParser_getMessageType(string message)
 	TiXmlElement *xmlHeader = xmldoc.RootElement();
 
 	if (xmldoc.Error() ||  (!xmlHeader))
-		return INVALID_MESSAGE;
+		return false;
 
 	int temp;
 	xmlHeader->QueryIntAttribute("Type", &temp);
-	return (MsgType)temp;
+	*msgTypeFromMessage = (MsgType)temp;
+
+	return true;
 }
 
-std::string msgParser_getSenderIP(string message)
+bool msgParser_getSenderIP(string message, std::string *senderIP)
 {
 	TiXmlDocument xmldoc;
 	xmldoc.Parse(message.c_str());
@@ -27,60 +30,52 @@ std::string msgParser_getSenderIP(string message)
 	TiXmlElement *xmlHeader = xmldoc.RootElement();
 	
 	if (xmldoc.Error() ||  (!xmlHeader))
-		return "invalid ip";
+		return false;
 
-	return xmlHeader->Attribute("fromIP");
+	*senderIP = xmlHeader->Attribute("fromIP");
 }
 
-Order msgParser_getOrderFromMessage(string message)
+bool msgParser_getOrderFromMessage(string message, Order *order)
 {
 	TiXmlDocument xmldoc;
 	xmldoc.Parse(message.c_str());
 
 	TiXmlElement *xmlHeader = xmldoc.RootElement();
 	
-	if (xmldoc.Error() ||  (!xmlHeader)){
-		std::cout << "Could not obtain order from message, root was not found\n";
-		return Order();
-	}
+	if (xmldoc.Error() ||  (!xmlHeader))
+		return false;
 
 	TiXmlNode *xmlOrder = xmlHeader->NextSibling("Order");
 	
 	if (xmlOrder){
+		xmlOrder->ToElement()->QueryIntAttribute("Floor", &order->floor);
 		int temp;
-		Order order;
-		xmlOrder->ToElement()->QueryIntAttribute("Floor", &order.floor);
 		xmlOrder->ToElement()->QueryIntAttribute("Direction", &temp);
-		order.direction = (button_type_t)temp;
-		order.assignedIP = xmlOrder->ToElement()->Attribute("AssignedIP");
-
-		return order;
-	} else
- 		return Order();
+		order->direction = (button_type_t)temp;
+		order->assignedIP = xmlOrder->ToElement()->Attribute("AssignedIP");
+	} 
 	
+	if (order->isValid())
+		return true;
+	else
+		return false;	
 }
 
 
-OrderList msgParser_getOrderListFromMessage(string message)
+bool msgParser_getOrderListFromMessage(string message, OrderList *orderlist)
 {
 	//  printf("Received message: %s\n", message.c_str());
 	TiXmlDocument xmldoc;
 	xmldoc.Parse(message.c_str());
 	TiXmlElement *xmlHeader = xmldoc.RootElement();
 	
-	if (xmldoc.Error() ||  (!xmlHeader)){
-		std::cout << "Could not obtain order from message, root was not found\n";
-		return OrderList { }; // ooops, how to return invalid orderlist?
-	}
-
-	OrderList orderlist;
+	if (xmldoc.Error() ||  (!xmlHeader))
+		return false;
 
 	TiXmlNode *orderListRoot = xmlHeader->NextSibling("OrderList");
 
-	if (!orderListRoot){
-		std::cout << " Did not find orderlist when parsing message\n";
-		return OrderList { };
-	}
+	if (!orderListRoot)
+		return false;
 	
 	TiXmlNode *childNode = NULL;
 	while (childNode = ((orderListRoot->ToElement())->IterateChildren(childNode))){
@@ -94,67 +89,65 @@ OrderList msgParser_getOrderListFromMessage(string message)
 		order.direction = (button_type_t)temp;
 		order.assignedIP = childElement->Attribute("AssignedIP");
 
-		orderlist.push_back(order);
+		if (order.isValid() == false)
+			return false;
+		else 
+			orderlist->push_back(order);
 	}
-	return orderlist;
+	return true;
 }
 
 
-Order msgParser_getOrderCostRequestFromMessage(string message)
+bool msgParser_getOrderCostRequestFromMessage(string message, int *floor, button_type_t *direction)
 {
-	Order order;
-
 	TiXmlDocument xmldoc;
 	xmldoc.Parse(message.c_str());
 
 	TiXmlElement *xmlHeader = xmldoc.RootElement();
 
-	if (xmldoc.Error() ||  (!xmlHeader)){
-		std::cout << "Could not obtain order from message, root was not found\n";
-		return Order(); // ooops, how to return invalid orde
-	}
+	if (xmldoc.Error() ||  (!xmlHeader))
+		return false;
 
 	TiXmlNode *xmlOrderCostRequest = xmlHeader->NextSibling("OrderCostRequest");
 
-	if (!xmlOrderCostRequest){
-		std::cout << " Did not find order when parsing OrderCostRequest\n";
-		return Order { };
-	}
+	if (!xmlOrderCostRequest)
+		return false;
 	
 	int temp;
-	xmlOrderCostRequest->ToElement()->QueryIntAttribute("Floor", &temp);
-	order.floor = temp;
+	xmlOrderCostRequest->ToElement()->QueryIntAttribute("Floor", floor);
 	xmlOrderCostRequest->ToElement()->QueryIntAttribute("Direction", &temp);
-	order.direction = (button_type_t)temp;
+	*direction = (button_type_t)temp;
 
-	return order;
+	if (*floor >= 0 && *floor < N_FLOORS)
+		return true;
+	else 
+		return false;
 }
 
-Offer msgParser_getOfferFromMessage(string message)
+bool msgParser_getOfferFromMessage(string message, Offer *offer)
 {
-	Offer offer;
-
 	TiXmlDocument xmldoc;
 	xmldoc.Parse(message.c_str());
 
 	TiXmlElement *xmlHeader = xmldoc.RootElement();
 
-	if (xmldoc.Error() ||  (!xmlHeader)){
-		std::cout << "Could not obtain offer from message, root was not found\n";
-		return offer; // ooops, how to return invalid offer?
-	}
+	if (xmldoc.Error() ||  (!xmlHeader))
+		return false;
 
 	TiXmlNode *xmlOrderCostOffer = xmlHeader->NextSibling("OrderCostReply");
 
 	int temp;
-	xmlOrderCostOffer->ToElement()->QueryIntAttribute("Cost", &offer.cost);
-	xmlOrderCostOffer->ToElement()->QueryIntAttribute("Floor", &offer.floor);
+	xmlOrderCostOffer->ToElement()->QueryIntAttribute("Cost", &offer->cost);
+	xmlOrderCostOffer->ToElement()->QueryIntAttribute("Floor", &offer->floor);
 	xmlOrderCostOffer->ToElement()->QueryIntAttribute("Direction", &temp);
-	offer.direction = (button_type_t)temp;
+	offer->direction = (button_type_t)temp;
 
-	offer.fromIP = xmlOrderCostOffer->ToElement()->Attribute("fromIP");
+	offer->fromIP = xmlOrderCostOffer->ToElement()->Attribute("fromIP");
 
-	return offer;
+	if (offer->isValid())
+		return true;
+	else 
+		return false;
 }
 
 /* ------------------Make messages  ---------------------------------- */

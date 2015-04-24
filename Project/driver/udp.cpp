@@ -61,7 +61,7 @@ bool udp_send(const char *data, size_t dataLength)
   	
 	bytes_sent  = sendto(sendsocketfd, data, dataLength, 0, (struct sockaddr *)&target, sizeof target);
 	pthread_mutex_unlock(&udpSendMutex);
-	if (bytes_sent == dataLength)
+	if (bytes_sent == dataLength)	
 		return true;
 	else
 	{

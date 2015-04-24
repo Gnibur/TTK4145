@@ -5,28 +5,27 @@
 #include <vector>
 #include <string>
 
-struct Order {
+using std::string;
+
+class Order {
+
+
+public:
 	button_type_t direction;
 	int floor;
-	std::string assignedIP;
+	string assignedIP;
 	int timeAssigned;
 
-	Order() {
-		direction = BUTTON_COMMAND;
-		floor = -1;
-		assignedIP = "";
-		timeAssigned = -1;
-	}
+	Order(); 
+	Order(button_type_t direction, int floor, string assignedIP, int timeAssigned);
 
-	Order(button_type_t d, int f, std::string i, int t)
-	{
-		direction = d;
-		floor = f;
-		assignedIP = i;
-		timeAssigned = t;
-	}	
+	bool isValid();
 
-	bool operator==(const Order& rhs) const
+	bool operator==(const Order& rhs) const;
+	
+	bool operator < (const Order& rhs) const;
+
+
 	{
 	    if ((rhs.floor == floor) && (rhs.direction == direction) &&  (assignedIP.compare(rhs.assignedIP) == 0))
 			return true;
@@ -35,7 +34,7 @@ struct Order {
 		else
 			return false;
 	}
-	bool operator < (const Order& rhs) const
+	
 	{
 		if (floor < rhs.floor) 					return true;
 		if (floor > rhs.floor) 					return false;
@@ -45,11 +44,6 @@ struct Order {
 		return false;
 	}
 
-	operator bool() const
-	{
-		if (floor == -1) return false;
-		return true;
-	}
 };
 
 typedef std::vector<Order> OrderList;
@@ -75,12 +69,27 @@ struct Offer {
 		fromIP = i;
 	}
 
+	bool isValid()
+	{
+
+
+	}
+
 	bool operator < (const Offer& rhs) const
 	{
 		if (cost < rhs.cost) 					return true;
 		if (cost > rhs.cost) 					return false;
 		return false;
 	}
+
+
+
+
 };
+
+bool isValidIP(std::string ip)
+{
+}
+
 
 #endif
