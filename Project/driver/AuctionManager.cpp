@@ -29,16 +29,22 @@ void auctionManager_init()
 void auction_start(int floor, button_type_t direction)
 {
 	Order *order = new Order(direction, floor, "", -1);
+	
 	pthread_mutex_lock(&auctionMutex);
 	if (auctions.find(*order) == auctions.end()){
 		int cost = orderManager_getCost(getLastFloor(), floor, getLastDirection(), direction);
-		Offer offer = {cost, floor, direction, getMyIP()};
+		
+		Offer offer(cost, floor, direction, getMyIP());
+		auctions[*order] = std::vector<Offer>();
 		auctions[*order].push_back(offer);
+		
 		pthread_t auction_id;
 		pthread_create(&auction_id, NULL, runAuction, (void*)order);
 	}
-	else 
+	else {
+		std::cout << "Already found order\n";
 		delete order;
+	}
 	pthread_mutex_unlock(&auctionMutex);
 }
 
@@ -56,9 +62,11 @@ void *runAuction(void *args)
 		;
 
 	pthread_mutex_lock(&auctionMutex);
+	auctions.erase(*order);
+	
 	std::sort(auctions[(*order)].begin(), auctions[(*order)].end());
-  	// hopefully there are some bids
 	Offer bestOffer = auctions[(*order)][0];
+
 	pthread_mutex_unlock(&auctionMutex);
 	
 	order->assignedIP = bestOffer.fromIP;
@@ -67,15 +75,9 @@ void *runAuction(void *args)
 	//OrderList updatedList;
 	orderManager_newOrder(*order);
 	stateMachine_newOrder(*order);
-
 	
-	std::cout << "AUCTION FINISHED, for floor " << order->floor << ", dir " << order->direction 
+	std::cout 	<< "AUCTION FINISHED, for floor " << order->floor << ", dir " << order->direction 
             	<< ", IP " << bestOffer.fromIP << " won\n";
-	
-
-	pthread_mutex_lock(&auctionMutex);
-	auctions.erase(*order);
-	pthread_mutex_unlock(&auctionMutex);
 
 	delete order;
 	return NULL;

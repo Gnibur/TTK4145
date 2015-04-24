@@ -8,7 +8,6 @@
 #include <string>
 #include "DataStructures.h"
 
-struct Order;
 
 void orderManager_init();
 
