@@ -64,7 +64,7 @@ void *runAuction(void *args)
 	OrderList updatedList = orderManager_getOrders();
 
 	std::string newOrderMessage = msgParser_makeNewOrderMsg(*order, updatedList);
-	udp_send(newOrderMessage.c_str(), strlen(newOrderMessage.c_str()));
+	udp_send(newOrderMessage.c_str(), strlen(newOrderMessage.c_str()) + 1);
 
 
 	std::cout << "AUCTION FINISHED, for floor " << order->floor << ", dir " << order->direction 

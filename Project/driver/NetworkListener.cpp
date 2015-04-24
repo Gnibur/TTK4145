@@ -82,7 +82,7 @@ void *listen(void*)
 			{
 				orderManager_mergeMyOrdersWith(receivedOrderList);
 				std::string updateMsg = msgParser_makeOrderListMsg(orderManager_getOrders());
-				udp_send(updateMsg.c_str(), strlen(updateMsg.c_str()));
+				udp_send(updateMsg.c_str(), strlen(updateMsg.c_str()) + 1);
 				//usleep(10000);
 			}
 		}
