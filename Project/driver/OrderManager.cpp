@@ -172,6 +172,10 @@ void orderManager_mergeMyOrdersWith(OrderList orders)
 		{
 			std::cout << "Pushing back this with IP: " << it->assignedIP << std::endl;
 			orderList.push_back((*it));
+
+		if (((it->direction == BUTTON_COMMAND) && (it->assignedIP == getMyIP())) || (it->direction != BUTTON_COMMAND))
+			ioDriver_setOrderButtonLamp(it->direction, it->floor);
+
 		}
 	}
 	
