@@ -31,8 +31,10 @@ bool orderManager_newOrder(Order order)
 		orderList.push_back(order);
 		orderAdded = true;
 	}
-	
-	std::sort(orderList.begin(), orderList.end());
+
+	std::string newOrderMessage = msgParser_makeNewOrderMsg(*order, orderList);
+	udp_send(newOrderMessage.c_str(), strlen(newOrderMessage.c_str()) + 1);
+
 	pthread_mutex_unlock(&orderManagerMutex);
 	
 	if (((order.direction == BUTTON_COMMAND) && (order.assignedIP == getMyIP())) || (order.direction != BUTTON_COMMAND))
@@ -54,7 +56,13 @@ bool orderManager_clearOrder(Order order)
 	}
 
 	std::sort(orderList.begin(), orderList.end());
+
+	std::string clearOrderMsg = msgParser_makeClearOrderMsg(order, orderList);
+	udp_send(clearOrderMsg.c_str(), strlen(clearOrderMsg.c_str()) + 1);
+
 	pthread_mutex_unlock(&orderManagerMutex);
+
+
 	
 	if (((order.direction == BUTTON_COMMAND) && (order.assignedIP == getMyIP())) || (order.direction != BUTTON_COMMAND))
 		ioDriver_clearOrderButtonLamp(order.direction, order.floor);
@@ -178,8 +186,9 @@ void orderManager_mergeMyOrdersWith(OrderList orders)
 
 		}
 	}
-	
-	std::sort(orderList.begin(), orderList.end());
+	std::string updateMsg = msgParser_makeOrderListMsg(orderList);
+	udp_send(updateMsg.c_str(), strlen(updateMsg.c_str()) + 1);
+
 	pthread_mutex_unlock(&orderManagerMutex);	
 }
 

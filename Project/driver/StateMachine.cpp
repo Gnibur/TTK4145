@@ -39,8 +39,6 @@ void stateMachine_buttonPressed(int floor, button_type_t button)
 		Order order(button, floor, getMyIP(), -1);
 		if(orderManager_newOrder(order))
 		{
-			std::string newOrderMsg = msgParser_makeNewOrderMsg(order, orderManager_getOrders());
-			udp_send(newOrderMsg.c_str(), strlen(newOrderMsg.c_str()) + 1);
         	//usleep(10000);
 			stateMachine_newOrder(order);
 		}
@@ -79,10 +77,6 @@ void stateMachine_floorReached(int floor)
 		for (auto it = ordersToClear.begin(); it != ordersToClear.end(); ++it) 
 		{
 			orderManager_clearOrder(*it);
-			std::string clearOrderMsg = msgParser_makeClearOrderMsg(*it, orderManager_getOrders());
-
-            std::cout << "Sending clearorder...\n";
-			udp_send(clearOrderMsg.c_str(), strlen(clearOrderMsg.c_str()) + 1);
 			//usleep(10000);
 		}
 
@@ -158,8 +152,7 @@ void stateMachine_orderTimeOut(Order order)
 		std::cout << "IP: " << order.assignedIP << " FLOOR: " << order.floor << " DIRECTION: " << order.direction << "\n";
 		std::cout << "----------------------\n";
 		orderManager_clearOrder(order);
-		std::string clearOrderMsg = msgParser_makeClearOrderMsg(order, orderManager_getOrders());
-		udp_send(clearOrderMsg.c_str(), strlen(clearOrderMsg.c_str()) + 1);
+
 
 		// TODO: Needs failsafe method, so the elevator doesn't die here and everything is lost..
 		stateMachine_buttonPressed(order.floor, order.direction);
