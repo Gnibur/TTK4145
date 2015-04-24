@@ -1,9 +1,11 @@
 #include "OrderManager.h"
 #include "udp.h"
 #include "IoDriver.h"
+#include "MsgParser.h"
 #include <ctime>
 #include <algorithm>
 #include <cmath>
+#include <cstring>
 #include <iostream>
 #include <pthread.h>
 
@@ -32,7 +34,7 @@ bool orderManager_newOrder(Order order)
 		orderAdded = true;
 	}
 
-	std::string newOrderMessage = msgParser_makeNewOrderMsg(*order, orderList);
+	std::string newOrderMessage = msgParser_makeNewOrderMsg(order, orderList);
 	udp_send(newOrderMessage.c_str(), strlen(newOrderMessage.c_str()) + 1);
 
 	pthread_mutex_unlock(&orderManagerMutex);

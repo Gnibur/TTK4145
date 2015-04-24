@@ -30,7 +30,7 @@ void auction_start(int floor, button_type_t direction)
 {
 	Order *order = new Order(direction, floor, "", -1);
 	pthread_mutex_lock(&auctionMutex);
-	if (auctions.find(*order) != auction.end()){
+	if (auctions.find(*order) == auctions.end()){
 		int cost = orderManager_getCost(getLastFloor(), floor, getLastDirection(), direction);
 		Offer offer = {cost, floor, direction, getMyIP()};
 		auctions[*order].push_back(offer);

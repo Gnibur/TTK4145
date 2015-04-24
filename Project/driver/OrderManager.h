@@ -2,7 +2,7 @@
 #define ORDERMANAGERNEW_H
 
 #define N_FLOORS 4
-#define ORDER_TIMEOUT 20
+#define ORDER_TIMEOUT 50
 
 #include <vector>
 #include <string>
