@@ -160,19 +160,16 @@ void stateMachine_eventDoorTimedOut()
 
 void stateMachine_eventOrderTimedOut(Order order)
 {
-	if (order.direction != BUTTON_COMMAND)
-	{
-		std::cout << "----------------------\n";
-		std::cout << "WARNING WARNING WARNING\n";
-		std::cout << "ORDER TIMED OUT\n";
-		std::cout << "IP: " << order.assignedIP << " FLOOR: " << order.floor << " DIRECTION: " << order.direction << "\n";
-		std::cout << "----------------------\n";
-		orderManager_clearOrder(order);
+	std::cout << "----------------------\n";
+	std::cout << "WARNING WARNING WARNING\n";
+	std::cout << "ORDER TIMED OUT\n";
+	std::cout << "IP: " << order.assignedIP << " FLOOR: " << order.floor << " DIRECTION: " << order.direction << "\n";
+	std::cout << "----------------------\n";
+	orderManager_clearOrder(order);
 
 
-		// TODO: Needs failsafe method, so the elevator doesn't die here and everything is lost..
-		stateMachine_eventButtonPressed(order.floor, order.direction);
-	}
+	// TODO: Needs failsafe method, so the elevator doesn't die here and everything is lost..
+	stateMachine_eventButtonPressed(order.floor, order.direction);
 }
 
 int getLastFloor()

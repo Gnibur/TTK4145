@@ -17,8 +17,8 @@ OrderList orderList;
 
 static pthread_mutex_t orderManagerMutex;
 
-bool saveOrderList(std::string filename);
-bool retrieveOrderList(std::string filename);
+static bool saveOrderList(std::string filename);
+static bool retrieveOrderList(std::string filename);
 
 void orderManager_recover()
 {
@@ -76,6 +76,7 @@ bool orderManager_addOrder(Order order)
 	
 	if (search == orderList.end())
 	{
+		order.timeAssigned = time(0);
 		orderList.push_back(order);
 		orderAdded = true;
 	}

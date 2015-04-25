@@ -71,8 +71,6 @@ void *runAuction(void *args)
 	pthread_mutex_unlock(&auctionMutex);
 	
 	order->assignedIP = bestOffer.fromIP;
-	order->timeAssigned = time(0);
-
 	
 	orderManager_addOrder(*order);
 	msgTool_sendNewOrder(*order, orderManager_getOrders(), udp_myIP());

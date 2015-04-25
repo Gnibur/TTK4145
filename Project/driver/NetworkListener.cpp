@@ -57,8 +57,6 @@ void *listen(void*)
 				std::cout << "Failed to obtain order from message\n";				
 				continue;
 			}
-			int timeNow = time(0);
-			order.timeAssigned = timeNow;
 			if (orderManager_addOrder(order))
 				std::cout << "Order was added\n";
 
