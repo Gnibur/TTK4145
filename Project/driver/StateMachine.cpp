@@ -29,6 +29,11 @@ static state_t state;
 
 void stateMachine_initialize()
 {
+	ioDriver_setMotorDirection(DIRECTION_UP);
+	
+	while (ioDriver_getFloorSensorValue() == -1)
+		;
+	ioDriver_setMotorDirection(DIRECTION_STOP);
 	lastFloor		= ioDriver_getFloorSensorValue();
 	lastDirection	= DIRECTION_UP;
 	auctionManager_init();
