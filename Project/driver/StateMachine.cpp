@@ -30,7 +30,7 @@ static state_t state;
 void stateMachine_initialize()
 {
 	lastFloor		= ioDriver_getFloorSensorValue();
-	lastDirection	= DIRECTION_STOP;
+	lastDirection	= DIRECTION_UP;
 	auctionManager_init();
 }
 
@@ -72,8 +72,10 @@ void stateMachine_eventNewOrderArrived(Order order)
 	case MOVING: 
 		break;	
 	case DOOR_OPEN:
-		orderManager_clearOrder(order);
-		timer_start(); 
+		if (order.floor == lastFloor){
+			orderManager_clearOrder(order);
+			timer_start(); 
+		}
 		break;	
 	}
 }
@@ -129,18 +131,20 @@ void stateMachine_eventFloorReached(int floor)
 void stateMachine_eventDoorTimedOut()
 {
 	switch (state) {
-	case DOOR_OPEN:
+	case DOOR_OPEN: {
 		timer_reset();
 		ioDriver_clearDoorOpenLamp();
 
-		lastDirection = orderManager_getNextDirection(lastFloor, lastDirection);
-		ioDriver_setMotorDirection(lastDirection);	
+		motor_direction_t nextDirection = orderManager_getNextDirection(lastFloor, lastDirection);
+		ioDriver_setMotorDirection(nextDirection);	
 
-		if (lastDirection == DIRECTION_STOP)	
-			state = IDLE;
-		else
+		if (nextDirection != DIRECTION_STOP) {
 			state = MOVING;
+			lastDirection = nextDirection;			
+		 } else
+			state = IDLE;
 		break;
+	}	
 	case MOVING: case IDLE:
 		std::cout << "Door timeout should not happen door is not open\n";
 	}

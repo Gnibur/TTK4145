@@ -92,20 +92,28 @@ bool orderManager_shouldStopHere(int floor, motor_direction_t direction)
 
 	for (auto orderPtr = orderList.begin(); orderPtr != orderList.end(); ++orderPtr){
 		
-		if (orderPtr->floor == floor && orderPtr->direction == direction){
-			hasOrderHereInSameDirection = true;
-			hasOrderHere = true;
-		} else if (orderPtr->floor == floor)
+		if (orderPtr->floor == floor){
 			hasOrderHere = true;
 
-		if (orderPtr->floor > floor)
+			if (orderPtr->direction != BUTTON_COMMAND){
+
+				if (direction == DIRECTION_UP && orderPtr->direction == BUTTON_CALL_UP)
+					hasOrderHereInSameDirection = true;
+				else if (direction == DIRECTION_DOWN && orderPtr->direction == BUTTON_CALL_DOWN)
+					hasOrderHereInSameDirection = true;
+			}
+		}
+		
+		if (direction == DIRECTION_UP && orderPtr->floor > floor)
+			hasMoreOrdersInSameDirection = true;
+		else if (direction == DIRECTION_DOWN && orderPtr->floor < floor)
 			hasMoreOrdersInSameDirection = true;
 
-		if (hasOrderHereInSameDirection && hasMoreOrdersInSameDirection)
+		if (hasOrderHereInSameDirection)
 			break;
 	}
 	 	
-	if (hasOrderHereInSameDirection && hasMoreOrdersInSameDirection)
+	if (hasOrderHereInSameDirection)
 		return true;
 	else if (hasOrderHere && !hasMoreOrdersInSameDirection)
 		return true;
@@ -125,47 +133,37 @@ motor_direction_t orderManager_getNextDirection(int floor, motor_direction_t las
 	if (myPendingOrders.size() == 0) 
 		return DIRECTION_STOP;
 
-	for (auto orderPtr = orderList.begin(); orderPtr != orderList.end(); ++orderPtr)
+	for (auto orderPtr = myPendingOrders.begin(); orderPtr != myPendingOrders.end(); ++orderPtr)
 		if (orderPtr->floor == floor)
 			return DIRECTION_STOP;
 
-	
-
-	
-
-	// If the elevator is idle, prioritize the floors closest
-	if (lastDirection == DIRECTION_STOP)
-	{
-		if (floor >= 2) lastDirection = DIRECTION_UP;
-		else			lastDirection = DIRECTION_DOWN;
-	}
-
-	// Find the directional multiplier, so we can use the same check whether you are going up or down.
-	int directionalMultiplier;
-	motor_direction_t newDirection;
-	if (lastDirection == DIRECTION_UP)
-	{
-		directionalMultiplier = 1;
-		newDirection = DIRECTION_DOWN;
-	}
+	if (myPendingOrders.begin()->floor > floor)
+		return DIRECTION_UP;
 	else
-	{
-		directionalMultiplier = -1;
-		newDirection = DIRECTION_UP;
-	}
-	
-	floor = directionalMultiplier * floor;
+		return DIRECTION_DOWN;	
 
-	// Go through all the elements. If you find something in your direction, imideatly return.
-	for (auto it = orderList.begin(); it != orderList.end(); ++it)
-	{
-		int orderedFloor = it->floor * directionalMultiplier;
-		if ((orderedFloor > floor) && (it->assignedIP.compare(udp_myIP()) == 0))
-			return lastDirection;
+	bool hasOrderInSameDirection = false;
+	for (auto orderPtr = myPendingOrders.begin(); orderPtr != myPendingOrders.end(); ++orderPtr){
+		if (lastDirection == DIRECTION_UP)
+		{
+			if (floor < orderPtr->floor)
+				hasOrderInSameDirection = true;
+		}
+		else if (lastDirection == DIRECTION_DOWN)
+		{
+			if (floor > orderPtr->floor)
+				hasOrderInSameDirection = true;
+		}	
 	}
 
-	// If you don't find anything in your direction ,change.
-	return newDirection;
+	if (hasOrderInSameDirection)
+		return lastDirection;
+	else {
+		if (lastDirection == DIRECTION_UP)
+			return DIRECTION_DOWN;
+		else 
+			return DIRECTION_UP;
+	}	
 }
 
 int orderManager_getCost(int lastFloor, int newFloor, motor_direction_t lastDirection, button_type_t wantedDirection)
