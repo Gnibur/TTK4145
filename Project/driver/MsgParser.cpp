@@ -1,8 +1,133 @@
 #include "MsgParser.h"
 #include "tinyxml.h"
-#include "udp.h"
 #include "IoDriver.h" // remove when N_FLOORS is moved
 #include <iostream>
+
+/* ------------------Make messages  ---------------------------------- */
+
+static TiXmlElement * msgParser_buildMessageHeader(MsgType type, std::string fromIP)
+{
+	TiXmlElement *rootElement = new TiXmlElement("MessageHeader\n");
+	
+	rootElement->SetAttribute("Type", type);
+	rootElement->SetAttribute("fromIP", fromIP.c_str());
+
+	return rootElement;			 
+}
+
+static TiXmlElement * msgParser_buildOrderElement(Order order) 
+{
+	TiXmlElement *xmlOrder = new TiXmlElement("Order");
+	xmlOrder->SetAttribute("Floor", order.floor);
+	xmlOrder->SetAttribute("Direction", order.direction);
+	xmlOrder->SetAttribute("AssignedIP", order.assignedIP.c_str());
+	
+	return xmlOrder;
+}
+
+static TiXmlElement * msgParser_buildOrderListElement(OrderList orderList)
+{
+	TiXmlElement *xmlOrderList = new TiXmlElement("OrderList");
+
+	for (auto it = orderList.begin(); it != orderList.end(); ++it){
+		TiXmlElement *orderListElement = msgParser_buildOrderElement(*it);
+		xmlOrderList->LinkEndChild(orderListElement);
+	}
+
+	return xmlOrderList;
+}
+
+string msgParser_makeNewOrderMsg(Order order, OrderList updatedOrderList, string fromIP)
+{
+	TiXmlDocument xmldoc;
+
+	TiXmlElement *xmlHeader = msgParser_buildMessageHeader(NEW_ORDER_MSG, fromIP);
+	TiXmlElement *xmlOrder = msgParser_buildOrderElement(order);
+	TiXmlElement *xmlOrderList = msgParser_buildOrderListElement(updatedOrderList);
+	
+	xmldoc.LinkEndChild(xmlHeader);
+	xmldoc.LinkEndChild(xmlOrder);
+	xmldoc.LinkEndChild(xmlOrderList);
+
+	TiXmlPrinter printer;
+	xmldoc.Accept(&printer);
+	return printer.CStr();
+}
+
+string msgParser_makeClearOrderMsg(Order order, OrderList updatedOrderList, string fromIP)
+{
+	TiXmlDocument xmldoc;
+
+	TiXmlElement *xmlHeader = msgParser_buildMessageHeader(CLEAR_ORDER_MSG, fromIP);
+	TiXmlElement *xmlOrder = msgParser_buildOrderElement(order);
+	TiXmlElement *xmlOrderList = msgParser_buildOrderListElement(updatedOrderList);
+	
+	xmldoc.LinkEndChild(xmlHeader);
+	xmldoc.LinkEndChild(xmlOrder);
+	xmldoc.LinkEndChild(xmlOrderList);
+
+	TiXmlPrinter printer;
+	xmldoc.Accept(&printer);
+	return printer.CStr();
+}
+
+string msgParser_makeOrderListMsg(OrderList orders, string fromIP)
+{
+	TiXmlDocument xmldoc;
+
+	TiXmlElement *xmlHeader = msgParser_buildMessageHeader(CLEAR_ORDER_MSG, fromIP);
+	TiXmlElement *xmlOrderList = msgParser_buildOrderListElement(orders);
+
+	xmldoc.LinkEndChild(xmlHeader);
+	xmldoc.LinkEndChild(xmlOrderList);
+
+	TiXmlPrinter printer;
+	xmldoc.Accept(&printer);
+	return printer.CStr();
+}
+
+string msgParser_makeOrderCostRequestMsg(int floor, button_type_t direction, string fromIP)
+{
+	TiXmlDocument xmldoc;
+
+	TiXmlElement *xmlHeader = msgParser_buildMessageHeader(ORDER_COST_REQUEST, fromIP);
+
+	TiXmlElement *xmlCostRequest = new TiXmlElement("OrderCostRequest");
+	xmlCostRequest->SetAttribute("Floor", floor);
+	xmlCostRequest->SetAttribute("Type", ORDER_COST_REQUEST);
+	xmlCostRequest->SetAttribute("Direction", direction);
+
+	xmldoc.LinkEndChild(xmlHeader);
+	xmldoc.LinkEndChild(xmlCostRequest);
+	
+	TiXmlPrinter printer;
+	xmldoc.Accept(&printer);
+	return printer.CStr();
+}
+
+string msgParser_makeOrderCostReplyMsg(Offer offer, string fromIP)
+{
+	TiXmlDocument xmldoc;
+
+	TiXmlElement *xmlHeader = msgParser_buildMessageHeader(ORDER_COST_REPLY, fromIP);
+
+	TiXmlElement *xmlCostReply = new TiXmlElement("OrderCostReply");
+	xmlCostReply->SetAttribute("Type", ORDER_COST_REPLY);
+	xmlCostReply->SetAttribute("Cost", offer.cost);
+	xmlCostReply->SetAttribute("Floor", offer.floor);
+	xmlCostReply->SetAttribute("Direction", offer.direction);
+	xmlCostReply->SetAttribute("fromIP", offer.fromIP.c_str());
+
+	xmldoc.LinkEndChild(xmlHeader);
+	xmldoc.LinkEndChild(xmlCostReply);
+
+	TiXmlPrinter printer;
+	xmldoc.Accept(&printer);
+
+	return printer.CStr();
+}
+
+/* -------------- Parse messages ----------------------------------------*/
 
 
 bool msgParser_getMessageType(string message, MsgType *msgTypeFromMessage)
@@ -161,127 +286,4 @@ bool msgParser_getOfferFromMessage(string message, Offer *offer)
 		return false;
 }
 
-/* ------------------Make messages  ---------------------------------- */
 
-static TiXmlElement * msgParser_buildMessageHeader(MsgType type, std::string fromIP)
-{
-	TiXmlElement *rootElement = new TiXmlElement("MessageHeader\n");
-	
-	rootElement->SetAttribute("Type", type);
-	rootElement->SetAttribute("fromIP", fromIP.c_str());
-
-	return rootElement;			 
-}
-
-static TiXmlElement * msgParser_buildOrderElement(Order order) 
-{
-	TiXmlElement *xmlOrder = new TiXmlElement("Order");
-	xmlOrder->SetAttribute("Floor", order.floor);
-	xmlOrder->SetAttribute("Direction", order.direction);
-	xmlOrder->SetAttribute("AssignedIP", order.assignedIP.c_str());
-	
-	return xmlOrder;
-}
-
-static TiXmlElement * msgParser_buildOrderListElement(OrderList orderList)
-{
-	TiXmlElement *xmlOrderList = new TiXmlElement("OrderList");
-
-	for (auto it = orderList.begin(); it != orderList.end(); ++it){
-		TiXmlElement *orderListElement = msgParser_buildOrderElement(*it);
-		xmlOrderList->LinkEndChild(orderListElement);
-	}
-
-	return xmlOrderList;
-}
-
-
-string msgParser_makeNewOrderMsg(Order order, OrderList updatedOrderList)
-{
-	TiXmlDocument xmldoc;
-
-	TiXmlElement *xmlHeader = msgParser_buildMessageHeader(NEW_ORDER_MSG, getMyIP());
-	TiXmlElement *xmlOrder = msgParser_buildOrderElement(order);
-	TiXmlElement *xmlOrderList = msgParser_buildOrderListElement(updatedOrderList);
-	
-	xmldoc.LinkEndChild(xmlHeader);
-	xmldoc.LinkEndChild(xmlOrder);
-	xmldoc.LinkEndChild(xmlOrderList);
-
-	TiXmlPrinter printer;
-	xmldoc.Accept(&printer);
-	return printer.CStr();
-}
-
-string msgParser_makeClearOrderMsg(Order order, OrderList updatedOrderList)
-{
-	TiXmlDocument xmldoc;
-
-	TiXmlElement *xmlHeader = msgParser_buildMessageHeader(CLEAR_ORDER_MSG, getMyIP());
-	TiXmlElement *xmlOrder = msgParser_buildOrderElement(order);
-	TiXmlElement *xmlOrderList = msgParser_buildOrderListElement(updatedOrderList);
-	
-	xmldoc.LinkEndChild(xmlHeader);
-	xmldoc.LinkEndChild(xmlOrder);
-	xmldoc.LinkEndChild(xmlOrderList);
-
-	TiXmlPrinter printer;
-	xmldoc.Accept(&printer);
-	return printer.CStr();
-}
-
-string msgParser_makeOrderListMsg(OrderList orders)
-{
-	TiXmlDocument xmldoc;
-
-	TiXmlElement *xmlHeader = msgParser_buildMessageHeader(CLEAR_ORDER_MSG, getMyIP());
-	TiXmlElement *xmlOrderList = msgParser_buildOrderListElement(orders);
-
-	xmldoc.LinkEndChild(xmlHeader);
-	xmldoc.LinkEndChild(xmlOrderList);
-
-	TiXmlPrinter printer;
-	xmldoc.Accept(&printer);
-	return printer.CStr();
-}
-
-string msgParser_makeOrderCostRequestMsg(int floor, button_type_t direction)
-{
-	TiXmlDocument xmldoc;
-
-	TiXmlElement *xmlHeader = msgParser_buildMessageHeader(ORDER_COST_REQUEST, getMyIP());
-
-	TiXmlElement *xmlCostRequest = new TiXmlElement("OrderCostRequest");
-	xmlCostRequest->SetAttribute("Floor", floor);
-	xmlCostRequest->SetAttribute("Type", ORDER_COST_REQUEST);
-	xmlCostRequest->SetAttribute("Direction", direction);
-
-	xmldoc.LinkEndChild(xmlHeader);
-	xmldoc.LinkEndChild(xmlCostRequest);
-	
-	TiXmlPrinter printer;
-	xmldoc.Accept(&printer);
-	return printer.CStr();
-}
-
-string msgParser_makeOrderCostReplyMsg(Offer offer)
-{
-	TiXmlDocument xmldoc;
-
-	TiXmlElement *xmlHeader = msgParser_buildMessageHeader(ORDER_COST_REPLY, getMyIP());
-
-	TiXmlElement *xmlCostReply = new TiXmlElement("OrderCostReply");
-	xmlCostReply->SetAttribute("Type", ORDER_COST_REPLY);
-	xmlCostReply->SetAttribute("Cost", offer.cost);
-	xmlCostReply->SetAttribute("Floor", offer.floor);
-	xmlCostReply->SetAttribute("Direction", offer.direction);
-	xmlCostReply->SetAttribute("fromIP", offer.fromIP.c_str());
-
-	xmldoc.LinkEndChild(xmlHeader);
-	xmldoc.LinkEndChild(xmlCostReply);
-
-	TiXmlPrinter printer;
-	xmldoc.Accept(&printer);
-
-	return printer.CStr();
-}

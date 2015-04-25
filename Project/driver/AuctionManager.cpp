@@ -31,10 +31,11 @@ void auction_start(int floor, button_type_t direction)
 	Order *order = new Order(direction, floor, "", -1);
 	
 	pthread_mutex_lock(&auctionMutex);
+
 	if (auctions.find(*order) == auctions.end()){
 		int cost = orderManager_getCost(getLastFloor(), floor, getLastDirection(), direction);
 		
-		Offer offer(cost, floor, direction, getMyIP());
+		Offer offer(cost, floor, direction, udp_myIP());
 		auctions[*order] = std::vector<Offer>();
 		auctions[*order].push_back(offer);
 		
@@ -54,7 +55,8 @@ void *runAuction(void *args)
 
 	std::cout << "AUCTION STARTED for floor " << order->floor << ", dir " << order->direction << std::endl;
 
-	std::string orderCostRequestMsg = msgParser_makeOrderCostRequestMsg(order->floor, order->direction);
+	std::string orderCostRequestMsg;
+	orderCostRequestMsg = msgParser_makeOrderCostRequestMsg(order->floor, order->direction, udp_myIP());
 	udp_send(orderCostRequestMsg.c_str(), strlen(orderCostRequestMsg.c_str()) + 1);
 	
 	time_t timeAtStart = time(0);
@@ -76,7 +78,8 @@ void *runAuction(void *args)
 
 	
 	orderManager_newOrder(*order);
-	std::string newOrderMessage = msgParser_makeNewOrderMsg(*order, orderManager_getOrders());
+	std::string newOrderMessage;
+	newOrderMessage = msgParser_makeNewOrderMsg(*order, orderManager_getOrders(), udp_myIP());
 	udp_send(newOrderMessage.c_str(), strlen(newOrderMessage.c_str()) + 1);
 	stateMachine_newOrder(*order);
 

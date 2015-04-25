@@ -12,5 +12,5 @@ bool udp_send(const char *data, size_t dataLength);
 
 bool udp_receive(char *data, size_t dataLength);
 
-std::string getMyIP();
-void findMyIP();
+std::string udp_myIP();
+

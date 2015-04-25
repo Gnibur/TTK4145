@@ -16,18 +16,19 @@ enum MsgType {
 	ORDER_COST_REPLY
 };
 
+string msgParser_makeNewOrderMsg(	Order order, OrderList updatedOrderList, string fromIP);
+string msgParser_makeClearOrderMsg(	Order order, OrderList updatedOrderList, string fromIP);
+string msgParser_makeOrderListMsg(	OrderList orderList, string fromIP);
+
+string msgParser_makeOrderCostRequestMsg(int floor, button_type_t direction, string fromIP);
+string msgParser_makeOrderCostReplyMsg(Offer offer, std::string fromIP);
 
 bool msgParser_getMessageType(string message, MsgType *msgType);
-bool msgParser_getSenderIP(string message, std::string *senderIp);
+bool msgParser_getSenderIP(string message, string *senderIp);
 bool msgParser_getOrderFromMessage(string message, Order *order);
 bool msgParser_getOrderListFromMessage(string message, OrderList *orderList);
 bool msgParser_getOrderCostRequestFromMessage(string message, int *floor, button_type_t *direction);
 bool msgParser_getOfferFromMessage(string message, Offer *offer);
 
-string    msgParser_makeNewOrderMsg(Order order, OrderList updatedOrderList);
-string    msgParser_makeClearOrderMsg(Order order, OrderList updatedOrderList);
-string    msgParser_makeOrderListMsg(OrderList orderList);
-string    msgParser_makeOrderCostRequestMsg(int floor, button_type_t direction);
-string    msgParser_makeOrderCostReplyMsg(Offer offer);
 
 

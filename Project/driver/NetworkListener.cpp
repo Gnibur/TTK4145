@@ -32,7 +32,7 @@ void *listen(void*)
 		if (msgParser_getSenderIP(buf, &senderIP) == false)
 			continue;
 
-		if (senderIP == getMyIP())
+		if (senderIP == udp_myIP())
 			continue;
 
 		MsgType messageType;
@@ -80,8 +80,8 @@ void *listen(void*)
 
 			int cost = orderManager_getCost(getLastFloor(), floor, getLastDirection(), direction);
 			
-			Offer offer = {cost, floor, direction, getMyIP()};
-			std::string offerMsg = msgParser_makeOrderCostReplyMsg(offer);
+			Offer offer(cost, floor, direction, udp_myIP());
+			std::string offerMsg = msgParser_makeOrderCostReplyMsg(offer, udp_myIP());
 
 			udp_send(offerMsg.c_str(), strlen(offerMsg.c_str()) + 1);
 			//usleep(10000);

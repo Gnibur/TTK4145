@@ -36,7 +36,7 @@ void stateMachine_buttonPressed(int floor, button_type_t button)
 
 	if (button == BUTTON_COMMAND)
 	{	
-		Order order(button, floor, getMyIP(), -1);
+		Order order(button, floor, udp_myIP(), -1);
 		if(orderManager_newOrder(order))
 		{
         	//usleep(10000);
@@ -77,7 +77,8 @@ void stateMachine_floorReached(int floor)
 		for (auto it = ordersToClear.begin(); it != ordersToClear.end(); ++it) 
 		{
 			orderManager_clearOrder(*it);
-			std::string clearOrderMsg = msgParser_makeClearOrderMsg(*it, orderManager_getOrders());
+			std::string clearOrderMsg;
+			clearOrderMsg = msgParser_makeClearOrderMsg(*it, orderManager_getOrders(), udp_myIP());
 			udp_send(clearOrderMsg.c_str(), strlen(clearOrderMsg.c_str()) + 1);
 
 			//usleep(10000);

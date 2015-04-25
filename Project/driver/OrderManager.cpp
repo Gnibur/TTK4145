@@ -36,7 +36,7 @@ bool orderManager_newOrder(Order order)
 
 	pthread_mutex_unlock(&orderManagerMutex);
 	
-	if (((order.direction == BUTTON_COMMAND) && (order.assignedIP == getMyIP())) || (order.direction != BUTTON_COMMAND))
+	if ((order.direction == BUTTON_COMMAND && order.assignedIP == udp_myIP()) || order.direction != BUTTON_COMMAND)
 		ioDriver_setOrderButtonLamp(order.direction, order.floor);
 
 	return orderAdded;
@@ -58,10 +58,8 @@ bool orderManager_clearOrder(Order order)
 
 	pthread_mutex_unlock(&orderManagerMutex);
 
-
-
 	
-	if (((order.direction == BUTTON_COMMAND) && (order.assignedIP == getMyIP())) || (order.direction != BUTTON_COMMAND))
+	if ((order.direction == BUTTON_COMMAND && order.assignedIP == udp_myIP()) || (order.direction != BUTTON_COMMAND))
 		ioDriver_clearOrderButtonLamp(order.direction, order.floor);
 
 	return orderCleared;
@@ -78,7 +76,7 @@ OrderList orderManager_getOrdersOnFloor(int floor)
 	OrderList returnList;
 	for (auto it = orderList.begin(); it != orderList.end(); ++it)
 	{
-		if ((it->floor == floor) && (it->assignedIP.compare(getMyIP()) == 0))
+		if (it->floor == floor && it->assignedIP == udp_myIP())
 			returnList.push_back(*it);
 	}
 	pthread_mutex_unlock(&orderManagerMutex);	
@@ -92,7 +90,7 @@ motor_direction_t orderManager_getNextDirection(int floor, motor_direction_t las
 	// If there are no orders on your IP, don't move
 	for (auto it = orderList.begin(); it != orderList.end(); ++it)
 	{
-		if (it->assignedIP.compare(getMyIP()) == 0)
+		if (it->assignedIP.compare(udp_myIP()) == 0)
 			empty = false;
 	}
 	if (empty) return DIRECTION_STOP;
@@ -124,7 +122,7 @@ motor_direction_t orderManager_getNextDirection(int floor, motor_direction_t las
 	for (auto it = orderList.begin(); it != orderList.end(); ++it)
 	{
 		int orderedFloor = it->floor * directionalMultiplier;
-		if ((orderedFloor > floor) && (it->assignedIP.compare(getMyIP()) == 0))
+		if ((orderedFloor > floor) && (it->assignedIP.compare(udp_myIP()) == 0))
 			return lastDirection;
 	}
 
@@ -160,7 +158,7 @@ int orderManager_getCost(int lastFloor, int newFloor, motor_direction_t lastDire
 	// Expansion for the cost function, so one elevator doesn't take all.
 	for (auto it = orderList.begin(); it != orderList.end(); ++it)
 	{
-		if (it->assignedIP.compare(getMyIP()) == 0)
+		if (it->assignedIP.compare(udp_myIP()) == 0)
 			cost += 2;
 	}
 
@@ -178,12 +176,12 @@ void orderManager_mergeMyOrdersWith(OrderList orders)
 			std::cout << "Pushing back this with IP: " << it->assignedIP << std::endl;
 			orderList.push_back((*it));
 
-		if (((it->direction == BUTTON_COMMAND) && (it->assignedIP == getMyIP())) || (it->direction != BUTTON_COMMAND))
+		if ((it->direction == BUTTON_COMMAND && it->assignedIP == udp_myIP()) || (it->direction != BUTTON_COMMAND))
 			ioDriver_setOrderButtonLamp(it->direction, it->floor);
 
 		}
 	}
-	std::string updateMsg = msgParser_makeOrderListMsg(orderList);
+	std::string updateMsg = msgParser_makeOrderListMsg(orderList, udp_myIP());
 	udp_send(updateMsg.c_str(), strlen(updateMsg.c_str()) + 1);
 
 	pthread_mutex_unlock(&orderManagerMutex);	

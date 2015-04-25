@@ -27,6 +27,8 @@ static pthread_mutex_t udpSendMutex;
 
 static struct sockaddr_in target;
 
+void findMyIP();
+
 bool udp_initialize(int targetPort)
 {
 	pthread_mutex_init(&udpSendMutex, NULL);
@@ -43,7 +45,8 @@ bool udp_initialize(int targetPort)
 	target.sin_port = htons(targetPort);
 
   	bind(recvsocketfd, (struct sockaddr*)&target, sizeof target);
-
+	
+	findMyIP();
 
 	return true; // DO SOME ERROR CHECKING
 }
@@ -116,7 +119,7 @@ void findMyIP()
 	}
 }
 
-std::string getMyIP ()
+std::string udp_myIP ()
 {
 	return myIP;
 }
