@@ -2,18 +2,21 @@
 #include "udp.h"
 #include "MsgParser.h"
 #include <cstring>
+#include <iostream>
 
 
 void msgTool_sendNewOrder(Order order, OrderList updatedOrderList, std::string fromIP){
 	std::string msg;
 	msg = msgParser_makeNewOrderMsg(order, updatedOrderList, fromIP);
 	udp_send(msg.c_str(), strlen(msg.c_str()) + 1);
+	std::cout << "Sent new order\n";
 }
 
 void msgTool_sendClearOrder(Order order, OrderList updatedOrderList, std::string fromIP){
 	std::string msg;
 	msg = msgParser_makeClearOrderMsg(order, updatedOrderList, fromIP);
 	udp_send(msg.c_str(), strlen(msg.c_str()) + 1);
+	std::cout << "Sent clear order\n";
 }
 
 void msgTool_sendOrderList(OrderList orderList, std::string fromIP){

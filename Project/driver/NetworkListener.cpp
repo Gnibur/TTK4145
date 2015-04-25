@@ -18,6 +18,8 @@
 
 void *listen(void*);
 
+static void synchronizeLists(std::string message);
+
 void networkListener_run()
 {
 	pthread_t networkListener;
@@ -25,9 +27,12 @@ void networkListener_run()
 }
 
 
+
 void *listen(void*) 
 {
 	char buf[BUFLENGTH];
+
+
 	while (true) {
 		udp_receive(buf, BUFLENGTH); // blocking read into buf
 
@@ -44,7 +49,7 @@ void *listen(void*)
 
 		switch (messageType) {
 
-		case NEW_ORDER_MSG:{
+		case NEW_ORDER_MSG: {
 			std::cout << "Received New order:\n" << buf << "\n\n";
 			
 			Order order;
@@ -54,8 +59,13 @@ void *listen(void*)
 			}
 			int timeNow = time(0);
 			order.timeAssigned = timeNow;
-			orderManager_addOrder(order);
-			std::cout << "Order was added\n";
+			if (orderManager_addOrder(order))
+				std::cout << "Order was added\n";
+
+			synchronizeLists(buf);
+	
+			stateMachine_eventNewOrderArrived(order);
+
 			break;
 		}
 		case CLEAR_ORDER_MSG: {
@@ -65,8 +75,11 @@ void *listen(void*)
 			if (msgParser_getOrderFromMessage(buf, &order) == false)
 				continue;
 
-			orderManager_clearOrder(order);
-			std::cout << "Order was cleared\n";
+			if (orderManager_clearOrder(order))	
+				std::cout << "Order was cleared\n";
+
+			synchronizeLists(buf);
+			
 			break;
 		}
 
@@ -99,30 +112,38 @@ void *listen(void*)
 	 	}
 		case ORDER_LIST_MSG:
 			std::cout << "Received list:\n" << buf << std::endl;
-			// we want to merge anyway. That happens below
+			
+			synchronizeLists(buf);
 			break;
 
 		default:
             std::cout << "Unknown message received:\n" << buf << std::endl;;
 			// Unknown message
-            continue;
+            break;
 		}
 
-		if ((messageType != ORDER_COST_REQUEST) && (messageType != ORDER_COST_REPLY))
-		{
-			OrderList receivedOrderList;
-			if (msgParser_getOrderListFromMessage(buf, &receivedOrderList) == false)
-				continue;
-			//OrderList receivedOrderList = orderManager_getOrders();
-			if (!(orderManager_orderListEquals(receivedOrderList)))
-			{
-				orderManager_mergeMyOrdersWith(receivedOrderList);
-				//usleep(10000);
-			}
-		}
+
     
 	}
 	return NULL;
+
+}
+
+void synchronizeLists(std::string message)
+{
+	OrderList receivedOrderList;
+	if (msgParser_getOrderListFromMessage(message, &receivedOrderList) == false)
+		return;
+
+
+	//OrderList receivedOrderList = orderManager_getOrders();
+	if (!(orderManager_orderListEquals(receivedOrderList)))
+	{
+			std::cout << "OrderList is not equal!\n";
+		orderManager_mergeMyOrdersWith(receivedOrderList);
+	}
+
+
 
 }
 

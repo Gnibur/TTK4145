@@ -210,11 +210,10 @@ void orderManager_mergeMyOrdersWith(OrderList orders)
 		if (std::find(orderList.begin(), orderList.end(), (*it)) == orderList.end())
 		{
 			std::cout << "Pushing back this with IP: " << it->assignedIP << std::endl;
+			it->timeAssigned = time(0);
 			orderList.push_back((*it));
-
 		if ((it->direction == BUTTON_COMMAND && it->assignedIP == udp_myIP()) || (it->direction != BUTTON_COMMAND))
 			ioDriver_setOrderButtonLamp(it->direction, it->floor);
-
 		}
 	}
 	msgTool_sendOrderList(orderList, udp_myIP());

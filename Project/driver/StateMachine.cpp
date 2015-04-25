@@ -59,6 +59,7 @@ void stateMachine_eventNewOrderArrived(Order order)
 		if (order.assignedIP == udp_myIP()){
 			if (order.floor == lastFloor){
 				orderManager_clearOrder(order);
+				msgTool_sendClearOrder(order, orderManager_getOrders(), udp_myIP());
 				ioDriver_setDoorOpenLamp();
 				timer_start();
 				state = DOOR_OPEN;
