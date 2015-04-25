@@ -60,21 +60,27 @@ void *runAuction(void *args)
 	time_t timeAtStart = time(0);
 	while (time(0) < timeAtStart + AUCTION_TIME)
 		;
-
-	pthread_mutex_lock(&auctionMutex);
-	auctions.erase(*order);
 	
+	std::cout << "Now finding best offer...\n";
+	
+	pthread_mutex_lock(&auctionMutex);
+
 	std::sort(auctions[(*order)].begin(), auctions[(*order)].end());
 	Offer bestOffer = auctions[(*order)][0];
+	auctions.erase(*order);
 
 	pthread_mutex_unlock(&auctionMutex);
 	
 	order->assignedIP = bestOffer.fromIP;
 	order->timeAssigned = time(0);
 
-	//OrderList updatedList;
+	
 	orderManager_newOrder(*order);
+	std::string newOrderMessage = msgParser_makeNewOrderMsg(*order, orderManager_getOrders());
+	udp_send(newOrderMessage.c_str(), strlen(newOrderMessage.c_str()) + 1);
 	stateMachine_newOrder(*order);
+
+	
 	
 	std::cout 	<< "AUCTION FINISHED, for floor " << order->floor << ", dir " << order->direction 
             	<< ", IP " << bestOffer.fromIP << " won\n";
@@ -92,4 +98,5 @@ void auction_addBid(Offer offer)
 		auctions[order].push_back(offer);
 	std::cout << "THE NUMBER OF BIDS IS NOW " << auctions.size() << std::endl; 
 	pthread_mutex_unlock(&auctionMutex);
+	
 }

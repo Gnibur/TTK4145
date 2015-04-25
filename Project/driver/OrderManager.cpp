@@ -34,9 +34,6 @@ bool orderManager_newOrder(Order order)
 		orderAdded = true;
 	}
 
-	std::string newOrderMessage = msgParser_makeNewOrderMsg(order, orderList);
-	udp_send(newOrderMessage.c_str(), strlen(newOrderMessage.c_str()) + 1);
-
 	pthread_mutex_unlock(&orderManagerMutex);
 	
 	if (((order.direction == BUTTON_COMMAND) && (order.assignedIP == getMyIP())) || (order.direction != BUTTON_COMMAND))
@@ -48,6 +45,7 @@ bool orderManager_newOrder(Order order)
 bool orderManager_clearOrder(Order order)
 {
 	bool orderCleared = false;
+	
 	pthread_mutex_lock(&orderManagerMutex);
 	std::vector<Order>::iterator search = std::find(orderList.begin(), orderList.end(), order);
 
@@ -57,12 +55,9 @@ bool orderManager_clearOrder(Order order)
 		orderCleared = true;
 	}
 
-	std::sort(orderList.begin(), orderList.end());
-
-	std::string clearOrderMsg = msgParser_makeClearOrderMsg(order, orderList);
-	udp_send(clearOrderMsg.c_str(), strlen(clearOrderMsg.c_str()) + 1);
 
 	pthread_mutex_unlock(&orderManagerMutex);
+
 
 
 	

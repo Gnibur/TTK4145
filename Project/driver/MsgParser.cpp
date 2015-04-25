@@ -12,8 +12,12 @@ bool msgParser_getMessageType(string message, MsgType *msgTypeFromMessage)
 
 	TiXmlElement *xmlHeader = xmldoc.RootElement();
 
-	if (xmldoc.Error() ||  (!xmlHeader))
+	if (xmldoc.Error())
 		return false;
+
+	if (!xmlHeader)
+		return false;
+
 
 	int temp;
 	xmlHeader->QueryIntAttribute("Type", &temp);
@@ -36,8 +40,10 @@ bool msgParser_getSenderIP(string message, std::string *senderIP)
 	
 	if (isValidIP(*senderIP))
 		return true;
-	else
+	else {
+		std::cout << "IP conformance check failed\n";
 		return false;
+	}
 }
 
 bool msgParser_getOrderFromMessage(string message, Order *order)
@@ -62,8 +68,8 @@ bool msgParser_getOrderFromMessage(string message, Order *order)
 	
 	if (order->isValid())
 		return true;
-	else
-		return false;	
+	else 
+		return false;
 }
 
 

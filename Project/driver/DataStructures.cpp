@@ -1,12 +1,13 @@
 #include "DataStructures.h"
 #include "IoDriver.h" 
 #include <cstring>
+#include <iostream>
 
 bool isValidIP(std::string ip)
 {
 	if (strlen(ip.c_str()) != strlen("???.???.???.???"))
 		return false;
-	if (ip[4] != '.' || ip[8] != '.' || ip[12] != '.')
+	if (ip[3] != '.' || ip[7] != '.' || ip[11] != '.')
 		return false;
 	
 	return true;
@@ -32,8 +33,8 @@ Order::Order(	button_type_t direction,
 bool Order::isValid() 
 {
 	if (direction != BUTTON_COMMAND 
-		|| direction != BUTTON_CALL_UP 
-		|| direction != BUTTON_CALL_DOWN)
+		&& direction != BUTTON_CALL_UP 
+		&& direction != BUTTON_CALL_DOWN)
 		return false;
 
 	if (floor < 0 || floor >= N_FLOORS)
@@ -41,10 +42,6 @@ bool Order::isValid()
 
 	if (!isValidIP(assignedIP))
 		return false;
-
-	time_t now = time(0); // TODO: use time since startup
-	if (timeAssigned + 34560000 < now || timeAssigned > now)
-		return false;	
 
 	return true;
 }

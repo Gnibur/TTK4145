@@ -28,15 +28,15 @@ void *listen(void*)
 	while (true) {
 		udp_receive(buf, BUFLENGTH); // blocking read into buf
 
-		MsgType messageType;
-		if (msgParser_getMessageType(buf, &messageType) == false)
-			continue;
-
 		std::string senderIP;
 		if (msgParser_getSenderIP(buf, &senderIP) == false)
 			continue;
 
 		if (senderIP == getMyIP())
+			continue;
+
+		MsgType messageType;
+		if (msgParser_getMessageType(buf, &messageType) == false)
 			continue;
 
 		switch (messageType) {
@@ -45,13 +45,15 @@ void *listen(void*)
 			std::cout << "Received New order:\n" << buf << "\n\n";
 			
 			Order order;
-			if (msgParser_getOrderFromMessage(buf, &order) == false)
+			if (msgParser_getOrderFromMessage(buf, &order) == false){
+				std::cout << "Failed to obtain order from message\n";				
 				continue;
-
+			}
 			int timeNow = time(0);
 			order.timeAssigned = timeNow;
 			orderManager_newOrder(order);
 			stateMachine_newOrder(order);
+			std::cout << "Order was added\n";
 			break;
 		}
 		case CLEAR_ORDER_MSG: {
@@ -62,6 +64,7 @@ void *listen(void*)
 				continue;
 
 			orderManager_clearOrder(order);
+			std::cout << "Order was cleared\n";
 			break;
 		}
 
