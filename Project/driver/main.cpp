@@ -40,7 +40,7 @@ void run_physical()
 				{
 					if (oldButtonStates[button][floor] != 1)
 					{
-						stateMachine_buttonPressed(floor, (button_type_t)button);
+						stateMachine_eventButtonPressed(floor, (button_type_t)button);
 						oldButtonStates[button][floor] = 1;
 					}
 				}
@@ -54,16 +54,16 @@ void run_physical()
 		// Check for new floors
 		newFloor = ioDriver_getFloorSensorValue();
 		if ((newFloor != -1) && (newFloor != getLastFloor()))
-			stateMachine_floorReached(newFloor);
+			stateMachine_eventFloorReached(newFloor);
 
 		// Check for timeout
 		if ((timer_active()) && (timer_done()))
-			stateMachine_doorTimeout();
+			stateMachine_eventDoorTimedOut();
 
 		// Check for order timeout
 		Order timedOutOrder = orderManager_checkForOrderTimeout();
 		if (timedOutOrder.isValid())
-			stateMachine_orderTimeOut(timedOutOrder);
+			stateMachine_eventOrderTimedOut(timedOutOrder);
 
 		// Stop the program if stop button is pressed
 		if (ioDriver_isStopButtonPressed()) {
@@ -88,7 +88,6 @@ int main()
 	std::cout << "Going into run physical..\n";
 
 	orderManager_init();
-	findMyIP();
 
 	networkListener_run();
 

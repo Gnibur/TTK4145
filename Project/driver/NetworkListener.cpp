@@ -52,7 +52,6 @@ void *listen(void*)
 			int timeNow = time(0);
 			order.timeAssigned = timeNow;
 			orderManager_newOrder(order);
-			stateMachine_newOrder(order);
 			std::cout << "Order was added\n";
 			break;
 		}

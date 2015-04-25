@@ -4,15 +4,13 @@
 #include "DataStructures.h"
 
 void stateMachine_initialize();
-void stateMachine_buttonPressed(int floor, button_type_t button);
-void stateMachine_floorReached(int floor);
-bool stateMachine_shouldIStopHere(OrderList ordersOnFloor);
-void stateMachine_doorTimeout();
-void stateMachine_orderTimeOut(Order order);
+void stateMachine_eventButtonPressed(int floor, button_type_t button);
+void stateMachine_eventFloorReached(int floor);
+void stateMachine_eventNewOrderArrived(Order order);
 
-void stateMachine_newOrder(Order order);
-void stateMachine_clearOrder(Order order);
-void stateMachine_updateDirection();
+void stateMachine_eventDoorTimedOut();
+void stateMachine_eventOrderTimedOut(Order order);
+
 
 int 			getLastFloor();
 motor_direction_t 	getLastDirection();

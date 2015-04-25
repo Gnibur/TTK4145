@@ -83,17 +83,55 @@ OrderList orderManager_getOrdersOnFloor(int floor)
 	return returnList;
 }
 
+
+bool orderManager_shouldStopHere(int floor, motor_direction_t direction) 
+{
+	bool hasOrderHere = false;
+	bool hasOrderHereInSameDirection = false;
+	bool hasMoreOrdersInSameDirection = false;
+
+	for (auto orderPtr = orderList.begin(); orderPtr != orderList.end(); ++orderPtr){
+		
+		if (orderPtr->floor == floor && orderPtr->direction == direction){
+			hasOrderHereInSameDirection = true;
+			hasOrderHere = true;
+		} else if (orderPtr->floor == floor)
+			hasOrderHere = true;
+
+		if (orderPtr->floor > floor)
+			hasMoreOrdersInSameDirection = true;
+
+		if (hasOrderHereInSameDirection && hasMoreOrdersInSameDirection)
+			break;
+	}
+	 	
+	if (hasOrderHereInSameDirection && hasMoreOrdersInSameDirection)
+		return true;
+	else if (hasOrderHere && !hasMoreOrdersInSameDirection)
+		return true;
+	else
+		return false;
+}
+
+
+
 motor_direction_t orderManager_getNextDirection(int floor, motor_direction_t lastDirection)
 {
-	bool empty = true;
+	OrderList myPendingOrders;
+	for (auto orderPtr = orderList.begin(); orderPtr != orderList.end(); ++orderPtr)
+		if (orderPtr->assignedIP == udp_myIP())
+			myPendingOrders.push_back(*orderPtr);
 
-	// If there are no orders on your IP, don't move
-	for (auto it = orderList.begin(); it != orderList.end(); ++it)
-	{
-		if (it->assignedIP.compare(udp_myIP()) == 0)
-			empty = false;
-	}
-	if (empty) return DIRECTION_STOP;
+	if (myPendingOrders.size() == 0) 
+		return DIRECTION_STOP;
+
+	for (auto orderPtr = orderList.begin(); orderPtr != orderList.end(); ++orderPtr)
+		if (orderPtr->floor == floor)
+			return DIRECTION_STOP;
+
+	
+
+	
 
 	// If the elevator is idle, prioritize the floors closest
 	if (lastDirection == DIRECTION_STOP)
