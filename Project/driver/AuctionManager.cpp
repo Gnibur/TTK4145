@@ -77,7 +77,7 @@ void *runAuction(void *args)
 	order->timeAssigned = time(0);
 
 	
-	orderManager_newOrder(*order);
+	orderManager_addOrder(*order);
 	std::string newOrderMessage;
 	newOrderMessage = msgParser_makeNewOrderMsg(*order, orderManager_getOrders(), udp_myIP());
 	udp_send(newOrderMessage.c_str(), strlen(newOrderMessage.c_str()) + 1);

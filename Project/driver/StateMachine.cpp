@@ -41,7 +41,7 @@ void stateMachine_eventButtonPressed(int floor, button_type_t button)
 	if (button == BUTTON_COMMAND) {	
 		Order order(button, floor, udp_myIP());
 		
-		if(orderManager_newOrder(order)) {
+		if(orderManager_addOrder(order)) {
 			stateMachine_eventNewOrderArrived(order);	
 		} else {
 			// panic

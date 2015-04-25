@@ -22,7 +22,7 @@ void orderManager_init()
 
 
 
-bool orderManager_newOrder(Order order)
+bool orderManager_addOrder(Order order)
 {
 	bool orderAdded = false;
 	pthread_mutex_lock(&orderManagerMutex);

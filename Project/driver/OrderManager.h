@@ -12,7 +12,7 @@
 void orderManager_init();
 
 // Pushing and popping from the orderlist
-bool 				orderManager_newOrder(Order order);
+bool 				orderManager_addOrder(Order order);
 bool 				orderManager_clearOrder(Order order);
 void				orderManager_mergeMyOrdersWith(OrderList orders);
 OrderList 			orderManager_getOrders();

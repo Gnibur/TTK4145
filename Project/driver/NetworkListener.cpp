@@ -51,7 +51,7 @@ void *listen(void*)
 			}
 			int timeNow = time(0);
 			order.timeAssigned = timeNow;
-			orderManager_newOrder(order);
+			orderManager_addOrder(order);
 			std::cout << "Order was added\n";
 			break;
 		}
