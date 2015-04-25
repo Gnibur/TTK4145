@@ -33,13 +33,20 @@ int main()
 
 void checkForEvents()
 {
+	int oldFloorReading = -1;
 	while (1)
 	{
 		checkButtonsFromEvents();
 
 		int newFloorReading = ioDriver_getFloorSensorValue();
-		if ((newFloorReading != -1) && (newFloorReading != getLastFloor()))
-			stateMachine_eventFloorReached(newFloorReading);
+		if (oldFloorReading != newFloorReading){
+			oldFloorReading = newFloorReading;
+			if (newFloorReading >= 0 && newFloorReading < N_FLOORS)	
+				stateMachine_eventFloorReached(newFloorReading);
+			else if (newFloorReading == -1)
+				stateMachine_eventFloorLeft();
+		}
+			
 
 		if ((timer_active()) && (timer_done()))
 			stateMachine_eventDoorTimedOut();

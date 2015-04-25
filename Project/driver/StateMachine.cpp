@@ -129,6 +129,12 @@ void stateMachine_eventFloorReached(int floor)
 	}	
 }
 
+void stateMachine_eventFloorLeft()
+{
+	if (state != MOVING)
+		std::cout << "It is not possible to leave a floor when idle\n";
+}
+
 
 void stateMachine_eventDoorTimedOut()
 {
