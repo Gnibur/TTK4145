@@ -139,10 +139,11 @@ void synchronizeLists(std::string message)
 	//OrderList receivedOrderList = orderManager_getOrders();
 	if (!(orderManager_orderListEquals(receivedOrderList)))
 	{
-			std::cout << "OrderList is not equal!\n";
+		std::cout << "OrderList is not equal!\n";
 		orderManager_mergeMyOrdersWith(receivedOrderList);
+		msgTool_sendOrderList(orderManager_getOrders(), udp_myIP());
 	}
-
+	
 
 
 }

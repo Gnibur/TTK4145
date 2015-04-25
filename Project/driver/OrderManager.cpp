@@ -1,6 +1,7 @@
 #include "OrderManager.h"
 #include "IoDriver.h"
 #include "msgTool.h"
+#include "MsgParser.h"
 #include "udp.h"
 #include <ctime>
 #include <algorithm>
@@ -14,51 +15,56 @@
 OrderList orderList;
 
 
-static bool saveOrderList();
-static void loadFromBackup();
-
 static pthread_mutex_t orderManagerMutex;
+
+bool saveOrderList(std::string filename);
+bool retrieveOrderList(std::string filename);
 
 void orderManager_recover()
 {
 	pthread_mutex_init(&orderManagerMutex, NULL);
 
-	
+	if (!retrieveOrderList("Backup1.txt"))
+		retrieveOrderList("Backup2.txt");			
 
 }
 
 
-bool saveOrderList()
+bool saveOrderList(std::string filename)
 {
-	pthread_mutex_lock(&orderManagerMutex);
-
 	std::ofstream backupFile;
 
-	backupFile.open("Backup1.txt");
+	backupFile.open(filename);
 
 	if (!backupFile.is_open())
 		return false;
 	
-	for (auto orderPtr = orderList.begin(); orderPtr != orderList.end(); ++orderPtr){
-		backupFile << *orderPtr << std::endl;
-	}
-	backupFile << "Finished writing\n";
-	backupFile.close();
-	
-	backupFile.open("Backup2.txt");
+	pthread_mutex_lock(&orderManagerMutex);
 
-	if (!backupFile.is_open())
-		return false;
-	
-	for (auto orderPtr = orderList.begin(); orderPtr != orderList.end(); ++orderPtr){
-		backupFile << *orderPtr << std::endl;
-	}
-	backupFile << "Finished writing\n";
-	backupFile.close();
-	
+	backupFile << msgParser_makeOrderListMsg(orderList, udp_myIP());	
+
 	pthread_mutex_unlock(&orderManagerMutex);
 
+	backupFile.close();
+
 	return true;
+}
+
+bool retrieveOrderList(std::string filename)
+{
+	std::fstream backupFile;
+	backupFile.open(filename);
+
+	if (!backupFile)
+		return false;
+
+	std::string content, temp;
+	while (getline(backupFile, temp))
+		content += temp;
+	backupFile.close();
+		
+	
+	return msgParser_getOrderListFromMessage(content, &orderList);
 }
 
 
@@ -77,7 +83,7 @@ bool orderManager_addOrder(Order order)
 	pthread_mutex_unlock(&orderManagerMutex);
 	
 	
-	if (!saveOrderList())
+	if (!(saveOrderList("Backup1.txt") || saveOrderList("Backup2.txt")) )
 		return false;
 
 	if ((order.direction == BUTTON_COMMAND && order.assignedIP == udp_myIP()) || order.direction != BUTTON_COMMAND)
@@ -102,7 +108,7 @@ bool orderManager_clearOrder(Order order)
 
 	pthread_mutex_unlock(&orderManagerMutex);
 	
-	if (!saveOrderList())
+	if (!(saveOrderList("Backup1.txt") || saveOrderList("Backup2.txt")) )
 		return false;
 	
 	if ((order.direction == BUTTON_COMMAND && order.assignedIP == udp_myIP()) || (order.direction != BUTTON_COMMAND))
@@ -266,7 +272,8 @@ void orderManager_mergeMyOrdersWith(OrderList orders)
 	
 	pthread_mutex_unlock(&orderManagerMutex);	
 
-	saveOrderList();
+	if (!(saveOrderList("Backup1.txt") || saveOrderList("Backup2.txt")) )
+		std::cout << "Failed saving merged orders\n";
 }
 
 bool orderManager_orderListEquals(OrderList rhs)

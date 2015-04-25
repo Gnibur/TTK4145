@@ -74,12 +74,6 @@ bool Order::operator<(const Order& rhs) const
 		return false;
 }
 
-std::ostream& operator<<(std::ostream& out, const Order& order)
-{
-	out << "Floor: " << order.floor << ", Direction: " << order.direction 
-		<< ", AssignedIP: " << order. assignedIP << ", timeAssigned: " << order.timeAssigned;
-	return out;
-}
 
 
 Offer::Offer()
