@@ -30,6 +30,8 @@ static state_t state;
 
 void stateMachine_initialize()
 {
+	assert(IoDriver_initialize());
+
 	ioDriver_setMotorDirection(DIRECTION_UP);
 	
 	while (ioDriver_getFloorSensorValue() == -1)
@@ -46,6 +48,7 @@ void stateMachine_initialize()
 
 void stateMachine_eventButtonPressed(int floor, button_type_t button)
 {
+	assert(floor >= 0 && floor < N_FLOORS);
 
 	if (button == BUTTON_COMMAND) {	
 		Order order(button, floor, udp_myIP());
@@ -64,6 +67,8 @@ void stateMachine_eventButtonPressed(int floor, button_type_t button)
 
 void stateMachine_eventNewOrderArrived(Order order)
 {
+	assert(order.isValid());
+
 	switch (state){
 	case IDLE: 
 		if (order.assignedIP == udp_myIP()){
@@ -95,6 +100,7 @@ void stateMachine_eventNewOrderArrived(Order order)
 void stateMachine_eventFloorReached(int floor)
 {
 	assert(state == MOVING);
+	assert(floor >= 0 && floor < N_FLOORS);
 
 	if (lastDirection == DIRECTION_UP)
 		assert(floor == lastFloor + 1);
@@ -161,6 +167,8 @@ void stateMachine_eventDoorTimedOut()
 
 void stateMachine_eventOrderTimedOut(Order order)
 {
+	assert(order.isValid());
+	
 	std::cout << "----------------------\n";
 	std::cout << "WARNING WARNING WARNING\n";
 	std::cout << "ORDER TIMED OUT\n";

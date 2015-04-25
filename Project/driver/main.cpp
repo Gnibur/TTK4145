@@ -16,10 +16,8 @@ int main()
 	std::cout << "Hello and welcome to the elevator program!\n";
 	std::cout << "Initalizing driver..\n";
 	
-	if (!IoDriver_initialize()) {
-		std::cout << "Unable to initialize elevator hardware!\n";
-	}
 	stateMachine_initialize();
+
 	orderManager_recover();
 
 	udp_initialize(BROADCAST_PORT);
