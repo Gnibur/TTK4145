@@ -5,6 +5,8 @@
 #include <string>
 #include <time.h>
 
+#include <ostream>
+
 bool isValidIP(std::string ip);
 
 
@@ -26,7 +28,9 @@ public:
 	bool operator==(const Order& rhs) const;
 	
 	bool operator < (const Order& rhs) const;
+	
 };
+std::ostream& operator<<(std::ostream& out, const Order& order);
 
 typedef std::vector<Order> OrderList;
 

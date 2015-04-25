@@ -7,19 +7,59 @@
 #include <cmath>
 #include <cstring>
 #include <iostream>
+#include <fstream>
 #include <pthread.h>
 
 
 OrderList orderList;
 
 
+static bool saveOrderList();
+static void loadFromBackup();
+
 static pthread_mutex_t orderManagerMutex;
 
-void orderManager_init()
+void orderManager_recover()
 {
 	pthread_mutex_init(&orderManagerMutex, NULL);
+
+	
+
 }
 
+
+bool saveOrderList()
+{
+	pthread_mutex_lock(&orderManagerMutex);
+
+	std::ofstream backupFile;
+
+	backupFile.open("Backup1.txt");
+
+	if (!backupFile.is_open())
+		return false;
+	
+	for (auto orderPtr = orderList.begin(); orderPtr != orderList.end(); ++orderPtr){
+		backupFile << *orderPtr << std::endl;
+	}
+	backupFile << "Finished writing\n";
+	backupFile.close();
+	
+	backupFile.open("Backup2.txt");
+
+	if (!backupFile.is_open())
+		return false;
+	
+	for (auto orderPtr = orderList.begin(); orderPtr != orderList.end(); ++orderPtr){
+		backupFile << *orderPtr << std::endl;
+	}
+	backupFile << "Finished writing\n";
+	backupFile.close();
+	
+	pthread_mutex_unlock(&orderManagerMutex);
+
+	return true;
+}
 
 
 bool orderManager_addOrder(Order order)
@@ -36,6 +76,10 @@ bool orderManager_addOrder(Order order)
 
 	pthread_mutex_unlock(&orderManagerMutex);
 	
+	
+	if (!saveOrderList())
+		return false;
+
 	if ((order.direction == BUTTON_COMMAND && order.assignedIP == udp_myIP()) || order.direction != BUTTON_COMMAND)
 		ioDriver_setOrderButtonLamp(order.direction, order.floor);
 
@@ -57,7 +101,9 @@ bool orderManager_clearOrder(Order order)
 
 
 	pthread_mutex_unlock(&orderManagerMutex);
-
+	
+	if (!saveOrderList())
+		return false;
 	
 	if ((order.direction == BUTTON_COMMAND && order.assignedIP == udp_myIP()) || (order.direction != BUTTON_COMMAND))
 		ioDriver_clearOrderButtonLamp(order.direction, order.floor);
@@ -217,8 +263,10 @@ void orderManager_mergeMyOrdersWith(OrderList orders)
 		}
 	}
 	msgTool_sendOrderList(orderList, udp_myIP());
-
+	
 	pthread_mutex_unlock(&orderManagerMutex);	
+
+	saveOrderList();
 }
 
 bool orderManager_orderListEquals(OrderList rhs)

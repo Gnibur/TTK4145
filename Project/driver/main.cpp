@@ -5,6 +5,7 @@
 #include "udp.h"
 #include "OrderManager.h"
 #include <iostream>
+#include <signal.h>
 
 
 void checkForEvents();
@@ -19,13 +20,13 @@ int main()
 		std::cout << "Unable to initialize elevator hardware!\n";
 	}
 	stateMachine_initialize();
-	orderManager_init();
+	orderManager_recover();
 
 	udp_initialize(BROADCAST_PORT);
+
 	networkListener_run();
 
 	checkForEvents();
-
 
 	return 0;
 }
@@ -53,7 +54,7 @@ void checkForEvents()
 void checkButtonsFromEvents()
 {
 	static int oldButtonStates[3][N_FLOORS] = {{0}};
-	for (int button = BUTTON_CALL_UP; button < BUTTON_COMMAND; button++)
+	for (int button = BUTTON_CALL_UP; button <= BUTTON_COMMAND; button++)
 	{
 		for (int floor = 0; floor < N_FLOORS; floor++)
 		{

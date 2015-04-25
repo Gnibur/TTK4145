@@ -9,12 +9,18 @@
 #include "DataStructures.h"
 
 
-void orderManager_init();
+void orderManager_recover();
 
 // Pushing and popping from the orderlist
-bool 				orderManager_addOrder(Order order);
-bool 				orderManager_clearOrder(Order order);
-void				orderManager_mergeMyOrdersWith(OrderList orders);
+bool orderManager_addOrder(Order order);
+bool orderManager_clearOrder(Order order);
+
+
+
+void orderManager_mergeMyOrdersWith(OrderList orders);
+
+
+
 OrderList 			orderManager_getOrders();
 		
 // Logic and algorithms
