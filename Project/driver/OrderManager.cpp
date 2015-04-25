@@ -146,6 +146,9 @@ bool orderManager_shouldStopHere(int floor, motor_direction_t direction)
 		
 		if (orderPtr->floor == floor){
 			hasOrderHere = true;
+			
+			if (orderPtr->direction == BUTTON_COMMAND)
+				return true;
 
 			if (orderPtr->direction != BUTTON_COMMAND){
 
@@ -154,6 +157,7 @@ bool orderManager_shouldStopHere(int floor, motor_direction_t direction)
 				else if (direction == DIRECTION_DOWN && orderPtr->direction == BUTTON_CALL_DOWN)
 					hasOrderHereInSameDirection = true;
 			}
+
 		}
 		
 		if (direction == DIRECTION_UP && orderPtr->floor > floor)
