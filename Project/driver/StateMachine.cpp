@@ -13,6 +13,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <pthread.h>
+#include <assert.h>
 
 
 static int					lastFloor;
@@ -50,6 +51,7 @@ void stateMachine_eventButtonPressed(int floor, button_type_t button)
 		Order order(button, floor, udp_myIP());
 		
 		if(orderManager_addOrder(order)) {
+			msgTool_sendNewOrder(order, orderManager_getOrders(), udp_myIP());
 			stateMachine_eventNewOrderArrived(order);	
 		} else {
 			// panic
@@ -92,73 +94,69 @@ void stateMachine_eventNewOrderArrived(Order order)
 
 void stateMachine_eventFloorReached(int floor)
 {
+	assert(state == MOVING);
+
+	if (lastDirection == DIRECTION_UP)
+		assert(floor == lastFloor + 1);
+	else if (lastDirection == DIRECTION_DOWN)
+		assert(floor == lastFloor - 1); 		
+
 	ioDriver_setFloorIndicator(floor);
 
 	std::cout << "Floor reached: " << floor << std::endl;
 	lastFloor = floor;
 
-	switch (state) {
-	case MOVING: {
 
-		if (orderManager_shouldStopHere(floor, lastDirection))
-		{	
-			ioDriver_setMotorDirection(DIRECTION_STOP);
-			
-			//clearMyOrdersAt(floor);
 
-			OrderList ordersToClear = orderManager_getOrdersOnFloor(floor);
-	
-			for (auto it = ordersToClear.begin(); it != ordersToClear.end(); ++it) 
-			{
-				orderManager_clearOrder(*it);		
-				msgTool_sendClearOrder(*it, orderManager_getOrders(), udp_myIP());
-			}
-
-			ioDriver_setDoorOpenLamp();
-			timer_start();
-
-			state = DOOR_OPEN;
-		}
-		// FAILSAFE: STOP THE ELEVATOR AT BOUNDARY FLOORS ANYWAY.
-		else if (floor == 0 || floor == (N_FLOORS - 1)) {
-			ioDriver_setMotorDirection(DIRECTION_STOP);
-			state = IDLE;
-		}
-		break;
-	}
+	if (orderManager_shouldStopHere(floor, lastDirection))
+	{	
+		ioDriver_setMotorDirection(DIRECTION_STOP);
 		
-	case IDLE: case DOOR_OPEN:
-		std::cout << "FloorReached should not be called when idle or door open\n";
-	}	
+		//clearMyOrdersAt(floor);
+
+		OrderList ordersToClear = orderManager_getOrdersOnFloor(floor);
+
+		for (auto it = ordersToClear.begin(); it != ordersToClear.end(); ++it) 
+		{
+			orderManager_clearOrder(*it);		
+			msgTool_sendClearOrder(*it, orderManager_getOrders(), udp_myIP());
+		}
+
+		ioDriver_setDoorOpenLamp();
+		timer_start();
+
+		state = DOOR_OPEN;
+	}
+	// FAILSAFE: STOP THE ELEVATOR AT BOUNDARY FLOORS ANYWAY.
+	else if (floor == 0 || floor == (N_FLOORS - 1)) {
+		ioDriver_setMotorDirection(DIRECTION_STOP);
+		state = IDLE;
+	}
+	
+
 }
 
 void stateMachine_eventFloorLeft()
 {
-	if (state != MOVING)
-		std::cout << "It is not possible to leave a floor when idle\n";
+	assert(state == MOVING);
 }
 
 
 void stateMachine_eventDoorTimedOut()
 {
-	switch (state) {
-	case DOOR_OPEN: {
-		timer_reset();
-		ioDriver_clearDoorOpenLamp();
+	assert(state == DOOR_OPEN);
 
-		motor_direction_t nextDirection = orderManager_getNextDirection(lastFloor, lastDirection);
-		ioDriver_setMotorDirection(nextDirection);	
+	timer_reset();
+	ioDriver_clearDoorOpenLamp();
 
-		if (nextDirection != DIRECTION_STOP) {
-			state = MOVING;
-			lastDirection = nextDirection;			
-		 } else
-			state = IDLE;
-		break;
-	}	
-	case MOVING: case IDLE:
-		std::cout << "Door timeout should not happen door is not open\n";
-	}
+	motor_direction_t nextDirection = orderManager_getNextDirection(lastFloor, lastDirection);
+	ioDriver_setMotorDirection(nextDirection);	
+
+	if (nextDirection != DIRECTION_STOP) {
+		state = MOVING;
+		lastDirection = nextDirection;			
+	 } else
+		state = IDLE;
 }
 
 void stateMachine_eventOrderTimedOut(Order order)
