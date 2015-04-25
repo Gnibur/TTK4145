@@ -33,12 +33,7 @@ void auction_start(int floor, button_type_t direction)
 	pthread_mutex_lock(&auctionMutex);
 
 	if (auctions.find(*order) == auctions.end()){
-		int cost = orderManager_getCost(getLastFloor(), floor, getLastDirection(), direction);
-		std::cout << "Self adding cost " << cost << std::endl;
-		Offer offer(cost, floor, direction, udp_myIP());
-		auctions[*order] = std::vector<Offer>();
-		auctions[*order].push_back(offer);
-		
+		auctions[*order] = std::vector<Offer>();		
 		pthread_t auction_id;
 		pthread_create(&auction_id, NULL, runAuction, (void*)order);
 	}

@@ -60,8 +60,13 @@ void stateMachine_eventButtonPressed(int floor, button_type_t button)
 			// panic
 		}
 	}
-	else
+	else {
 		auction_start(floor, button);
+
+		int cost = orderManager_getCost(lastFloor, floor, lastDirection, button);
+		Offer offer(cost, floor, button, udp_myIP());
+		auction_addBid(offer);
+	}
 
 }
 
@@ -94,6 +99,16 @@ void stateMachine_eventNewOrderArrived(Order order)
 		}
 		break;	
 	}
+}
+
+
+void stateMachine_eventAuctionStarted(int floor, button_type_t button)
+{
+	assert(floor >= 0 && floor < N_FLOORS);
+	
+	int cost = orderManager_getCost(lastFloor, floor, lastDirection, button);
+	Offer offer(cost, floor, button, udp_myIP());
+	msgTool_sendOrderCostReply(offer, udp_myIP());
 }
 
 

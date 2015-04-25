@@ -91,10 +91,8 @@ void *listen(void*)
 			if (msgParser_getOrderCostRequestFromMessage(buf, &floor, &direction) == false)
 				continue;
 
-			int cost = orderManager_getCost(getLastFloor(), floor, getLastDirection(), direction);
+			stateMachine_eventAuctionStarted(floor, direction);
 			
-			Offer offer(cost, floor, direction, udp_myIP());
-			msgTool_sendOrderCostReply(offer, udp_myIP());
 			break;
 		}
 
