@@ -1,7 +1,7 @@
 #include "OrderManager.h"
-#include "udp.h"
 #include "IoDriver.h"
-#include "MsgParser.h"
+#include "msgTool.h"
+#include "udp.h"
 #include <ctime>
 #include <algorithm>
 #include <cmath>
@@ -217,8 +217,7 @@ void orderManager_mergeMyOrdersWith(OrderList orders)
 
 		}
 	}
-	std::string updateMsg = msgParser_makeOrderListMsg(orderList, udp_myIP());
-	udp_send(updateMsg.c_str(), strlen(updateMsg.c_str()) + 1);
+	msgTool_sendOrderList(orderList, udp_myIP());
 
 	pthread_mutex_unlock(&orderManagerMutex);	
 }

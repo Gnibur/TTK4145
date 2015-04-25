@@ -1,6 +1,6 @@
 #include "StateMachine.h"
 #include "IoDriver.h"
-#include "MsgParser.h"
+#include "msgTool.h"
 #include "AuctionManager.h"
 #include "OrderManager.h"
 #include "udp.h"
@@ -15,8 +15,8 @@
 #include <pthread.h>
 
 
-int					lastFloor;
-motor_direction_t	lastDirection;
+static int					lastFloor;
+static motor_direction_t	lastDirection;
 
 typedef enum state {
 	IDLE,
@@ -101,12 +101,8 @@ void stateMachine_eventFloorReached(int floor)
 	
 			for (auto it = ordersToClear.begin(); it != ordersToClear.end(); ++it) 
 			{
-				orderManager_clearOrder(*it);
-				std::string clearOrderMsg;
-				clearOrderMsg = msgParser_makeClearOrderMsg(*it, orderManager_getOrders(), udp_myIP());
-				udp_send(clearOrderMsg.c_str(), strlen(clearOrderMsg.c_str()) + 1);
-
-				//usleep(10000);
+				orderManager_clearOrder(*it);		
+				msgTool_sendClearOrder(*it, orderManager_getOrders(), udp_myIP());
 			}
 
 			ioDriver_setDoorOpenLamp();

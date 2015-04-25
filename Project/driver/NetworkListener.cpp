@@ -1,7 +1,10 @@
 #include <pthread.h>
 
 #include "udp.h"
+
+#include "msgTool.h"
 #include "MsgParser.h"
+
 #include "OrderManager.h"
 #include "StateMachine.h"
 #include "AuctionManager.h"
@@ -80,10 +83,7 @@ void *listen(void*)
 			int cost = orderManager_getCost(getLastFloor(), floor, getLastDirection(), direction);
 			
 			Offer offer(cost, floor, direction, udp_myIP());
-			std::string offerMsg = msgParser_makeOrderCostReplyMsg(offer, udp_myIP());
-
-			udp_send(offerMsg.c_str(), strlen(offerMsg.c_str()) + 1);
-			//usleep(10000);
+			msgTool_sendOrderCostReply(offer, udp_myIP());
 			break;
 		}
 

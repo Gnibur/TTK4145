@@ -1,8 +1,8 @@
 #include "AuctionManager.h"
 #include "DataStructures.h"
+#include "msgTool.h"
 #include "udp.h"
 #include "OrderManager.h"
-#include "MsgParser.h"
 #include "StateMachine.h"
 #include <pthread.h>
 #include <time.h>
@@ -43,7 +43,6 @@ void auction_start(int floor, button_type_t direction)
 		pthread_create(&auction_id, NULL, runAuction, (void*)order);
 	}
 	else {
-		std::cout << "Already found order\n";
 		delete order;
 	}
 	pthread_mutex_unlock(&auctionMutex);
@@ -55,9 +54,7 @@ void *runAuction(void *args)
 
 	std::cout << "AUCTION STARTED for floor " << order->floor << ", dir " << order->direction << std::endl;
 
-	std::string orderCostRequestMsg;
-	orderCostRequestMsg = msgParser_makeOrderCostRequestMsg(order->floor, order->direction, udp_myIP());
-	udp_send(orderCostRequestMsg.c_str(), strlen(orderCostRequestMsg.c_str()) + 1);
+	msgTool_sendOrderCostRequest(order->floor, order->direction, udp_myIP());
 	
 	time_t timeAtStart = time(0);
 	while (time(0) < timeAtStart + AUCTION_TIME)
@@ -78,9 +75,7 @@ void *runAuction(void *args)
 
 	
 	orderManager_addOrder(*order);
-	std::string newOrderMessage;
-	newOrderMessage = msgParser_makeNewOrderMsg(*order, orderManager_getOrders(), udp_myIP());
-	udp_send(newOrderMessage.c_str(), strlen(newOrderMessage.c_str()) + 1);
+	msgTool_sendNewOrder(*order, orderManager_getOrders(), udp_myIP());
 	stateMachine_eventNewOrderArrived(*order);
 	
 	
