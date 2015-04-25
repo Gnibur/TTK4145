@@ -36,6 +36,7 @@ void stateMachine_initialize()
 	ioDriver_setMotorDirection(DIRECTION_STOP);
 	lastFloor		= ioDriver_getFloorSensorValue();
 	lastDirection	= DIRECTION_UP;
+	state 			= IDLE;
 	auctionManager_init();
 }
 

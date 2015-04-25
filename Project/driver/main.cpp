@@ -33,7 +33,7 @@ int main()
 
 void checkForEvents()
 {
-	int oldFloorReading = -1;
+	int oldFloorReading = ioDriver_getFloorSensorValue();
 	while (1)
 	{
 		checkButtonsFromEvents();
