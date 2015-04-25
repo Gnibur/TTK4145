@@ -19,7 +19,7 @@ motor_direction_t	lastDirection;
 typedef enum state {
 	IDLE,
 	MOVING,
-	DOOROPEN
+	DOOR_OPEN
 } state_t;
 
 static state_t state;
@@ -36,17 +36,18 @@ void stateMachine_buttonPressed(int floor, button_type_t button)
 
 	if (button == BUTTON_COMMAND)
 	{	
-		Order order(button, floor, udp_myIP(), -1);
-		if(orderManager_newOrder(order))
-		{
-        	//usleep(10000);
+		Order order(button, floor, udp_myIP());
+		
+		if(orderManager_newOrder(order)) {
 			stateMachine_newOrder(order);
+		} else {
+			// panic 
 		}
+
 	}
 	else
-	{
 		auction_start(floor, button);
-	}
+
 }
 
 void stateMachine_newOrder(Order order)
@@ -55,7 +56,7 @@ void stateMachine_newOrder(Order order)
 	case IDLE:
 		stateMachine_updateDirection();
 		break;
-	case DOOROPEN:
+	case DOOR_OPEN:
 		break;
 	case MOVING:
 		break;
@@ -64,40 +65,45 @@ void stateMachine_newOrder(Order order)
 
 void stateMachine_floorReached(int floor)
 {
-	std::cout << "Floor reached: " << floor << std::endl;
-	lastFloor = floor;
+	switch (state) {
+	case MOVING: {
+		ioDriver_setFloorIndicator(floor);
 
-	ioDriver_setFloorIndicator(floor);
-	OrderList ordersToClear = orderManager_getOrdersOnFloor(floor);
+		std::cout << "Floor reached: " << floor << std::endl;
+		lastFloor = floor;
 
-	if (stateMachine_shouldIStopHere(ordersToClear))
-	{
-		ioDriver_setMotorDirection(DIRECTION_STOP);
-
-		for (auto it = ordersToClear.begin(); it != ordersToClear.end(); ++it) 
+		OrderList ordersToClear = orderManager_getOrdersOnFloor(floor);
+		if (stateMachine_shouldIStopHere(ordersToClear))
 		{
-			orderManager_clearOrder(*it);
-			std::string clearOrderMsg;
-			clearOrderMsg = msgParser_makeClearOrderMsg(*it, orderManager_getOrders(), udp_myIP());
-			udp_send(clearOrderMsg.c_str(), strlen(clearOrderMsg.c_str()) + 1);
+			
+		
+			ioDriver_setMotorDirection(DIRECTION_STOP);
 
-			//usleep(10000);
+			for (auto it = ordersToClear.begin(); it != ordersToClear.end(); ++it) 
+			{
+				orderManager_clearOrder(*it);
+				std::string clearOrderMsg;
+				clearOrderMsg = msgParser_makeClearOrderMsg(*it, orderManager_getOrders(), udp_myIP());
+				udp_send(clearOrderMsg.c_str(), strlen(clearOrderMsg.c_str()) + 1);
+
+				//usleep(10000);
+			}
+
+			ioDriver_setDoorOpenLamp();
+			timer_start();
+
+			state = DOOR_OPEN;
 		}
-
-		ioDriver_setDoorOpenLamp();
-		timer_start();
-
-		state = DOOROPEN;
-	}
-	// FAILSAFE: STOP THE ELEVATOR AT BOUNDARY FLOORS ANYWAY.
-	else
-	{
-		if ((floor == 0) || (floor == N_FLOORS - 1))
-		{
+		// FAILSAFE: STOP THE ELEVATOR AT BOUNDARY FLOORS ANYWAY.
+		else if (floor == 0 || floor == (N_FLOORS - 1)) {
 			ioDriver_setMotorDirection(DIRECTION_STOP);
 			state = IDLE;
 		}
 	}
+	break;	
+	case IDLE: case DOOR_OPEN:
+		std::cout << "FloorReached should not be called when idle or door open\n";
+	}	
 }
 
 bool stateMachine_shouldIStopHere(OrderList ordersOnFloor)

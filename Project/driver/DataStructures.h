@@ -19,7 +19,7 @@ public:
 	Order(	button_type_t direction, 
 			int floor, 
 			std::string assignedIP, 
-			time_t timeAssigned);
+			time_t timeAssigned = -1);
 
 	bool isValid();
 
