@@ -86,6 +86,10 @@ bool orderManager_addOrder(Order order, bool sendupdate)
 
 	if (saveOrderList("Backup1.txt", newOrderList) || saveOrderList("Backup2.txt", newOrderList))
 		orderAddedToStorage = true;
+	else {
+		saveOrderList("Backup1.txt", orderList);
+		saveOrderList("Backup2.txt", orderList);
+	}
 
 	if (orderAddedToList && orderAddedToStorage)
 	{
@@ -132,6 +136,10 @@ bool orderManager_clearOrder(Order order, bool sendupdate)
 
 	if (saveOrderList("Backup1.txt", newOrderList) || saveOrderList("Backup2.txt", newOrderList))
 		orderClearedFromStorage = true;
+	else {
+		saveOrderList("Backup1.txt", orderList);
+		saveOrderList("Backup2.txt", orderList);
+	}
 
 	if (orderClearedFromList && orderClearedFromStorage)
 	{
@@ -179,6 +187,10 @@ bool orderManager_clearOrdersAt(int floor, std::string orderIP, bool sendupdate)
 
 	if (saveOrderList("Backup1.txt", newOrderList) || saveOrderList("Backup2.txt", newOrderList))
 		ordersClearedFromStorage = true;
+	else {
+		saveOrderList("Backup1.txt", orderList);
+		saveOrderList("Backup2.txt", orderList);
+	}
 
 	if (ordersClearedFromList && ordersClearedFromStorage)
 	{
