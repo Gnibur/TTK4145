@@ -6,7 +6,6 @@
 #include "OrderManager.h"
 #include "BackupWatcher.h"
 #include <iostream>
-#include <signal.h>
 
 
 void checkForEvents();
@@ -14,16 +13,11 @@ void checkButtonsFromEvents();
 
 int main()
 {
-	std::cout << "Hello and welcome to the elevator program!\n";
-	std::cout << "Initalizing driver..\n";
-	
 	FSM_initialize();
 
 	//startBackupProcess();
 
-	orderManager_recoverFromBackup();
-
-	udp_initialize(BROADCAST_PORT);
+	orderManager_recoverFromDisk();
 
 	networkListener_run();
 

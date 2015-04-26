@@ -58,8 +58,8 @@ void FSM_handleButtonPressed(int floor, button_type_t button)
 	if (button == BUTTON_COMMAND) 
 	{	
 		Order order(floor, button, getMyIP());
-		assert(orderManager_addOrder(order, SEND_UPDATE));
-		FSM_handleNewOrderArrived(order);	
+		if (orderManager_addOrder(order, SEND_UPDATE))
+			FSM_handleNewOrderArrived(order);	
 	}
 	else 
 	{
@@ -97,8 +97,8 @@ void FSM_handleNewOrderArrived(Order order)
 		break;	
 	case DOOR_OPEN:
 		if (order.floor == lastFloor && order.assignedIP == getMyIP()){
-			assert(orderManager_clearOrder(order, SEND_UPDATE));
-			doortimer_start(); 
+			if (orderManager_clearOrder(order, SEND_UPDATE))
+				doortimer_start();
 		}
 		break;	
 	}
@@ -137,10 +137,13 @@ void FSM_handleFloorReached(int floor)
 	{	
 		ioDriver_setMotorDirection(DIRECTION_STOP);
 		
-		assert(orderManager_clearOrdersAt(floor, getMyIP(), SEND_UPDATE) == true);
-		ioDriver_setDoorOpenLamp();
-		doortimer_start();
-		state = DOOR_OPEN;
+		if (orderManager_clearOrdersAt(floor, getMyIP(), SEND_UPDATE) == true) {
+			ioDriver_setDoorOpenLamp();
+			doortimer_start();
+			state = DOOR_OPEN;
+		}
+		else 
+			state = IDLE;
 	}
 
 	// FAILSAFE: STOP THE ELEVATOR AT BOUNDARY FLOORS ANYWAY.
@@ -178,7 +181,7 @@ void FSM_handleOrderTimedOut(Order order)
 
 	assert(order.isValid());
 
-	assert(orderManager_addOrder(order, SEND_UPDATE));
+	orderManager_addOrder(order, SEND_UPDATE);
 }
 
 

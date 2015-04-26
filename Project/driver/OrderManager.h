@@ -31,7 +31,7 @@ public:
 
 typedef std::vector<Order> OrderList;
 
-void orderManager_recoverFromBackup();
+void orderManager_recoverFromDisk();
 
 #define SEND_UPDATE 		true
 #define DONT_SEND_UPDATE 	false

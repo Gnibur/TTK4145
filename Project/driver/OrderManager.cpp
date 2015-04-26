@@ -19,7 +19,7 @@ static pthread_mutex_t orderManagerMutex = PTHREAD_MUTEX_INITIALIZER;
 static bool saveOrderList(std::string filename, OrderList order);
 static bool retrieveOrderList(std::string filename);
 
-void orderManager_recoverFromBackup()
+void orderManager_recoverFromDisk()
 {
 	if (!retrieveOrderList("Backup1.txt"))
 		retrieveOrderList("Backup2.txt");			

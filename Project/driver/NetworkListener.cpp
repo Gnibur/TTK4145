@@ -21,6 +21,7 @@ static void synchronizeLists(std::string message);
 
 void networkListener_run()
 {
+	udp_initialize(BROADCAST_PORT);
 	pthread_t networkListener;
 	pthread_create(&networkListener, NULL, listen, NULL);
 }
