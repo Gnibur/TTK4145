@@ -38,7 +38,7 @@ BackupProcess: BackupProcess.c
 #	$(CCC) $(CCFLAGS) -c $< 
 
 clean:
-	rm -r *.o 
+	rm -rf heis BackupProcess *.o *.cpp~ *.c~ *.h~
 
 rebuild:	clean all
 

@@ -15,6 +15,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <assert.h>
 
 #include <unistd.h>
 #include <pthread.h>
@@ -78,13 +79,6 @@ bool udp_receive(char *data, size_t dataLength)
  
 	ssize_t bytes_received;
 
-	/*struct timeval tv;
-	tv.tv_sec = 0;
-	tv.tv_usec = 100000;
-	if (setsockopt(socketfd, SOL_SOCKET, SO_RCVTIMEO,&tv,sizeof(tv)) < 0) {
-	perror("Error");
-	}*/
-
 	bytes_received = recv(recvsocketfd, data, dataLength, 0);
 	if (bytes_received != -1)
 		return true;
@@ -132,5 +126,6 @@ void findMyIP()
 
 std::string getMyIP ()
 {
+	assert(isValidIP(myIP));
 	return myIP;
 }

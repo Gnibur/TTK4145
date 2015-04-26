@@ -29,7 +29,10 @@ static motor_direction_t	lastDirection;
 
 void FSM_doSafeStop(int signum)
 {
+	while (ioDriver_getFloorSensorValue() == -1)
+		;
 	ioDriver_setMotorDirection(DIRECTION_STOP);
+	ioDriver_setFloorIndicator(lastFloor);
 	exit(0);
 }
 
@@ -184,8 +187,6 @@ void FSM_handleOrderTimedOut(Order order)
 	std::cout << "----------------------\n";
 
 	assert(order.isValid());
-	
-	orderManager_clearOrder(order, DONT_SEND_UPDATE);
 
 	if (order.direction == BUTTON_COMMAND && order.assignedIP == getMyIP())
 		FSM_handleNewOrderArrived(order);
