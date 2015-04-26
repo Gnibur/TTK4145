@@ -188,14 +188,18 @@ void FSM_handleOrderTimedOut(Order order)
 
 	assert(order.isValid());
 
-	if (order.direction == BUTTON_COMMAND && order.assignedIP == getMyIP())
+	
+	if (order.direction == BUTTON_COMMAND && order.assignedIP == getMyIP()){
+		orderManager_addOrder(order, DONT_SEND_UPDATE);
 		FSM_handleNewOrderArrived(order);
-	else {
+	} else {
 		auction_start(order.floor, order.direction);
 		int cost = orderManager_getOrderCost(order.floor, order.direction, lastFloor, lastDirection);
 		Offer offer(cost, order.floor, order.direction, getMyIP());
 		auction_addBid(offer);
-	}	
+		orderManager_clearOrder(order, SEND_UPDATE);
+	}
+		
 }
 
 

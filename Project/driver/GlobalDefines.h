@@ -10,7 +10,7 @@
 
 #define DOOR_OPEN_TIME 3
 
-#define ORDER_TIMEOUT 30
+#define ORDER_TIMEOUT 45
 
 #define BROADCAST_PORT 2222
 

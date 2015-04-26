@@ -367,6 +367,10 @@ motor_direction_t orderManager_getNextMotorDirection(int floor, motor_direction_
 int orderManager_getOrderCostSimple(int orderFloor, button_type_t orderButton, int lastFloor, motor_direction_t lastDirection)
 {
 	int cost = 0;
+		
+	if (orderFloor == lastFloor)
+		return 0;
+	
 	cost += abs(lastFloor - orderFloor);
 	
 	motor_direction_t orderDirection;
@@ -401,11 +405,13 @@ int orderManager_getOrderCost(int orderFloor, button_type_t orderButton, int las
 
 	pthread_mutex_lock(&orderManagerMutex);
 
-	// A busy elevator will have a higher cost
-	for (auto it = orderList.begin(); it != orderList.end(); ++it)
-	{
-		if (it->assignedIP == getMyIP())
-			cost += 3 * orderManager_getOrderCostSimple(it->floor, it->direction, lastFloor, lastDirection);
+	if (cost != 0){
+		// A busy elevator will have a higher cost
+		for (auto it = orderList.begin(); it != orderList.end(); ++it)
+		{
+			if (it->assignedIP == getMyIP())
+				cost += 3 * orderManager_getOrderCostSimple(it->floor, it->direction, lastFloor, lastDirection);
+		}
 	}
 
 	pthread_mutex_unlock(&orderManagerMutex);
