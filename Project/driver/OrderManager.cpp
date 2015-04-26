@@ -20,7 +20,7 @@ static pthread_mutex_t orderManagerMutex = PTHREAD_MUTEX_INITIALIZER;;
 static bool saveOrderList(std::string filename, OrderList order);
 static bool retrieveOrderList(std::string filename);
 
-void orderManager_recover()
+void orderManager_recoverFromBackup()
 {
 	if (!retrieveOrderList("Backup1.txt"))
 		retrieveOrderList("Backup2.txt");			
@@ -213,7 +213,7 @@ bool orderManager_clearOrdersAt(int floor, std::string orderIP, bool sendupdate)
 }
 
 
-bool orderManager_shouldStopHere(int floor, motor_direction_t direction) 
+bool orderManager_shouldElevatorStopHere(int floor, motor_direction_t direction) 
 {
 	bool hasOrderHere = false;
 	bool hasOrderHereInSameDirection = false;
@@ -256,7 +256,7 @@ bool orderManager_shouldStopHere(int floor, motor_direction_t direction)
 
 
 
-motor_direction_t orderManager_getNextDirection(int floor, motor_direction_t lastDirection)
+motor_direction_t orderManager_getNextMotorDirection(int floor, motor_direction_t lastDirection)
 {
 	OrderList myPendingOrders;
 	for (auto orderPtr = orderList.begin(); orderPtr != orderList.end(); ++orderPtr)
@@ -299,36 +299,36 @@ motor_direction_t orderManager_getNextDirection(int floor, motor_direction_t las
 	}	
 }
 
-int orderManager_getCost(int lastFloor, int newFloor, motor_direction_t lastDirection, button_type_t wantedDirection)
+int orderManager_getOrderCost(int orderFloor, button_type_t orderButton, int lastFloor, motor_direction_t lastDirection)
 {
-	int cost = abs(lastFloor - newFloor);
-	motor_direction_t wantedMotorDirection;
+	int cost = 0;
+	cost += abs(lastFloor - orderFloor);
 	
-	// Regular cost function
-	if (wantedDirection == BUTTON_CALL_UP)
-		wantedMotorDirection = DIRECTION_UP;
-	else if (wantedDirection == BUTTON_CALL_DOWN)
-		wantedMotorDirection = DIRECTION_DOWN;
-	else
-		wantedMotorDirection = DIRECTION_STOP;
 
-	if (((lastDirection == DIRECTION_UP) && (newFloor < lastFloor)) || ((lastDirection == DIRECTION_DOWN) && (newFloor > lastFloor)))
+	motor_direction_t orderDirection;
+	
+
+	if (orderButton == BUTTON_CALL_UP)			orderDirection = DIRECTION_UP;
+	else if (orderButton == BUTTON_CALL_DOWN)	orderDirection = DIRECTION_DOWN;
+	else										orderDirection = DIRECTION_STOP;
+
+	if (((lastDirection == DIRECTION_UP) && (orderFloor < lastFloor)) || ((lastDirection == DIRECTION_DOWN) && (orderFloor > lastFloor)))
 	{
 		cost += N_FLOORS * 2;
-		if (wantedMotorDirection == lastDirection)
+		if (orderDirection == lastDirection)
 			cost += N_FLOORS;
 	}
 	else
 	{
-		if (lastDirection != wantedMotorDirection)
+		if (lastDirection != orderDirection)
 			cost += N_FLOORS;
 	}
 
-	// Expansion for the cost function, so one elevator doesn't take all.
+	// A busy elevator will have a higher cost
 	for (auto it = orderList.begin(); it != orderList.end(); ++it)
 	{
-		if (it->assignedIP.compare(udp_myIP()) == 0)
-			cost += 2;
+		if (it->assignedIP == udp_myIP())
+			cost += 1;
 	}
 
 	return cost;

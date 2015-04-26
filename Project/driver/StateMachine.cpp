@@ -60,7 +60,7 @@ void stateMachine_eventButtonPressed(int floor, button_type_t button)
 	else {
 		auction_start(floor, button);
 
-		int cost = orderManager_getCost(lastFloor, floor, lastDirection, button);
+		int cost = orderManager_getOrderCost(floor, button, lastFloor, lastDirection);
 		Offer offer(cost, floor, button, udp_myIP());
 		auction_addBid(offer);
 	}
@@ -81,7 +81,7 @@ void stateMachine_eventNewOrderArrived(Order order)
 					state = DOOR_OPEN;				
 				}
 			} else {
-				lastDirection = orderManager_getNextDirection(lastFloor, lastDirection);
+				lastDirection = orderManager_getNextMotorDirection(lastFloor, lastDirection);
 				ioDriver_setMotorDirection(lastDirection);	
 				state = MOVING;
 			}
@@ -103,7 +103,7 @@ void stateMachine_eventAuctionStarted(int floor, button_type_t button)
 {
 	assert(floor >= 0 && floor < N_FLOORS);
 	
-	int cost = orderManager_getCost(lastFloor, floor, lastDirection, button);
+	int cost = orderManager_getOrderCost(floor, button, lastFloor, lastDirection);
 	Offer offer(cost, floor, button, udp_myIP());
 	msgTool_sendOrderCostReply(offer, udp_myIP());
 }
@@ -126,7 +126,7 @@ void stateMachine_eventFloorReached(int floor)
 
 
 
-	if (orderManager_shouldStopHere(floor, lastDirection))
+	if (orderManager_shouldElevatorStopHere(floor, lastDirection))
 	{	
 		ioDriver_setMotorDirection(DIRECTION_STOP);
 		
@@ -163,7 +163,7 @@ void stateMachine_eventDoorTimedOut()
 	timer_reset();
 	ioDriver_clearDoorOpenLamp();
 
-	motor_direction_t nextDirection = orderManager_getNextDirection(lastFloor, lastDirection);
+	motor_direction_t nextDirection = orderManager_getNextMotorDirection(lastFloor, lastDirection);
 	ioDriver_setMotorDirection(nextDirection);	
 
 	if (nextDirection != DIRECTION_STOP) {

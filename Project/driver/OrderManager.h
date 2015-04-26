@@ -11,7 +11,7 @@
 #define SEND_UPDATE true
 #define DONT_SEND_UPDATE false
 
-void orderManager_recover();
+void orderManager_recoverFromBackup();
 
 
 bool orderManager_addOrder(Order order, bool sendupdate);
@@ -21,8 +21,8 @@ void orderManager_mergeOrderListWith(OrderList orders, bool sendupdate);
 
 Order orderManager_checkForOrderTimeout();
 
-bool 				orderManager_shouldStopHere(int floor, motor_direction_t direction); 
-motor_direction_t	orderManager_getNextDirection(int floor, motor_direction_t lastDirection);
-int					orderManager_getCost(int lastFloor, int newFloor, motor_direction_t lastDirection, button_type_t wantedDirection);
+bool 				orderManager_shouldElevatorStopHere(int floor, motor_direction_t direction); 
+motor_direction_t	orderManager_getNextMotorDirection(int floor, motor_direction_t lastDirection);
+int					orderManager_getOrderCost(int orderFloor, button_type_t orderDirection, int lastFloor, motor_direction_t lastDirection);
 
 #endif

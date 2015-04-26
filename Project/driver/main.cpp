@@ -18,7 +18,7 @@ int main()
 	
 	stateMachine_initialize();
 
-	orderManager_recover();
+	orderManager_recoverFromBackup();
 
 	udp_initialize(BROADCAST_PORT);
 
