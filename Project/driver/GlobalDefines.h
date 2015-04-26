@@ -12,6 +12,7 @@
 
 #define ORDER_TIMEOUT 30
 
+#define BROADCAST_PORT 2222
 
 typedef enum {
 	DIRECTION_DOWN,

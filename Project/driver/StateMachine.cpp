@@ -4,7 +4,7 @@
 #include "OrderManager.h"
 #include "MsgParser.h"
 #include "udp.h"
-#include "Timer.h"
+#include "DoorTimer.h"
 #include <algorithm>
 #include <string>
 #include <cstring>
@@ -77,6 +77,10 @@ void FSM_handleButtonPressed(int floor, button_type_t button)
 void FSM_handleNewOrderArrived(Order order)
 {
 	assert(order.isValid());
+
+	std::cout << "Order arrived: Floor: "	<< order.floor 
+				<< ", Dir " << order.direction 
+				<< ", IP " << order.assignedIP << std::endl;
 
 	switch (state){
 	case IDLE: 

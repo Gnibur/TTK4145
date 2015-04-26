@@ -31,7 +31,8 @@ public:
 
 typedef std::vector<Order> OrderList;
 
-void orderManager_recoverFromDisk();
+// Recover will recover the orderlist from disk and asking the rest of the network
+void orderManager_recover();
 
 #define SEND_UPDATE 		true
 #define DONT_SEND_UPDATE 	false

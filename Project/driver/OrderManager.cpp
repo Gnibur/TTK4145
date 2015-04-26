@@ -19,11 +19,16 @@ static pthread_mutex_t orderManagerMutex = PTHREAD_MUTEX_INITIALIZER;
 static bool saveOrderList(std::string filename, OrderList order);
 static bool retrieveOrderList(std::string filename, OrderList *orders);
 
-void orderManager_recoverFromDisk()
+void orderManager_recover()
 {
 	pthread_mutex_lock(&orderManagerMutex);	
 	if (!retrieveOrderList("Backup1.txt", &orderList))
-		retrieveOrderList("Backup2.txt", &orderList);	
+		retrieveOrderList("Backup2.txt", &orderList);
+
+	std::string orderListMsg;
+	orderListMsg = msgParser_makeOrderListMsg(orderList, getMyIP());
+	udp_send(orderListMsg.c_str(), strlen(orderListMsg.c_str()) + 1);	
+			
 	pthread_mutex_unlock(&orderManagerMutex);		
 }
 

@@ -1,7 +1,7 @@
 #include "StateMachine.h"
 #include "NetworkListener.h"
 #include "IoDriver.h"
-#include "Timer.h"
+#include "DoorTimer.h"
 #include "udp.h"
 #include "OrderManager.h"
 #include "BackupWatcher.h"
@@ -17,9 +17,11 @@ int main()
 
 	//startBackupProcess();
 
-	orderManager_recoverFromDisk();
-
 	networkListener_run();
+
+	orderManager_recover();
+
+
 
 	checkForEvents();
 }

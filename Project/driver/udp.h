@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <string>
 
-#define BROADCAST_PORT 2222
+
 
 bool isValidIP(std::string ip);
 
