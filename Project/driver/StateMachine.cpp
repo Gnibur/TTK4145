@@ -76,6 +76,7 @@ void FSM_handleButtonPressed(int floor, button_type_t button)
 
 void FSM_handleNewOrderArrived(Order order)
 {
+	std::cout << "Arrived at state machine!\n";	
 	assert(order.isValid());
 
 	std::cout << "Order arrived: Floor: "	<< order.floor 
@@ -159,7 +160,7 @@ void FSM_handleFloorReached(int floor)
 void FSM_handleDoorTimedOut()
 {
 	assert(state == DOOR_OPEN);
-
+	
 	doortimer_reset();
 	ioDriver_clearDoorOpenLamp();
 
@@ -183,9 +184,17 @@ void FSM_handleOrderTimedOut(Order order)
 	std::cout << "----------------------\n";
 
 	assert(order.isValid());
+	
+	orderManager_clearOrder(order, DONT_SEND_UPDATE);
 
-	orderManager_addOrder(order, SEND_UPDATE);
-	FSM_handleNewOrderArrived(order);
+	if (order.direction == BUTTON_COMMAND && order.assignedIP == getMyIP())
+		FSM_handleNewOrderArrived(order);
+	else {
+		auction_start(order.floor, order.direction);
+		int cost = orderManager_getOrderCost(order.floor, order.direction, lastFloor, lastDirection);
+		Offer offer(cost, order.floor, order.direction, getMyIP());
+		auction_addBid(offer);
+	}	
 }
 
 
