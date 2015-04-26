@@ -13,14 +13,13 @@
 
 void orderManager_recover();
 
+
 bool orderManager_addOrder(Order order, bool sendupdate);
 bool orderManager_clearOrder(Order order, bool sendupdate);
 bool orderManager_clearOrdersAt(int floor, std::string orderIP, bool sendupdate);
 void orderManager_mergeOrderListWith(OrderList orders, bool sendupdate);
 
 Order orderManager_checkForOrderTimeout();
-
-
 
 bool 				orderManager_shouldStopHere(int floor, motor_direction_t direction); 
 motor_direction_t	orderManager_getNextDirection(int floor, motor_direction_t lastDirection);

@@ -16,14 +16,9 @@
 
 std::map<Order, std::vector<Offer>> auctions;
 
-static pthread_mutex_t auctionMutex;
+static pthread_mutex_t auctionMutex = PTHREAD_MUTEX_INITIALIZER;
 
 void *runAuction(void *args);
-
-void auctionManager_init()
-{
-	pthread_mutex_init(&auctionMutex, NULL);
-}
 
 
 void auction_start(int floor, button_type_t direction)
