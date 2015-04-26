@@ -7,7 +7,7 @@ CFLAGS = -g -Wall -std=c++11
 CCFLAGS = -g -Wall -std=c99
 
 # Linker flags go here.
-LDFLAGS =  -lm -lcomedi -lstdc++ -lpthread
+LDFLAGS =  -lm -lcomedi -lstdc++ -lpthread -lrt
 
 SOURCES = $(wildcard *.cpp)
 #CSOURCES = $(wildcard *.c)
@@ -16,8 +16,14 @@ OBJECTS := $(SOURCES:%.cpp=%.o)
 #COBJECTS := $(CSOURCES:%.c=%.o)
 
 #$(COBJECTS)
-all:  $(OBJECTS) 
+all: heis BackupProcess  
+		
+
+heis: $(OBJECTS)
 	$(CC) $(LDFLAGS) -o $@ $^ 
+
+BackupProcess: BackupProcess.c
+	gcc BackupProcess.c -o BackupProcess
 
 %.o: %.cpp %.h
 	$(CC) $(CFLAGS) -c $<
@@ -32,7 +38,7 @@ all:  $(OBJECTS)
 #	$(CCC) $(CCFLAGS) -c $< 
 
 clean:
-	rm -r *.o $(TARGET)
+	rm -r *.o 
 
 rebuild:	clean all
 

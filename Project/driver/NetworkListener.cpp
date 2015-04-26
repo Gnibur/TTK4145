@@ -127,20 +127,10 @@ void *listen(void*)
 
 void synchronizeLists(std::string message)
 {
-	/*OrderList receivedOrderList;
+	OrderList receivedOrderList;
 	if (msgParser_getOrderListFromMessage(message, &receivedOrderList) == false)
 		return;
 
-
-	//OrderList receivedOrderList = orderManager_getOrders();
-	if (!(orderManager_orderListEquals(receivedOrderList)))
-	{
-		std::cout << "OrderList is not equal!\n";
-		orderManager_mergeMyOrdersWith(receivedOrderList, DONT_SEND_UPDATE);
-		msgTool_sendOrderList(orderManager_getOrders(), udp_myIP());
-	}
-	*/
-
-
+	orderManager_mergeOrderListWith(receivedOrderList, SEND_UPDATE);
 }
 

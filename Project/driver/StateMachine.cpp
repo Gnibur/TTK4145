@@ -184,7 +184,7 @@ void stateMachine_eventOrderTimedOut(Order order)
 	std::cout << "----------------------\n";
 	orderManager_clearOrder(order, SEND_UPDATE);
 
-
+	
 	// TODO: Needs failsafe method, so the elevator doesn't die here and everything is lost..
-	stateMachine_eventButtonPressed(order.floor, order.direction);
+	orderManager_addOrder(order, SEND_UPDATE);
 }

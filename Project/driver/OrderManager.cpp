@@ -213,6 +213,37 @@ bool orderManager_clearOrdersAt(int floor, std::string orderIP, bool sendupdate)
 }
 
 
+void orderManager_mergeOrderListWith(OrderList orders, bool sendupdate)
+{
+	bool wasUpdated = false;	
+	pthread_mutex_lock(&orderManagerMutex);
+
+	for (auto it = orders.begin(); it != orders.end(); ++it)
+	{
+		if (std::find(orderList.begin(), orderList.end(), (*it)) == orderList.end())
+		{
+			std::cout << "Pushing back this with IP: " << it->assignedIP << std::endl;
+			it->timeAssigned = time(0);
+			orderList.push_back((*it));
+			wasUpdated = true;
+		if ((it->direction == BUTTON_COMMAND && it->assignedIP == udp_myIP()) || (it->direction != BUTTON_COMMAND))
+			ioDriver_setOrderButtonLamp(it->direction, it->floor);
+		}
+	}
+
+	if (sendupdate == true && wasUpdated){
+		std::cout << "Orders were merged\n";
+		std::string msg;
+		msg = msgParser_makeOrderListMsg(orderList, udp_myIP());
+		udp_send(msg.c_str(), strlen(msg.c_str()) + 1);
+	}
+	
+	pthread_mutex_unlock(&orderManagerMutex);	
+
+	if (!(saveOrderList("Backup1.txt", orderList) || saveOrderList("Backup2.txt", orderList)) )
+		std::cout << "Failed saving merged orders\n";
+}
+
 bool orderManager_shouldElevatorStopHere(int floor, motor_direction_t direction) 
 {
 	bool hasOrderHere = false;
@@ -334,65 +365,13 @@ int orderManager_getOrderCost(int orderFloor, button_type_t orderButton, int las
 	return cost;
 }
 
-void orderManager_mergeMyOrdersWith(OrderList orders, bool sendupdate)
-{
-	pthread_mutex_lock(&orderManagerMutex);
-	
-	for (auto it = orders.begin(); it != orders.end(); ++it)
-	{
-		if (std::find(orderList.begin(), orderList.end(), (*it)) == orderList.end())
-		{
-			std::cout << "Pushing back this with IP: " << it->assignedIP << std::endl;
-			it->timeAssigned = time(0);
-			orderList.push_back((*it));
-		if ((it->direction == BUTTON_COMMAND && it->assignedIP == udp_myIP()) || (it->direction != BUTTON_COMMAND))
-			ioDriver_setOrderButtonLamp(it->direction, it->floor);
-		}
-	}
-	msgTool_sendOrderList(orderList, udp_myIP());
-
-	if (sendupdate == true){
-
-
-	}
-	
-	pthread_mutex_unlock(&orderManagerMutex);	
-
-	if (!(saveOrderList("Backup1.txt", orderList) || saveOrderList("Backup2.txt", orderList)) )
-		std::cout << "Failed saving merged orders\n";
-}
-
-bool orderManager_orderListEquals(OrderList rhs)
-{
-	pthread_mutex_lock(&orderManagerMutex);
-	std::sort(rhs.begin(), rhs.end());
-	std::sort(orderList.begin(), orderList.end());
-	auto rhsIterator = rhs.begin();
-	auto lhsIterator = orderList.begin();
-	bool returnVal = true;
-	while (lhsIterator != orderList.end())
-	{
-		if (rhsIterator == rhs.end())
-			returnVal = false;
-		if (!((*lhsIterator) == (*rhsIterator)))
-			returnVal = false;
-
-		++lhsIterator;
-		++rhsIterator;
-	}
-	if (rhsIterator != rhs.end())
-		returnVal = false;
-	pthread_mutex_unlock(&orderManagerMutex);	
-	return returnVal;
-}
 
 Order orderManager_checkForOrderTimeout()
 {
 	for (auto it = orderList.begin(); it != orderList.end(); ++it)
 	{ 
-		time_t timer;
-		int time_now = time(&timer);
-		if ((it->timeAssigned + ORDER_TIMEOUT) < time_now) return (*it);
+		if ((it->timeAssigned + ORDER_TIMEOUT) < time(0)) 
+			return (*it);
 	}
 	Order defaultOrder;
 	return defaultOrder;

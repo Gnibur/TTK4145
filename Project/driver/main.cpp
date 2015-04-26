@@ -4,6 +4,7 @@
 #include "Timer.h"
 #include "udp.h"
 #include "OrderManager.h"
+#include "BackupWatcher.h"
 #include <iostream>
 #include <signal.h>
 
@@ -17,6 +18,8 @@ int main()
 	std::cout << "Initalizing driver..\n";
 	
 	stateMachine_initialize();
+
+	startBackupProcess();
 
 	orderManager_recoverFromBackup();
 
