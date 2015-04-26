@@ -27,8 +27,8 @@ bool Offer::isValid()
 	if (floor < 0 || floor >= FLOORCOUNT)
 		return false;
 	if (direction != BUTTON_COMMAND 
-		|| direction != BUTTON_CALL_UP 
-		|| direction != BUTTON_CALL_DOWN)
+		&& direction != BUTTON_CALL_UP 
+		&& direction != BUTTON_CALL_DOWN)
 		return false;
 	if (!isValidIP(fromIP))
 		return false;

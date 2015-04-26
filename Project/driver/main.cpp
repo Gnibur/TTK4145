@@ -5,6 +5,8 @@
 #include "udp.h"
 #include "OrderManager.h"
 #include "BackupWatcher.h"
+#include <unistd.h>
+
 #include <iostream>
 
 
@@ -31,6 +33,7 @@ void checkForEvents()
 	int oldFloorReading = ioDriver_getFloorSensorValue();
 	while (1)
 	{
+		usleep(10000);
 		checkButtonsFromEvents();
 
 		int newFloorReading = ioDriver_getFloorSensorValue();

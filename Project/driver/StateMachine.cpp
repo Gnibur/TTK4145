@@ -185,6 +185,7 @@ void FSM_handleOrderTimedOut(Order order)
 	assert(order.isValid());
 
 	orderManager_addOrder(order, SEND_UPDATE);
+	FSM_handleNewOrderArrived(order);
 }
 
 

@@ -55,7 +55,6 @@ void *runAuction(void *args)
 		return NULL;
 
 	std::sort(auctions[(*order)].begin(), auctions[(*order)].end());
-	
 	Offer bestOffer = auctions[(*order)][0];
 	auctions.erase(*order);
 
@@ -68,7 +67,7 @@ void *runAuction(void *args)
 	
 	
 	std::cout 	<< "AUCTION FINISHED, for floor " << order->floor << ", dir " << order->direction 
-            	<< ", IP " << bestOffer.fromIP << " won\n";
+            	<< ", IP " << bestOffer.fromIP << ", cost "<< bestOffer.cost << " won\n";
 
 	delete order;
 	return NULL;
@@ -77,10 +76,12 @@ void *runAuction(void *args)
 void auction_addBid(Offer offer)
 {
 	Order order(offer.floor, offer.direction,  "");
-
+	
 	pthread_mutex_lock(&auctionMutex);
 	if (auctions.find(order) != auctions.end())
 		auctions[order].push_back(offer);
+
+	std::cout << "Got offer from " << offer.fromIP << ", floor " << offer.floor << ", cost" << offer.cost << std::endl;
 	pthread_mutex_unlock(&auctionMutex);
 	
 }

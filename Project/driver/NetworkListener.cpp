@@ -6,6 +6,9 @@
 #include "StateMachine.h"
 #include "AuctionManager.h"
 
+#include <iostream>
+#include <unistd.h>
+
 
 #define BUFFERLENGTH 4096
 
@@ -29,6 +32,8 @@ bool networkListener_run()
 void *listen(void*) 
 {
 	char messagebuffer[BUFFERLENGTH];
+	
+	usleep(1000);
 
 	while (true) {
 		udp_receive(messagebuffer, BUFFERLENGTH); // blocking 
@@ -71,23 +76,24 @@ void *listen(void*)
 			break;
 		}
 
-		case ORDER_COST_REQUEST: {
+		case ORDER_COST_REQUEST: {	
 			int floor;
 			button_type_t direction; 
 
 			if (msgParser_getOrderCostRequestFromMessage(messagebuffer, &floor, &direction) == false)
 				continue;
-
+			
 			FSM_handleAuctionStarted(floor, direction);
 			
 			break;
 		}
 
 		case ORDER_COST_REPLY: {
+			
 			Offer offer;
 			if (msgParser_getOfferFromMessage(messagebuffer, &offer) == false)
 				continue;
-	
+			
 			auction_addBid(offer);
 			break;
 	 	}

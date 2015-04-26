@@ -3,6 +3,8 @@
 #include "udp.h"
 #include "tinyxml.h"
 
+#include <iostream>
+
 /* ------------------Make messages  ---------------------------------- */
 
 static TiXmlElement * msgParser_buildMessageHeader(MsgType type, std::string fromIP)
@@ -277,7 +279,8 @@ bool msgParser_getOfferFromMessage(string message, Offer *offer)
 	offer->direction = (button_type_t)temp;
 
 	offer->fromIP = xmlOrderCostOffer->ToElement()->Attribute("fromIP");
-
+	
+	std::cout << "Passed all the way to the validation test\n";
 	if (offer->isValid())
 		return true;
 	else 
