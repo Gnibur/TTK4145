@@ -1,6 +1,4 @@
-#ifndef NETWORKLISTENER_H
-#define NETWORKLISTENER_H
+#pragma once
 
 void networkListener_run();
 
-#endif

@@ -3,10 +3,7 @@
 #include "GlobalDefines.h"
 #include <string>
 
-
-
 void auction_start(int floor, button_type_t direction);
-
 
 class Offer {
 public:

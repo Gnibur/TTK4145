@@ -1,7 +1,7 @@
 #pragma once
 
 #include "OrderManager.h"
-#include "IoDriver.h"
+#include "GlobalDefines.h"
 
 void FSM_doSafeStop(int);
 
