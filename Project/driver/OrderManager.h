@@ -39,7 +39,7 @@ void orderManager_recoverFromDisk();
 bool orderManager_addOrder(Order order, 	bool sendupdate);
 bool orderManager_clearOrder(Order order, 	bool sendupdate);
 bool orderManager_clearOrdersAt(int floor, std::string orderIP, bool sendupdate);
-void orderManager_mergeOrderListWith(OrderList orders, bool sendupdate);
+bool orderManager_mergeOrderListWith(OrderList orders, bool sendupdate);
 
 // Returns a order which is timed out
 Order orderManager_checkForOrderTimeout();

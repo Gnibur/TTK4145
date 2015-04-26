@@ -11,20 +11,21 @@
 #include <pthread.h>
 
 
-OrderList orderList;
+static OrderList orderList;
 
 
 static pthread_mutex_t orderManagerMutex = PTHREAD_MUTEX_INITIALIZER;
 
 static bool saveOrderList(std::string filename, OrderList order);
-static bool retrieveOrderList(std::string filename);
+static bool retrieveOrderList(std::string filename, OrderList *orders);
 
 void orderManager_recoverFromDisk()
 {
-	if (!retrieveOrderList("Backup1.txt"))
-		retrieveOrderList("Backup2.txt");			
+	pthread_mutex_lock(&orderManagerMutex);	
+	if (!retrieveOrderList("Backup1.txt", &orderList))
+		retrieveOrderList("Backup2.txt", &orderList);	
+	pthread_mutex_unlock(&orderManagerMutex);		
 }
-
 
 bool saveOrderList(std::string filename, OrderList orders)
 {
@@ -33,16 +34,19 @@ bool saveOrderList(std::string filename, OrderList orders)
 	backupFile.open(filename);
 
 	if (!backupFile.is_open())
+
 		return false;
 
 	backupFile << msgParser_makeOrderListMsg(orders, getMyIP());	
 
 	backupFile.close();
 
-	return true;
+	// acceptance test
+	OrderList tempOrders;
+	return retrieveOrderList(filename, &tempOrders);
 }
 
-bool retrieveOrderList(std::string filename)
+bool retrieveOrderList(std::string filename, OrderList *orders)
 {
 	std::fstream backupFile;
 	backupFile.open(filename);
@@ -56,7 +60,7 @@ bool retrieveOrderList(std::string filename)
 	backupFile.close();
 		
 	
-	return msgParser_getOrderListFromMessage(content, &orderList);
+	return msgParser_getOrderListFromMessage(content, orders);
 }
 
 
@@ -69,7 +73,6 @@ bool orderManager_addOrder(Order order, bool sendupdate)
 
 	pthread_mutex_lock(&orderManagerMutex);
 	OrderList newOrderList = orderList;
-
 
 	OrderList::iterator search = std::find(newOrderList.begin(), newOrderList.end(), order);
 	
@@ -212,42 +215,58 @@ bool orderManager_clearOrdersAt(int floor, std::string orderIP, bool sendupdate)
 }
 
 
-void orderManager_mergeOrderListWith(OrderList orders, bool sendupdate)
+bool orderManager_mergeOrderListWith(OrderList orders, bool sendupdate)
 {
-	bool wasUpdated = false;	
+	bool wasListUpdated = false;
+	bool wasStorageUpdated = false;
+	bool transactionSucceeded = false;
+		
 	pthread_mutex_lock(&orderManagerMutex);
+
+	OrderList newOrderList = orderList;
 
 	for (auto it = orders.begin(); it != orders.end(); ++it)
 	{
-		if (std::find(orderList.begin(), orderList.end(), (*it)) == orderList.end())
+		if (std::find(newOrderList.begin(), newOrderList.end(), (*it)) == newOrderList.end())
 		{
-			std::cout << "Pushing back this with IP: " << it->assignedIP << std::endl;
 			it->timeAssigned = time(0);
-			orderList.push_back((*it));
-			wasUpdated = true;
+			newOrderList.push_back((*it));
+			wasListUpdated = true;
 		if ((it->direction == BUTTON_COMMAND && it->assignedIP == getMyIP()) || (it->direction != BUTTON_COMMAND))
 			ioDriver_setOrderButtonLamp(it->direction, it->floor);
 		}
 	}
 
-	if (sendupdate == true && wasUpdated){
-		std::cout << "Orders were merged\n";
-		std::string msg;
-		msg = msgParser_makeOrderListMsg(orderList, getMyIP());
-		udp_send(msg.c_str(), strlen(msg.c_str()) + 1);
-	}
-	
-	pthread_mutex_unlock(&orderManagerMutex);	
+	if (saveOrderList("Backup1.txt", orderList) || saveOrderList("Backup2.txt", orderList) )
+		wasStorageUpdated = true;
 
-	if (!(saveOrderList("Backup1.txt", orderList) || saveOrderList("Backup2.txt", orderList)) )
-		std::cout << "Failed saving merged orders\n";
+	if (wasListUpdated && wasStorageUpdated){
+		transactionSucceeded = true;
+
+		orderList = newOrderList;
+
+		if (sendupdate == true){
+			std::string msg;
+			msg = msgParser_makeOrderListMsg(orderList, getMyIP());
+			udp_send(msg.c_str(), strlen(msg.c_str()) + 1);
+		}
+		
+	}
+
+	pthread_mutex_unlock(&orderManagerMutex);	
+	return transactionSucceeded;
 }
+
+
+
 
 bool orderManager_shouldElevatorStopHere(int floor, motor_direction_t direction) 
 {
 	bool hasOrderHere = false;
 	bool hasOrderHereInSameDirection = false;
 	bool hasMoreOrdersInSameDirection = false;
+
+	pthread_mutex_lock(&orderManagerMutex);
 
 	for (auto orderPtr = orderList.begin(); orderPtr != orderList.end(); ++orderPtr){
 		
@@ -275,6 +294,8 @@ bool orderManager_shouldElevatorStopHere(int floor, motor_direction_t direction)
 		if (hasOrderHereInSameDirection)
 			break;
 	}
+
+	pthread_mutex_unlock(&orderManagerMutex);
 	 	
 	if (hasOrderHereInSameDirection)
 		return true;
@@ -288,10 +309,14 @@ bool orderManager_shouldElevatorStopHere(int floor, motor_direction_t direction)
 
 motor_direction_t orderManager_getNextMotorDirection(int floor, motor_direction_t lastDirection)
 {
+	pthread_mutex_lock(&orderManagerMutex);
+
 	OrderList myPendingOrders;
 	for (auto orderPtr = orderList.begin(); orderPtr != orderList.end(); ++orderPtr)
 		if (orderPtr->assignedIP == getMyIP())
 			myPendingOrders.push_back(*orderPtr);
+
+	pthread_mutex_unlock(&orderManagerMutex);
 
 	if (myPendingOrders.size() == 0) 
 		return DIRECTION_STOP;
@@ -304,6 +329,8 @@ motor_direction_t orderManager_getNextMotorDirection(int floor, motor_direction_
 		return DIRECTION_UP;
 	else
 		return DIRECTION_DOWN;	
+
+
 
 	bool hasOrderInSameDirection = false;
 	for (auto orderPtr = myPendingOrders.begin(); orderPtr != myPendingOrders.end(); ++orderPtr){
@@ -334,10 +361,8 @@ int orderManager_getOrderCost(int orderFloor, button_type_t orderButton, int las
 	int cost = 0;
 	cost += abs(lastFloor - orderFloor);
 	
-
 	motor_direction_t orderDirection;
 	
-
 	if (orderButton == BUTTON_CALL_UP)			orderDirection = DIRECTION_UP;
 	else if (orderButton == BUTTON_CALL_DOWN)	orderDirection = DIRECTION_DOWN;
 	else										orderDirection = DIRECTION_STOP;
@@ -354,6 +379,8 @@ int orderManager_getOrderCost(int orderFloor, button_type_t orderButton, int las
 			cost += FLOORCOUNT;
 	}
 
+	pthread_mutex_lock(&orderManagerMutex);
+
 	// A busy elevator will have a higher cost
 	for (auto it = orderList.begin(); it != orderList.end(); ++it)
 	{
@@ -361,17 +388,22 @@ int orderManager_getOrderCost(int orderFloor, button_type_t orderButton, int las
 			cost += 1;
 	}
 
+	pthread_mutex_unlock(&orderManagerMutex);
+
 	return cost;
 }
 
 
 Order orderManager_checkForOrderTimeout()
 {
+	pthread_mutex_lock(&orderManagerMutex);
+	Order order;
 	for (auto it = orderList.begin(); it != orderList.end(); ++it)
 	{ 
-		if ((it->timeAssigned + ORDER_TIMEOUT) < time(0)) 
-			return (*it);
+		if (it->timeAssigned + ORDER_TIMEOUT < time(0)) 
+			order = *it;
 	}
-	Order defaultOrder;
-	return defaultOrder;
+
+	pthread_mutex_lock(&orderManagerMutex);
+	return order;
 }
