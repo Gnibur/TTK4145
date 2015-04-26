@@ -3,7 +3,6 @@
 #include "udp.h"
 #include "tinyxml.h"
 
-#include <iostream>
 
 /* ------------------Make messages  ---------------------------------- */
 
@@ -280,7 +279,6 @@ bool msgParser_getOfferFromMessage(string message, Offer *offer)
 
 	offer->fromIP = xmlOrderCostOffer->ToElement()->Attribute("fromIP");
 	
-	std::cout << "Passed all the way to the validation test\n";
 	if (offer->isValid())
 		return true;
 	else 

@@ -12,7 +12,6 @@
 #include <ctime>
 #include <iostream>
 #include <unistd.h>
-#include <pthread.h>
 #include <assert.h>
 #include <signal.h>
 
@@ -79,7 +78,6 @@ void FSM_handleButtonPressed(int floor, button_type_t button)
 
 void FSM_handleNewOrderArrived(Order order)
 {
-	std::cout << "Arrived at state machine!\n";	
 	assert(order.isValid());
 
 	std::cout << "Order arrived: Floor: "	<< order.floor 
@@ -180,24 +178,21 @@ void FSM_handleDoorTimedOut()
 
 void FSM_handleOrderTimedOut(Order order)
 {
-	std::cout << "----------------------\n";
-	std::cout << "WARNING WARNING WARNING\n";
-	std::cout << "ORDER TIMED OUT\n";
+	std::cout << "ORDER TIMED OUT, ";
 	std::cout << "IP: " << order.assignedIP << " FLOOR: " << order.floor << " DIRECTION: " << order.direction << "\n";
-	std::cout << "----------------------\n";
 
 	assert(order.isValid());
-
 	
 	if (order.direction == BUTTON_COMMAND && order.assignedIP == getMyIP()){
 		orderManager_addOrder(order, DONT_SEND_UPDATE);
 		FSM_handleNewOrderArrived(order);
 	} else {
+		orderManager_clearOrder(order, SEND_UPDATE);
 		auction_start(order.floor, order.direction);
 		int cost = orderManager_getOrderCost(order.floor, order.direction, lastFloor, lastDirection);
 		Offer offer(cost, order.floor, order.direction, getMyIP());
 		auction_addBid(offer);
-		orderManager_clearOrder(order, SEND_UPDATE);
+
 	}
 		
 }

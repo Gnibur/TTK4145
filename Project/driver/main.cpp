@@ -8,22 +8,22 @@
 #include <unistd.h>
 
 #include <iostream>
-
+#include <assert.h>
 
 void checkForEvents();
 void checkButtonsFromEvents();
 
 int main()
 {
+	std::cout << "Heisprogram har startet\n";
+	
 	FSM_initialize();
 
-	//startBackupProcess();
+	startBackupProcess();
 
-	networkListener_run();
+	assert(networkListener_run() == true);
 
 	orderManager_recover();
-
-
 
 	checkForEvents();
 }

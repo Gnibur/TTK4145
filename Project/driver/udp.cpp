@@ -21,6 +21,7 @@
 #include <pthread.h>
 
 std::string myIP;
+
 static int recvsocketfd;
 static int sendsocketfd;
 
@@ -49,7 +50,7 @@ bool udp_initialize(int targetPort)
 	
 	findMyIP();
 
-	return true; // DO SOME ERROR CHECKING
+	return true; 
 }
 
 void udp_close ()

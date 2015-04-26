@@ -6,7 +6,6 @@
 #include "StateMachine.h"
 #include "AuctionManager.h"
 
-#include <iostream>
 #include <unistd.h>
 
 

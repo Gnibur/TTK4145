@@ -5,6 +5,10 @@
 
 #include <string>
 
+/* 	MsgParser is a utility library for parsing and building messages.
+	The messages are xml-formatted. */
+
+
 
 using std::string;
 

@@ -1,4 +1,6 @@
 #pragma once
 
-void networkListener_run();
+/* Listens to the network for actions. */
+
+bool networkListener_run();
 

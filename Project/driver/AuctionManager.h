@@ -3,6 +3,16 @@
 #include "GlobalDefines.h"
 #include <string>
 
+/* 	An auction manager auctions for an order.
+	Bids can be added.
+	
+	After ACTION_TIME the cheapest offer is chosen, 
+	and the order is broadcasted to 
+	the network.
+*/
+
+
+
 void auction_start(int floor, button_type_t direction);
 
 class Offer {

@@ -3,6 +3,9 @@
 #include "OrderManager.h"
 #include "GlobalDefines.h"
 
+/* 	The state machine is responsible for handling events.
+	It controls the motor to the desired floors. */
+
 void FSM_doSafeStop(int);
 
 void FSM_initialize();

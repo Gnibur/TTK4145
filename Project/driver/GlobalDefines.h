@@ -1,5 +1,9 @@
 #pragma once
 
+/* Defines the system
+*/
+
+
 #define FLOORCOUNT 4
 
 #define BUTTONCOUNT 3

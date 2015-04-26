@@ -2,6 +2,8 @@
 	OrderManager holds Order's in memory and on disk.
 	Holding the orderList it can decide where to move, 
 	and which orders are expensive.
+
+	Ordermanager is reponsible for setting order lights
 */
 
 
@@ -37,9 +39,11 @@ void orderManager_recover();
 #define SEND_UPDATE 		true
 #define DONT_SEND_UPDATE 	false
 
+// The functions given below are atomic. An update can be sent over the network
 bool orderManager_addOrder(Order order, 	bool sendupdate);
 bool orderManager_clearOrder(Order order, 	bool sendupdate);
 bool orderManager_clearOrdersAt(int floor, std::string orderIP, bool sendupdate);
+
 bool orderManager_mergeOrderListWith(OrderList orders, bool sendupdate);
 
 // Returns a order which is timed out
