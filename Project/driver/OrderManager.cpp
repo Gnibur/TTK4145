@@ -81,6 +81,9 @@ bool orderManager_addOrder(Order order, bool sendupdate)
 		order.timeAssigned = time(0);
 		newOrderList.push_back(order);
 		orderAddedToList = true;
+	} else {
+		search->timeAssigned = time(0);
+		orderAddedToList = true;
 	}
 
 	if (saveOrderList("Backup1.txt", newOrderList) || saveOrderList("Backup2.txt", newOrderList))
@@ -120,7 +123,6 @@ bool orderManager_clearOrder(Order order, bool sendupdate)
 	bool orderClearedFromList = false;
 	bool orderClearedFromStorage = false;
 	
-
 	pthread_mutex_lock(&orderManagerMutex);
 	OrderList newOrderList = orderList;
 
@@ -190,6 +192,7 @@ bool orderManager_clearOrdersAt(int floor, std::string orderIP, bool sendupdate)
 		saveOrderList("Backup1.txt", orderList);
 		saveOrderList("Backup2.txt", orderList);
 	}
+
 
 	if (ordersClearedFromList && ordersClearedFromStorage)
 	{
@@ -274,7 +277,7 @@ bool orderManager_shouldElevatorStopHere(int floor, motor_direction_t direction)
 			hasOrderHere = true;
 			
 			if (orderPtr->direction == BUTTON_COMMAND)
-				return true;
+				hasOrderHereInSameDirection = true;
 
 			if (orderPtr->direction != BUTTON_COMMAND){
 
@@ -404,6 +407,6 @@ Order orderManager_checkForOrderTimeout()
 			order = *it;
 	}
 
-	pthread_mutex_lock(&orderManagerMutex);
+	pthread_mutex_unlock(&orderManagerMutex);
 	return order;
 }

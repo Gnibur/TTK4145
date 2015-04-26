@@ -30,6 +30,7 @@ static motor_direction_t	lastDirection;
 void FSM_doSafeStop(int signum)
 {
 	ioDriver_setMotorDirection(DIRECTION_STOP);
+	exit(0);
 }
 
 void FSM_initialize()
@@ -132,11 +133,9 @@ void FSM_handleFloorReached(int floor)
 
 	lastFloor = floor;
 	ioDriver_setFloorIndicator(floor);
-
 	if (orderManager_shouldElevatorStopHere(floor, lastDirection))
 	{	
 		ioDriver_setMotorDirection(DIRECTION_STOP);
-		
 		if (orderManager_clearOrdersAt(floor, getMyIP(), SEND_UPDATE) == true) {
 			ioDriver_setDoorOpenLamp();
 			doortimer_start();
