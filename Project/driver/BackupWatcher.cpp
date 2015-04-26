@@ -7,8 +7,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-#include <iostream>
-
+#include <assert.h>
 
 void *runBackupWatcher(void *);
 
@@ -24,18 +23,13 @@ void *runBackupWatcher(void *args)
 	while (true){
 		pid_t pid = fork();
 
-		if (pid < 0){
-			std::cout << "Was not able to create backup process\n";
-			exit(1);
-		}
-		else if (pid == 0){
-			// if backup doesn't exist, run, start another one
-			if (system("pidof -x backupProcess > /dev/null"))
-				execlp("./BackupProcess", NULL);
-			else {
-				std::cout << "Was not able to create backup process\n";
-				exit(1);
-			}
+		// must be able to create backup process
+		assert(pid >= 0);
+
+		if (pid == 0){
+			// if backup doesn't exist, run another one
+			assert(system("pidof -x backupProcess"));
+			execlp("./BackupProcess", NULL);
 			break;
 		}
 
