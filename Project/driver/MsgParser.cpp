@@ -1,7 +1,7 @@
 #include "MsgParser.h"
+#include "GlobalDefines.h"
+#include "udp.h"
 #include "tinyxml.h"
-#include "IoDriver.h" // remove when N_FLOORS is moved
-#include <iostream>
 
 /* ------------------Make messages  ---------------------------------- */
 
@@ -166,7 +166,6 @@ bool msgParser_getSenderIP(string message, std::string *senderIP)
 	if (isValidIP(*senderIP))
 		return true;
 	else {
-		std::cout << "IP conformance check failed\n";
 		return false;
 	}
 }
@@ -254,7 +253,7 @@ bool msgParser_getOrderCostRequestFromMessage(string message, int *floor, button
 	xmlOrderCostRequest->ToElement()->QueryIntAttribute("Direction", &temp);
 	*direction = (button_type_t)temp;
 
-	if (*floor >= 0 && *floor < N_FLOORS)
+	if (*floor >= 0 && *floor < FLOORCOUNT)
 		return true;
 	else 
 		return false;

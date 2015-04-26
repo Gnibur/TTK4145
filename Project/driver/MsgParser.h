@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Enums.h"
-#include "DataStructures.h"
+#include "OrderManager.h"
+#include "AuctionManager.h"
 
 #include <string>
 

@@ -92,6 +92,17 @@ bool udp_receive(char *data, size_t dataLength)
 		return false;
 }
 
+bool isValidIP(std::string ip)
+{
+	if (strlen(ip.c_str()) != strlen("???.???.???.???"))
+		return false;
+	if (ip[3] != '.' || ip[7] != '.' || ip[11] != '.')
+		return false;
+	
+	return true;
+}
+
+
 void findMyIP()
 {
 	std::string line;
@@ -119,7 +130,7 @@ void findMyIP()
 	}
 }
 
-std::string udp_myIP ()
+std::string getMyIP ()
 {
 	return myIP;
 }

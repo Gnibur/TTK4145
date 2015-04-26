@@ -1,7 +1,7 @@
 #include "AuctionManager.h"
 #include "DataStructures.h"
-#include "msgTool.h"
 #include "udp.h"
+#include "MsgParser.h"
 #include "OrderManager.h"
 #include "StateMachine.h"
 #include <pthread.h>
@@ -23,7 +23,7 @@ void *runAuction(void *args);
 
 void auction_start(int floor, button_type_t direction)
 {
-	Order *order = new Order(direction, floor, "", -1);
+	Order *order = new Order(floor, direction, "");
 	
 	pthread_mutex_lock(&auctionMutex);
 
@@ -44,7 +44,9 @@ void *runAuction(void *args)
 
 	std::cout << "AUCTION STARTED for floor " << order->floor << ", dir " << order->direction << std::endl;
 
-	msgTool_sendOrderCostRequest(order->floor, order->direction, udp_myIP());
+	std::string costRequestMsg;
+	costRequestMsg = msgParser_makeOrderCostRequestMsg(order->floor, order->direction, getMyIP());
+	udp_send(costRequestMsg.c_str(), strlen(costRequestMsg.c_str()) + 1);
 	
 	time_t timeAtStart = time(0);
 	while (time(0) < timeAtStart + AUCTION_TIME)
@@ -63,7 +65,7 @@ void *runAuction(void *args)
 	order->assignedIP = bestOffer.fromIP;
 	
 	orderManager_addOrder(*order, SEND_UPDATE);
-	stateMachine_eventNewOrderArrived(*order);
+	FSM_handleNewOrderArrived(*order);
 	
 	
 	std::cout 	<< "AUCTION FINISHED, for floor " << order->floor << ", dir " << order->direction 
@@ -75,7 +77,7 @@ void *runAuction(void *args)
 
 void auction_addBid(Offer offer)
 {
-	Order order(offer.direction, offer.floor, "", -1);
+	Order order(offer.floor, offer.direction,  "");
 
 	pthread_mutex_lock(&auctionMutex);
 	if (auctions.find(order) != auctions.end())

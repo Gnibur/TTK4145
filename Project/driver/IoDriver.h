@@ -2,10 +2,9 @@
 #define IO_DRIVER_H
 
 #include <stdbool.h>
-#include "Enums.h"
 
-// Number of floors
-#define N_FLOORS 4
+#include "GlobalDefines.h"
+
 
 /**
   Initialize elevator.

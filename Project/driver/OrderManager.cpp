@@ -15,7 +15,7 @@
 OrderList orderList;
 
 
-static pthread_mutex_t orderManagerMutex = PTHREAD_MUTEX_INITIALIZER;;
+static pthread_mutex_t orderManagerMutex = PTHREAD_MUTEX_INITIALIZER;
 
 static bool saveOrderList(std::string filename, OrderList order);
 static bool retrieveOrderList(std::string filename);
@@ -36,7 +36,7 @@ bool saveOrderList(std::string filename, OrderList orders)
 	if (!backupFile.is_open())
 		return false;
 
-	backupFile << msgParser_makeOrderListMsg(orders, udp_myIP());	
+	backupFile << msgParser_makeOrderListMsg(orders, getMyIP());	
 
 	backupFile.close();
 
@@ -95,11 +95,11 @@ bool orderManager_addOrder(Order order, bool sendupdate)
 
 		if (sendupdate == true){
 			std::string msg;
-			msg = msgParser_makeNewOrderMsg(order, newOrderList, udp_myIP());
+			msg = msgParser_makeNewOrderMsg(order, newOrderList, getMyIP());
 			udp_send(msg.c_str(), strlen(msg.c_str()) + 1);
 		}
 
-		if ((order.direction == BUTTON_COMMAND && order.assignedIP == udp_myIP()) || order.direction != BUTTON_COMMAND)
+		if ((order.direction == BUTTON_COMMAND && order.assignedIP == getMyIP()) || order.direction != BUTTON_COMMAND)
 			ioDriver_setOrderButtonLamp(order.direction, order.floor);
 		
 		transactionSucceeded = true;
@@ -145,11 +145,11 @@ bool orderManager_clearOrder(Order order, bool sendupdate)
 
 		if (sendupdate == true){
 			std::string msg;
-			msg = msgParser_makeClearOrderMsg(order, newOrderList, udp_myIP());
+			msg = msgParser_makeClearOrderMsg(order, newOrderList, getMyIP());
 			udp_send(msg.c_str(), strlen(msg.c_str()) + 1);
 		}
 
-		if ((order.direction == BUTTON_COMMAND && order.assignedIP == udp_myIP()) || order.direction != BUTTON_COMMAND)
+		if ((order.direction == BUTTON_COMMAND && order.assignedIP == getMyIP()) || order.direction != BUTTON_COMMAND)
 			ioDriver_clearOrderButtonLamp(order.direction, order.floor);
 
 		transactionSucceeded = true;
@@ -226,7 +226,7 @@ void orderManager_mergeOrderListWith(OrderList orders, bool sendupdate)
 			it->timeAssigned = time(0);
 			orderList.push_back((*it));
 			wasUpdated = true;
-		if ((it->direction == BUTTON_COMMAND && it->assignedIP == udp_myIP()) || (it->direction != BUTTON_COMMAND))
+		if ((it->direction == BUTTON_COMMAND && it->assignedIP == getMyIP()) || (it->direction != BUTTON_COMMAND))
 			ioDriver_setOrderButtonLamp(it->direction, it->floor);
 		}
 	}
@@ -234,7 +234,7 @@ void orderManager_mergeOrderListWith(OrderList orders, bool sendupdate)
 	if (sendupdate == true && wasUpdated){
 		std::cout << "Orders were merged\n";
 		std::string msg;
-		msg = msgParser_makeOrderListMsg(orderList, udp_myIP());
+		msg = msgParser_makeOrderListMsg(orderList, getMyIP());
 		udp_send(msg.c_str(), strlen(msg.c_str()) + 1);
 	}
 	
@@ -291,7 +291,7 @@ motor_direction_t orderManager_getNextMotorDirection(int floor, motor_direction_
 {
 	OrderList myPendingOrders;
 	for (auto orderPtr = orderList.begin(); orderPtr != orderList.end(); ++orderPtr)
-		if (orderPtr->assignedIP == udp_myIP())
+		if (orderPtr->assignedIP == getMyIP())
 			myPendingOrders.push_back(*orderPtr);
 
 	if (myPendingOrders.size() == 0) 
@@ -345,20 +345,20 @@ int orderManager_getOrderCost(int orderFloor, button_type_t orderButton, int las
 
 	if (((lastDirection == DIRECTION_UP) && (orderFloor < lastFloor)) || ((lastDirection == DIRECTION_DOWN) && (orderFloor > lastFloor)))
 	{
-		cost += N_FLOORS * 2;
+		cost += FLOORCOUNT * 2;
 		if (orderDirection == lastDirection)
-			cost += N_FLOORS;
+			cost += FLOORCOUNT;
 	}
 	else
 	{
 		if (lastDirection != orderDirection)
-			cost += N_FLOORS;
+			cost += FLOORCOUNT;
 	}
 
 	// A busy elevator will have a higher cost
 	for (auto it = orderList.begin(); it != orderList.end(); ++it)
 	{
-		if (it->assignedIP == udp_myIP())
+		if (it->assignedIP == getMyIP())
 			cost += 1;
 	}
 

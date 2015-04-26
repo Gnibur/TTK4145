@@ -7,9 +7,7 @@
 #include <stdlib.h>
 
 // Number of signals and lamps on a per-floor basis (excl sensor)
-#define N_BUTTONS 3
-
-static const int lamp_channel_matrix[N_FLOORS][N_BUTTONS] = {
+static const int lamp_channel_matrix[FLOORCOUNT][BUTTONCOUNT] = {
     {LIGHT_UP1, LIGHT_DOWN1, LIGHT_COMMAND1},
     {LIGHT_UP2, LIGHT_DOWN2, LIGHT_COMMAND2},
     {LIGHT_UP3, LIGHT_DOWN3, LIGHT_COMMAND3},
@@ -17,7 +15,7 @@ static const int lamp_channel_matrix[N_FLOORS][N_BUTTONS] = {
 };
 
 
-static const int button_channel_matrix[N_FLOORS][N_BUTTONS] = {
+static const int button_channel_matrix[FLOORCOUNT][BUTTONCOUNT] = {
     {BUTTON_UP1, BUTTON_DOWN1, BUTTON_COMMAND1},
     {BUTTON_UP2, BUTTON_DOWN2, BUTTON_COMMAND2},
     {BUTTON_UP3, BUTTON_DOWN3, BUTTON_COMMAND3},
@@ -31,11 +29,11 @@ bool IoDriver_initialize(void) {
     if (!io_init(ET_comedi))
         return false;
 
-    for (i = 0; i < N_FLOORS; ++i) {
+    for (i = 0; i < FLOORCOUNT; ++i) {
         if (i != 0)
 	  		ioDriver_clearOrderButtonLamp(BUTTON_CALL_DOWN, i);
 
-        if (i != N_FLOORS - 1)
+        if (i != FLOORCOUNT - 1)
 	  		ioDriver_clearOrderButtonLamp(BUTTON_CALL_UP, i);
 
         ioDriver_clearOrderButtonLamp(BUTTON_COMMAND, i);
@@ -104,7 +102,7 @@ int ioDriver_getFloorSensorValue(void) {
 
 void ioDriver_setFloorIndicator(int floor) {
     assert(floor >= 0);
-    assert(floor < N_FLOORS);
+    assert(floor < FLOORCOUNT);
 
     // Binary encoding. One light must always be on.
     if (floor & 0x02)
@@ -120,8 +118,8 @@ void ioDriver_setFloorIndicator(int floor) {
 
 bool ioDriver_isOrderButtonPressed(button_type_t type, int floor) {
     assert(floor >= 0);
-    assert(floor < N_FLOORS);
-    assert(!(type == BUTTON_CALL_UP && floor == N_FLOORS - 1));
+    assert(floor < FLOORCOUNT);
+    assert(!(type == BUTTON_CALL_UP && floor == FLOORCOUNT - 1));
     assert(!(type == BUTTON_CALL_DOWN && floor == 0));
     assert(type == BUTTON_CALL_UP || type == BUTTON_CALL_DOWN || type == BUTTON_COMMAND);
 
@@ -134,8 +132,8 @@ bool ioDriver_isOrderButtonPressed(button_type_t type, int floor) {
 
 void ioDriver_setOrderButtonLamp(button_type_t type, int floor){
     assert(floor >= 0);
-    assert(floor < N_FLOORS);
-    assert(!(type == BUTTON_CALL_UP && floor == N_FLOORS - 1));
+    assert(floor < FLOORCOUNT);
+    assert(!(type == BUTTON_CALL_UP && floor == FLOORCOUNT - 1));
     assert(!(type == BUTTON_CALL_DOWN && floor == 0));
     assert(type == BUTTON_CALL_UP || type == BUTTON_CALL_DOWN || type == BUTTON_COMMAND);
 
@@ -145,8 +143,8 @@ void ioDriver_setOrderButtonLamp(button_type_t type, int floor){
 
 void ioDriver_clearOrderButtonLamp(button_type_t type, int floor){
     assert(floor >= 0);
-    assert(floor < N_FLOORS);
-    assert(!(type == BUTTON_CALL_UP && floor == N_FLOORS - 1));
+    assert(floor < FLOORCOUNT);
+    assert(!(type == BUTTON_CALL_UP && floor == FLOORCOUNT - 1));
     assert(!(type == BUTTON_CALL_DOWN && floor == 0));
     assert(type == BUTTON_CALL_UP || type == BUTTON_CALL_DOWN || type == BUTTON_COMMAND);
 

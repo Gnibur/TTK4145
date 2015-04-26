@@ -1,11 +1,9 @@
 #ifndef TIMER_H
 #define TIMER_H
 
-#define TIMER_DOOR 3
-
-void	timer_start();
-bool	timer_done();
-void	timer_reset();
-bool	timer_active();
+void	doortimer_start();
+bool	doortimer_isDone();
+void	doortimer_reset();
+bool	doortimer_isActive();
 
 #endif

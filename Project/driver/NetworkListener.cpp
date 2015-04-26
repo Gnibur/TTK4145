@@ -2,7 +2,6 @@
 
 #include "udp.h"
 
-#include "msgTool.h"
 #include "MsgParser.h"
 
 #include "OrderManager.h"
@@ -40,7 +39,7 @@ void *listen(void*)
 		if (msgParser_getSenderIP(buf, &senderIP) == false)
 			continue;
 
-		if (senderIP == udp_myIP())
+		if (senderIP == getMyIP())
 			continue;
 
 		MsgType messageType;
@@ -62,7 +61,7 @@ void *listen(void*)
 
 			synchronizeLists(buf);
 	
-			stateMachine_eventNewOrderArrived(order);
+			FSM_handleNewOrderArrived(order);
 
 			break;
 		}
@@ -91,7 +90,7 @@ void *listen(void*)
 			if (msgParser_getOrderCostRequestFromMessage(buf, &floor, &direction) == false)
 				continue;
 
-			stateMachine_eventAuctionStarted(floor, direction);
+			FSM_handleAuctionStarted(floor, direction);
 			
 			break;
 		}

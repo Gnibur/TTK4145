@@ -1,16 +1,22 @@
 #pragma once
 
-#include "DataStructures.h"
+#include "OrderManager.h"
+#include "IoDriver.h"
 
-void stateMachine_initialize();
-void stateMachine_eventButtonPressed(int floor, button_type_t button);
-void stateMachine_eventFloorReached(int floor);
-void stateMachine_eventFloorLeft();
-void stateMachine_eventAuctionStarted(int floor, button_type_t button);
-void stateMachine_eventNewOrderArrived(Order order);
+void FSM_doSafeStop(int);
 
+void FSM_initialize();
 
-void stateMachine_eventDoorTimedOut();
-void stateMachine_eventOrderTimedOut(Order order);
+void FSM_handleButtonPressed(int floor, button_type_t button);
+void FSM_handleFloorReached(int floor);
+
+void FSM_handleAuctionStarted(int floor, button_type_t button);
+void FSM_handleNewOrderArrived(Order order);
+
+void FSM_handleDoorTimedOut();
+
+// methods which are added for failsafety
+void FSM_handleOrderTimedOut(Order order);
+void FSM_handleFloorLeft();
 
 

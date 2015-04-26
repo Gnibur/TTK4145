@@ -1,8 +1,8 @@
 #include "StateMachine.h"
 #include "IoDriver.h"
-#include "msgTool.h"
 #include "AuctionManager.h"
 #include "OrderManager.h"
+#include "MsgParser.h"
 #include "udp.h"
 #include "Timer.h"
 #include <algorithm>
@@ -14,10 +14,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <assert.h>
-
-
-static int					lastFloor;
-static motor_direction_t	lastDirection;
+#include <signal.h>
 
 typedef enum state {
 	IDLE,
@@ -27,15 +24,25 @@ typedef enum state {
 
 static state_t state;
 
+static int					lastFloor;
+static motor_direction_t	lastDirection;
 
-void stateMachine_initialize()
+void FSM_doSafeStop(int signum)
+{
+	ioDriver_setMotorDirection(DIRECTION_STOP);
+}
+
+void FSM_initialize()
 {
 	assert(IoDriver_initialize());
+
+	assert(signal(SIGINT, FSM_doSafeStop) != SIG_ERR);
 
 	ioDriver_setMotorDirection(DIRECTION_UP);
 	
 	while (ioDriver_getFloorSensorValue() == -1)
 		;
+		
 	ioDriver_setMotorDirection(DIRECTION_STOP);
 	ioDriver_setFloorIndicator(lastFloor);
 	lastFloor		= ioDriver_getFloorSensorValue();
@@ -44,40 +51,39 @@ void stateMachine_initialize()
 }
 
 
-void stateMachine_eventButtonPressed(int floor, button_type_t button)
+void FSM_handleButtonPressed(int floor, button_type_t button)
 {		
-	assert(floor >= 0 && floor < N_FLOORS);
+	assert(floor >= 0 && floor < FLOORCOUNT);
 
-	if (button == BUTTON_COMMAND) {	
-		Order order(button, floor, udp_myIP());
-		
-		if(orderManager_addOrder(order, SEND_UPDATE)) {
-			stateMachine_eventNewOrderArrived(order);	
-		} else {
-			// panic
-		}
+	if (button == BUTTON_COMMAND) 
+	{	
+		Order order(floor, button, getMyIP());
+		assert(orderManager_addOrder(order, SEND_UPDATE));
+		FSM_handleNewOrderArrived(order);	
 	}
-	else {
+	else 
+	{
+		// a global order can be handled by everyone, therefore it is auctioned
 		auction_start(floor, button);
 
 		int cost = orderManager_getOrderCost(floor, button, lastFloor, lastDirection);
-		Offer offer(cost, floor, button, udp_myIP());
+		Offer offer(cost, floor, button, getMyIP());
 		auction_addBid(offer);
 	}
 
 }
 
-void stateMachine_eventNewOrderArrived(Order order)
+void FSM_handleNewOrderArrived(Order order)
 {
 	assert(order.isValid());
 
 	switch (state){
 	case IDLE: 
-		if (order.assignedIP == udp_myIP()){
+		if (order.assignedIP == getMyIP()){
 			if (order.floor == lastFloor){
 				if (orderManager_clearOrder(order, SEND_UPDATE)){
 					ioDriver_setDoorOpenLamp();
-					timer_start();
+					doortimer_start();
 					state = DOOR_OPEN;				
 				}
 			} else {
@@ -90,80 +96,69 @@ void stateMachine_eventNewOrderArrived(Order order)
 	case MOVING: 
 		break;	
 	case DOOR_OPEN:
-		if (order.floor == lastFloor){
-			if (orderManager_clearOrder(order, SEND_UPDATE))
-				timer_start(); 
+		if (order.floor == lastFloor && order.assignedIP == getMyIP()){
+			assert(orderManager_clearOrder(order, SEND_UPDATE));
+			doortimer_start(); 
 		}
 		break;	
 	}
 }
 
 
-void stateMachine_eventAuctionStarted(int floor, button_type_t button)
+void FSM_handleAuctionStarted(int floor, button_type_t button)
 {
-	assert(floor >= 0 && floor < N_FLOORS);
+	assert(floor >= 0 && floor < FLOORCOUNT);
 	
 	int cost = orderManager_getOrderCost(floor, button, lastFloor, lastDirection);
-	Offer offer(cost, floor, button, udp_myIP());
-	msgTool_sendOrderCostReply(offer, udp_myIP());
+	Offer offer(cost, floor, button, getMyIP());
+
+	std::string costReply;
+	costReply = msgParser_makeOrderCostReplyMsg(offer, getMyIP());
+	udp_send(costReply.c_str(), strlen(costReply.c_str()) + 1);
 }
 
-
-void stateMachine_eventFloorReached(int floor)
+void FSM_handleFloorReached(int floor)
 {
+	std::cout << "Floor reached: " << floor << std::endl;
+
 	assert(state == MOVING);
-	assert(floor >= 0 && floor < N_FLOORS);
+	assert(floor >= 0 && floor < FLOORCOUNT);
 
 	if (lastDirection == DIRECTION_UP)
 		assert(floor == lastFloor + 1);
 	else if (lastDirection == DIRECTION_DOWN)
 		assert(floor == lastFloor - 1); 		
 
-	ioDriver_setFloorIndicator(floor);
 
-	std::cout << "Floor reached: " << floor << std::endl;
 	lastFloor = floor;
-
-
+	ioDriver_setFloorIndicator(floor);
 
 	if (orderManager_shouldElevatorStopHere(floor, lastDirection))
 	{	
 		ioDriver_setMotorDirection(DIRECTION_STOP);
 		
-		if (orderManager_clearOrdersAt(floor, udp_myIP(), SEND_UPDATE) == true){
-			ioDriver_setDoorOpenLamp();
-			timer_start();
-			state = DOOR_OPEN;
-		}
-		else {
-			std::cout << "Failed to clear orders\n";		
-			state = IDLE;
-
-		}
+		assert(orderManager_clearOrdersAt(floor, getMyIP(), SEND_UPDATE) == true);
+		ioDriver_setDoorOpenLamp();
+		doortimer_start();
+		state = DOOR_OPEN;
 	}
+
 	// FAILSAFE: STOP THE ELEVATOR AT BOUNDARY FLOORS ANYWAY.
-	else if (floor == 0 || floor == (N_FLOORS - 1)) {
+	else if (floor == 0 || floor == (FLOORCOUNT - 1)) {
 		ioDriver_setMotorDirection(DIRECTION_STOP);
 		state = IDLE;
 	}
-	
-
 }
 
-void stateMachine_eventFloorLeft()
-{
-	assert(state == MOVING);
-}
-
-
-void stateMachine_eventDoorTimedOut()
+void FSM_handleDoorTimedOut()
 {
 	assert(state == DOOR_OPEN);
 
-	timer_reset();
+	doortimer_reset();
 	ioDriver_clearDoorOpenLamp();
 
-	motor_direction_t nextDirection = orderManager_getNextMotorDirection(lastFloor, lastDirection);
+	motor_direction_t nextDirection;
+	nextDirection = orderManager_getNextMotorDirection(lastFloor, lastDirection);
 	ioDriver_setMotorDirection(nextDirection);	
 
 	if (nextDirection != DIRECTION_STOP) {
@@ -173,18 +168,21 @@ void stateMachine_eventDoorTimedOut()
 		state = IDLE;
 }
 
-void stateMachine_eventOrderTimedOut(Order order)
+void FSM_handleOrderTimedOut(Order order)
 {
-	assert(order.isValid());
-	
 	std::cout << "----------------------\n";
 	std::cout << "WARNING WARNING WARNING\n";
 	std::cout << "ORDER TIMED OUT\n";
 	std::cout << "IP: " << order.assignedIP << " FLOOR: " << order.floor << " DIRECTION: " << order.direction << "\n";
 	std::cout << "----------------------\n";
-	orderManager_clearOrder(order, SEND_UPDATE);
 
-	
-	// TODO: Needs failsafe method, so the elevator doesn't die here and everything is lost..
-	orderManager_addOrder(order, SEND_UPDATE);
+	assert(order.isValid());
+
+	assert(orderManager_addOrder(order, SEND_UPDATE));
+}
+
+
+void FSM_handleFloorLeft()
+{
+	assert(state == MOVING);
 }

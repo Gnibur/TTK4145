@@ -1,31 +1,32 @@
 #include "Timer.h"
+#include "GlobalDefines.h"
 #include <ctime>
 
-int		time_start;
-bool	time_active;
+static time_t	timeAtStart;
+static bool		isActive;
 
-void timer_start() {
-	time_t timer;
-	
-	time_start		= time(&timer);
-	time_active	= true;
+void doortimer_start() {
+	timeAtStart	= time(0);
+	isActive	= true;
 }
 
-bool timer_done() {
-	time_t timer;
-	int time_now = time(&timer);
-	if ((time_now - TIMER_DOOR) > time_start)
-		return true;
-	else
+bool doortimer_isDone() {
+	if (isActive) {
+		time_t time_now = time(0);
+		if (timeAtStart + DOOR_OPEN_TIME > time_now)
+			return true;
+		else
+			return false;
+	} else 
 		return false;
 }
 
-void timer_reset() {
-	time_start		= -1;
-	time_active		= false;
+void doortimer_reset() {
+	timeAtStart		= -1;
+	isActive		= false;
 }
 
-bool timer_active()
+bool doortimer_isActive()
 {
-	return time_active;
+	return isActive;
 }
