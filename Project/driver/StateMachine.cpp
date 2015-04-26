@@ -90,11 +90,11 @@ void FSM_handleNewOrderArrived(Order order)
 	case IDLE: 
 		if (order.assignedIP == getMyIP()){
 			if (order.floor == lastFloor){
-				if (orderManager_clearOrder(order, SEND_UPDATE)){
-					ioDriver_setDoorOpenLamp();
-					doortimer_start();
-					state = DOOR_OPEN;				
-				}
+				orderManager_clearOrder(order, SEND_UPDATE);
+				ioDriver_setDoorOpenLamp();
+				doortimer_start();
+				state = DOOR_OPEN;				
+				
 			} else {
 				lastDirection = orderManager_getNextMotorDirection(lastFloor, lastDirection);
 				ioDriver_setMotorDirection(lastDirection);	
