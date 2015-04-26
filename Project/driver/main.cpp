@@ -19,7 +19,7 @@ int main()
 	
 	FSM_initialize();
 
-	startBackupProcess();
+	//startBackupProcess();
 
 	orderManager_recoverFromBackup();
 

@@ -13,7 +13,7 @@ void doortimer_start() {
 bool doortimer_isDone() {
 	if (isActive) {
 		time_t time_now = time(0);
-		if (timeAtStart + DOOR_OPEN_TIME > time_now)
+		if (timeAtStart + DOOR_OPEN_TIME < time_now)
 			return true;
 		else
 			return false;
