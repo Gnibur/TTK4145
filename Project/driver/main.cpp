@@ -22,8 +22,6 @@ int main()
 	networkListener_run();
 
 	checkForEvents();
-
-	return 0;
 }
 
 void checkForEvents()
@@ -55,7 +53,7 @@ void checkForEvents()
 
 void checkButtonsFromEvents()
 {
-	static int oldButtonStates[3][FLOORCOUNT] = {{0}};
+	static int oldButtonStates[BUTTONCOUNT][FLOORCOUNT] = {{0}};
 	for (int button = BUTTON_CALL_UP; button <= BUTTON_COMMAND; button++)
 	{
 		for (int floor = 0; floor < FLOORCOUNT; floor++)

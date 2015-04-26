@@ -199,7 +199,6 @@ bool msgParser_getOrderFromMessage(string message, Order *order)
 
 bool msgParser_getOrderListFromMessage(string message, OrderList *orderlist)
 {
-	//  printf("Received message: %s\n", message.c_str());
 	TiXmlDocument xmldoc;
 	xmldoc.Parse(message.c_str());
 	TiXmlElement *xmlHeader = xmldoc.RootElement();

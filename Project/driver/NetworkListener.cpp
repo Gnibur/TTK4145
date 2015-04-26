@@ -1,94 +1,81 @@
 #include <pthread.h>
 
 #include "udp.h"
-
 #include "MsgParser.h"
-
 #include "OrderManager.h"
 #include "StateMachine.h"
 #include "AuctionManager.h"
 
-#include <cstring>
-#include <iostream>
-#include <unistd.h>
-#include <ctime>
 
-#define BUFLENGTH 4096
+#define BUFFERLENGTH 4096
 
 void *listen(void*);
 
 static void synchronizeLists(std::string message);
 
-void networkListener_run()
+bool networkListener_run()
 {
-	udp_initialize(BROADCAST_PORT);
+	if (udp_initialize(BROADCAST_PORT) == false)
+		return false;
+	
 	pthread_t networkListener;
-	pthread_create(&networkListener, NULL, listen, NULL);
-}
+	if (pthread_create(&networkListener, NULL, listen, NULL) != 0)
+		return false;
 
+	return true;
+}
 
 
 void *listen(void*) 
 {
-	char buf[BUFLENGTH];
-
+	char messagebuffer[BUFFERLENGTH];
 
 	while (true) {
-		udp_receive(buf, BUFLENGTH); // blocking read into buf
+		udp_receive(messagebuffer, BUFFERLENGTH); // blocking 
 
 		std::string senderIP;
-		if (msgParser_getSenderIP(buf, &senderIP) == false)
+		if (msgParser_getSenderIP(messagebuffer, &senderIP) == false)
 			continue;
 
 		if (senderIP == getMyIP())
 			continue;
 
 		MsgType messageType;
-		if (msgParser_getMessageType(buf, &messageType) == false)
+		if (msgParser_getMessageType(messagebuffer, &messageType) == false)
 			continue;
 
 		switch (messageType) {
 
 		case NEW_ORDER_MSG: {
-			std::cout << "Received New order:\n" << buf << "\n\n";
-			
 			Order order;
-			if (msgParser_getOrderFromMessage(buf, &order) == false){
-				std::cout << "Failed to obtain order from message\n";				
+			if (msgParser_getOrderFromMessage(messagebuffer, &order) == false)	
 				continue;
-			}
-			if (orderManager_addOrder(order, DONT_SEND_UPDATE))
-				std::cout << "Order was added\n";
-
-			synchronizeLists(buf);
+		
+			orderManager_addOrder(order, DONT_SEND_UPDATE);
+				
+			synchronizeLists(messagebuffer);
 	
 			FSM_handleNewOrderArrived(order);
 
 			break;
 		}
 		case CLEAR_ORDER_MSG: {
-			std::cout << "Received Clear order:\n" << buf << "\n\n";
-
 			Order order;
-			if (msgParser_getOrderFromMessage(buf, &order) == false)
+			if (msgParser_getOrderFromMessage(messagebuffer, &order) == false)
 				continue;
 
-			if (orderManager_clearOrder(order, DONT_SEND_UPDATE))	
-				std::cout << "Order was cleared\n";
+			orderManager_clearOrder(order, DONT_SEND_UPDATE);	
+				
+			synchronizeLists(messagebuffer);
 
-			synchronizeLists(buf);
-			
 			break;
 		}
 
 		case ORDER_COST_REQUEST: {
-			std::cout << "Received Order cost request:\n" << buf << "\n\n";
-
 			int floor;
 			button_type_t direction; 
 
-
-			if (msgParser_getOrderCostRequestFromMessage(buf, &floor, &direction) == false)
+			if (msgParser_getOrderCostRequestFromMessage(messagebuffer, &floor, &direction) == false)
 				continue;
 
 			FSM_handleAuctionStarted(floor, direction);
@@ -97,23 +84,18 @@ void *listen(void*)
 		}
 
 		case ORDER_COST_REPLY: {
-			std::cout << "Received Order cost reply:\n" << buf << "\n\n";
-
 			Offer offer;
-			if (msgParser_getOfferFromMessage(buf, &offer))
+			if (msgParser_getOfferFromMessage(messagebuffer, &offer) == false)
 				continue;
-
+	
 			auction_addBid(offer);
 			break;
 	 	}
 		case ORDER_LIST_MSG:
-			std::cout << "Received list:\n" << buf << std::endl;
-			
-			synchronizeLists(buf);
+			synchronizeLists(messagebuffer);
 			break;
 
 		default:
-            std::cout << "Unknown message received:\n" << buf << std::endl;;
 			// Unknown message
             break;
 		}
