@@ -57,7 +57,7 @@ void *listen(void*)
 				std::cout << "Failed to obtain order from message\n";				
 				continue;
 			}
-			if (orderManager_addOrder(order))
+			if (orderManager_addOrder(order, DONT_SEND_UPDATE))
 				std::cout << "Order was added\n";
 
 			synchronizeLists(buf);
@@ -73,7 +73,7 @@ void *listen(void*)
 			if (msgParser_getOrderFromMessage(buf, &order) == false)
 				continue;
 
-			if (orderManager_clearOrder(order))	
+			if (orderManager_clearOrder(order, DONT_SEND_UPDATE))	
 				std::cout << "Order was cleared\n";
 
 			synchronizeLists(buf);
@@ -127,7 +127,7 @@ void *listen(void*)
 
 void synchronizeLists(std::string message)
 {
-	OrderList receivedOrderList;
+	/*OrderList receivedOrderList;
 	if (msgParser_getOrderListFromMessage(message, &receivedOrderList) == false)
 		return;
 
@@ -136,10 +136,10 @@ void synchronizeLists(std::string message)
 	if (!(orderManager_orderListEquals(receivedOrderList)))
 	{
 		std::cout << "OrderList is not equal!\n";
-		orderManager_mergeMyOrdersWith(receivedOrderList);
+		orderManager_mergeMyOrdersWith(receivedOrderList, DONT_SEND_UPDATE);
 		msgTool_sendOrderList(orderManager_getOrders(), udp_myIP());
 	}
-	
+	*/
 
 
 }

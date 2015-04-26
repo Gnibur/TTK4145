@@ -67,8 +67,7 @@ void *runAuction(void *args)
 	
 	order->assignedIP = bestOffer.fromIP;
 	
-	orderManager_addOrder(*order);
-	msgTool_sendNewOrder(*order, orderManager_getOrders(), udp_myIP());
+	orderManager_addOrder(*order, SEND_UPDATE);
 	stateMachine_eventNewOrderArrived(*order);
 	
 	

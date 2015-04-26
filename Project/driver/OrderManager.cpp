@@ -17,7 +17,7 @@ OrderList orderList;
 
 static pthread_mutex_t orderManagerMutex;
 
-static bool saveOrderList(std::string filename);
+static bool saveOrderList(std::string filename, OrderList order);
 static bool retrieveOrderList(std::string filename);
 
 void orderManager_recover()
@@ -30,7 +30,7 @@ void orderManager_recover()
 }
 
 
-bool saveOrderList(std::string filename)
+bool saveOrderList(std::string filename, OrderList orders)
 {
 	std::ofstream backupFile;
 
@@ -38,12 +38,8 @@ bool saveOrderList(std::string filename)
 
 	if (!backupFile.is_open())
 		return false;
-	
-	pthread_mutex_lock(&orderManagerMutex);
 
-	backupFile << msgParser_makeOrderListMsg(orderList, udp_myIP());	
-
-	pthread_mutex_unlock(&orderManagerMutex);
+	backupFile << msgParser_makeOrderListMsg(orders, udp_myIP());	
 
 	backupFile.close();
 
@@ -68,72 +64,143 @@ bool retrieveOrderList(std::string filename)
 }
 
 
-bool orderManager_addOrder(Order order)
+bool orderManager_addOrder(Order order, bool sendupdate)
 {
-	bool orderAdded = false;
-	pthread_mutex_lock(&orderManagerMutex);
-	std::vector<Order>::iterator search = std::find(orderList.begin(), orderList.end(), order);
+	bool transactionSucceeded = false;	
 	
-	if (search == orderList.end())
+	bool orderAddedToList = false;
+	bool orderAddedToStorage = false;
+
+	pthread_mutex_lock(&orderManagerMutex);
+	OrderList newOrderList = orderList;
+
+
+	OrderList::iterator search = std::find(newOrderList.begin(), newOrderList.end(), order);
+	
+	if (search == newOrderList.end())
 	{
 		order.timeAssigned = time(0);
-		orderList.push_back(order);
-		orderAdded = true;
+		newOrderList.push_back(order);
+		orderAddedToList = true;
+	}
+
+	if (saveOrderList("Backup1.txt", newOrderList) || saveOrderList("Backup2.txt", newOrderList))
+		orderAddedToStorage = true;
+
+	if (orderAddedToList && orderAddedToStorage)
+	{
+		orderList = newOrderList;
+
+
+		if (sendupdate == true){
+			std::string msg;
+			msg = msgParser_makeNewOrderMsg(order, newOrderList, udp_myIP());
+			udp_send(msg.c_str(), strlen(msg.c_str()) + 1);
+		}
+
+		if ((order.direction == BUTTON_COMMAND && order.assignedIP == udp_myIP()) || order.direction != BUTTON_COMMAND)
+			ioDriver_setOrderButtonLamp(order.direction, order.floor);
+		
+		transactionSucceeded = true;
+
+	}	
+
+	pthread_mutex_unlock(&orderManagerMutex);
+	return transactionSucceeded;
+
+}
+
+bool orderManager_clearOrder(Order order, bool sendupdate)
+{
+	bool transactionSucceeded = false;
+
+	bool orderClearedFromList = false;
+	bool orderClearedFromStorage = false;
+	
+
+	pthread_mutex_lock(&orderManagerMutex);
+	OrderList newOrderList = orderList;
+
+
+	OrderList::iterator search = std::find(newOrderList.begin(), newOrderList.end(), order);
+	
+	if (search != newOrderList.end())
+	{
+		newOrderList.erase(search);
+		orderClearedFromList = true;
+	}
+
+	if (saveOrderList("Backup1.txt", newOrderList) || saveOrderList("Backup2.txt", newOrderList))
+		orderClearedFromStorage = true;
+
+	if (orderClearedFromList && orderClearedFromStorage)
+	{
+		orderList = newOrderList;
+
+
+		if (sendupdate == true){
+			std::string msg;
+			msg = msgParser_makeClearOrderMsg(order, newOrderList, udp_myIP());
+			udp_send(msg.c_str(), strlen(msg.c_str()) + 1);
+		}
+
+		if ((order.direction == BUTTON_COMMAND && order.assignedIP == udp_myIP()) || order.direction != BUTTON_COMMAND)
+			ioDriver_clearOrderButtonLamp(order.direction, order.floor);
+
+		transactionSucceeded = true;
+	} 
+	pthread_mutex_unlock(&orderManagerMutex);
+	return transactionSucceeded;
+}
+
+bool orderManager_clearOrdersAt(int floor, std::string orderIP, bool sendupdate)
+{
+	bool transactionSucceeded = false;
+
+	bool ordersClearedFromList = false;
+	bool ordersClearedFromStorage = false;	
+	OrderList clearedOrders;
+
+
+	pthread_mutex_lock(&orderManagerMutex);
+	OrderList newOrderList = orderList;
+
+
+	OrderList::iterator search = newOrderList.begin();
+
+	while (search != newOrderList.end()){
+		if (search->floor == floor && search->assignedIP == orderIP){
+			clearedOrders.push_back(*search);
+			search = newOrderList.erase(search);
+			ordersClearedFromList = true;
+		} else
+			++search;
+	}	
+
+	if (saveOrderList("Backup1.txt", newOrderList) || saveOrderList("Backup2.txt", newOrderList))
+		ordersClearedFromStorage = true;
+
+	if (ordersClearedFromList && ordersClearedFromStorage)
+	{
+		orderList = newOrderList;
+
+		if (sendupdate == true){
+			std::string msg;
+			for (auto it = clearedOrders.begin(); it != clearedOrders.end(); ++it) 
+			{
+				msg = msgParser_makeClearOrderMsg(*it, newOrderList, orderIP);
+				udp_send(msg.c_str(), strlen(msg.c_str()) + 1);
+			}
+		}
+
+		for (auto it = clearedOrders.begin(); it != clearedOrders.end(); ++it) 
+			ioDriver_clearOrderButtonLamp(it->direction, it->floor);
+		
+		transactionSucceeded = true;
 	}
 
 	pthread_mutex_unlock(&orderManagerMutex);
-	
-	
-	if (!(saveOrderList("Backup1.txt") || saveOrderList("Backup2.txt")) )
-		return false;
-
-	if ((order.direction == BUTTON_COMMAND && order.assignedIP == udp_myIP()) || order.direction != BUTTON_COMMAND)
-		ioDriver_setOrderButtonLamp(order.direction, order.floor);
-
-	return orderAdded;
-}
-
-bool orderManager_clearOrder(Order order)
-{
-	bool orderCleared = false;
-	
-	pthread_mutex_lock(&orderManagerMutex);
-	std::vector<Order>::iterator search = std::find(orderList.begin(), orderList.end(), order);
-
-	if (search != orderList.end())
-	{
-		orderList.erase(search);
-		orderCleared = true;
-	}
-
-
-	pthread_mutex_unlock(&orderManagerMutex);
-	
-	if (!(saveOrderList("Backup1.txt") || saveOrderList("Backup2.txt")) )
-		return false;
-	
-	if ((order.direction == BUTTON_COMMAND && order.assignedIP == udp_myIP()) || (order.direction != BUTTON_COMMAND))
-		ioDriver_clearOrderButtonLamp(order.direction, order.floor);
-
-	return orderCleared;
-}
-
-OrderList orderManager_getOrders()
-{
-	return orderList;
-}
-
-OrderList orderManager_getOrdersOnFloor(int floor)
-{
-	pthread_mutex_lock(&orderManagerMutex);
-	OrderList returnList;
-	for (auto it = orderList.begin(); it != orderList.end(); ++it)
-	{
-		if (it->floor == floor && it->assignedIP == udp_myIP())
-			returnList.push_back(*it);
-	}
-	pthread_mutex_unlock(&orderManagerMutex);	
-	return returnList;
+	return transactionSucceeded;
 }
 
 
@@ -258,7 +325,7 @@ int orderManager_getCost(int lastFloor, int newFloor, motor_direction_t lastDire
 	return cost;
 }
 
-void orderManager_mergeMyOrdersWith(OrderList orders)
+void orderManager_mergeMyOrdersWith(OrderList orders, bool sendupdate)
 {
 	pthread_mutex_lock(&orderManagerMutex);
 	
@@ -274,10 +341,15 @@ void orderManager_mergeMyOrdersWith(OrderList orders)
 		}
 	}
 	msgTool_sendOrderList(orderList, udp_myIP());
+
+	if (sendupdate == true){
+
+
+	}
 	
 	pthread_mutex_unlock(&orderManagerMutex);	
 
-	if (!(saveOrderList("Backup1.txt") || saveOrderList("Backup2.txt")) )
+	if (!(saveOrderList("Backup1.txt", orderList) || saveOrderList("Backup2.txt", orderList)) )
 		std::cout << "Failed saving merged orders\n";
 }
 
