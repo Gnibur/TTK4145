@@ -15,10 +15,10 @@ int main()
 	printf("Backup has started!\n");
 	
 	while (1){
-		if (system("pidof -x heis") == 0){
-			printf("Heis was found\n");
+		if (system("pidof -x heis > /dev/null") == 0){
+			sleep(5);
 		} else { 
-			printf("Heis was not found\n");
+			printf("Detected that program crashed, restarting\n");
 			system("./heis");
 			break;
 		}
